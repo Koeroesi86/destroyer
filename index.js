@@ -1,40 +1,28 @@
-const {app, BrowserWindow, TouchBar} = require('electron')
-const {TouchBarLabel, TouchBarSpacer} = TouchBar
-const windowStateKeeper = require('electron-window-state')
+const { app, ipcMain } = require('electron')
+const { resolve } = require('path')
+const createWindow = require('./electron/createWindow')
+const createDatabase = require('./electron/createDatabase')
+const executeQuery = require('./electron/executeQuery')
+
+process.env.ELECTRON_ENABLE_LOGGING = '1'
+
+const argv = require('minimist')(process.argv.slice(2))
+
 let mainWindow
+let library
 
-const artist = new TouchBarLabel({textColor: '#5c43e8'})
-const track = new TouchBarLabel({textColor: '#555555'})
-const time = new TouchBarLabel({textColor: '#5c43e8'})
+const libraryLocation = resolve(__dirname, './database/library.sqlite')
 
-const touchBar = new TouchBar([
-  artist,
-  new TouchBarSpacer({size: 'small'}),
-  track,
-  new TouchBarSpacer({size: 'small'}),
-  time
-])
+let windowLocation = `file://${__dirname}/components/app/index.html`
 
-const createWindow = () => {
-  let mainWindowState = windowStateKeeper({
-    defaultWidth: 1200,
-    defaultHeight: 800
-  })
-  mainWindow = new BrowserWindow({
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height,
-    titleBarStyle: 'hidden',
-    darkTheme: true,
-    show: false,
-    webPreferences: {
-      backgroundThrottling: false
-    }
-  })
-  mainWindowState.manage(mainWindow)
-  mainWindow.loadURL(`file://${__dirname}/components/app/index.html`)
-  mainWindow.setTouchBar(touchBar)
+if (argv.webpackPort) {
+  windowLocation = `http://localhost:${argv.webpackPort}/index.html`
+}
+
+const initWindow = () => {
+  mainWindow = createWindow(app, windowLocation)
+  mainWindow.loadURL(windowLocation)
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
@@ -43,25 +31,42 @@ const createWindow = () => {
   })
 }
 
-app.on('ready', createWindow)
+createDatabase(libraryLocation)
+  .then(db => {
+    console.log(`Connected to library ${libraryLocation}`)
+    library = db
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    initWindow()
+
+    app.on('ready', initWindow)
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+    })
+
+    app.on('activate', () => {
+      if (mainWindow === null) {
+        initWindow()
+      }
+    })
+  })
+  .catch(msg => {
+    console.error(msg)
+    process.exit(1)
+  })
+
+ipcMain.on('APP_READY', () => {
+  mainWindow.openDevTools()
+
+  executeQuery(library, `SELECT * FROM folders ORDER BY path ASC`)
+    .then(folders => {
+      mainWindow && mainWindow.webContents.send('store-folders', { folders })
+    })
+
+  executeQuery(library, `SELECT * FROM library ORDER BY path ASC`)
+    .then(library => {
+      mainWindow && mainWindow.webContents.send('store-library', { library })
+    })
 })
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
-
-app.updateTouchBar = metadata => {
-  artist.label = metadata.artist
-  track.label = metadata.track
-}
-
-app.updateTouchBarTime = duration => {
-  time.label = duration
-}

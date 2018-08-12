@@ -7,17 +7,17 @@
   "scripts": {
     "clean": "rm -r bundle || true",
     "prebuild": "yarn run clean",
-    "build": "NODE_ENV=development webpack --progress",
-    "build:watch": "yarn run build -- --watch",
+    "postinstall-win": "npx electron-builder install-app-deps",
+    "dev": "node scripts/start.js",
+    "build": "webpack --progress --config config/webpack.config.base.js",
     "start": "electron index.js",
-    "pack:osx":
-      "rm -rf Destroyer-darwin-x64 && NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --platform=darwin --arch=x64 --icon=icons.icns --prune",
-    "pack:win":
-      "NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --out=dist/windows --platform=win32 --arch=x64 --overwrite --icon=icons.ico --prune"
+    "pack:osx": "rm -rf Destroyer-darwin-x64 && NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --platform=darwin --arch=x64 --icon=icons.icns --prune",
+    "pack:win": "cross-env NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --out=dist/windows --platform=win32 --arch=x64 --overwrite --icon=icons.ico --prune"
   },
   "author": "omar mashaal",
   "license": "ISC",
   "dependencies": {
+    "cross-env": "^5.2.0",
     "date-fns": "^1.28.2",
     "electron": "^1.6.5",
     "electron-window-state": "^4.1.0",
@@ -25,25 +25,30 @@
     "in-view": "^0.6.1",
     "key": "^0.1.11",
     "leftpad": "0.0.0",
+    "minimist": "^1.2.0",
     "musicmetadata": "^2.0.5",
+    "prop-types": "^15.6.2",
     "radium": "^0.18.2",
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-redux": "^5.0.7",
     "redux": "^3.6.0",
     "scroll-animator": "^1.1.0",
+    "sqlite3": "^4.0.2",
     "walk": "^2.3.9"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.1",
-    "babel-loader": "^6.4.1",
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "^6.24.0",
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-0": "^6.22.0",
+    "css-loader": "^1.0.0",
     "electron-packager": "^8.6.0",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^7.1.0",
@@ -54,15 +59,14 @@
     "exports-loader": "^0.6.4",
     "file-loader": "^0.11.0",
     "imports-loader": "^0.7.1",
+    "node-sass": "^4.9.3",
+    "react-dev-utils": "^5.0.1",
+    "sass-loader": "^7.1.0",
+    "static-site-generator-webpack-plugin": "^3.4.1",
+    "style-loader": "^0.22.1",
     "url-loader": "^0.5.8",
-    "webpack": "^2.3.2"
-  },
-  "babel": {
-    "presets": ["es2015", "stage-0", "react"],
-    "plugins": ["transform-runtime", "transform-decorators-legacy"]
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "extends": ["standard", "standard-react"]
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
   }
 }

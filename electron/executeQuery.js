@@ -1,0 +1,13 @@
+function executeQuery (db, query) {
+  return new Promise((resolve, reject) => {
+    db.all(query, [], (err, result) => {
+      if (err) {
+        reject(err.message)
+      } else {
+        resolve(result)
+      }
+    })
+  })
+}
+
+module.exports = executeQuery

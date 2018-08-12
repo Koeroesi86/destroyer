@@ -1,0 +1,45 @@
+$FontPath: './fonts/fonts';
+@import 'fonts/fonts';
+
+.PlayerHome {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  font-family: "Open Sans", sans-serif;
+  background: #333;
+  color: #efefef;
+
+  .mainPanel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .controls {
+    height: 100px;
+  }
+
+  .library {
+    flex-grow: 1;
+
+    .addItems {
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .fileInput {
+      display: none;
+    }
+  }
+
+  .nowPlaying {
+    width: 200px;
+  }
+}
