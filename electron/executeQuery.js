@@ -1,3 +1,4 @@
+/** return Promise */
 function executeQuery (db, query) {
   return new Promise((resolve, reject) => {
     db.all(query, [], (err, result) => {

@@ -2,7 +2,7 @@ const { app, ipcMain } = require('electron')
 const { resolve } = require('path')
 const createWindow = require('./electron/createWindow')
 const createDatabase = require('./electron/createDatabase')
-const executeQuery = require('./electron/executeQuery')
+const setupListeners = require('./electron/setupListeners')
 
 process.env.ELECTRON_ENABLE_LOGGING = '1'
 
@@ -37,6 +37,7 @@ createDatabase(libraryLocation)
     library = db
 
     initWindow()
+    setupListeners(db, mainWindow)
 
     app.on('ready', initWindow)
 
@@ -59,14 +60,4 @@ createDatabase(libraryLocation)
 
 ipcMain.on('APP_READY', () => {
   mainWindow.openDevTools()
-
-  executeQuery(library, `SELECT * FROM folders ORDER BY path ASC`)
-    .then(folders => {
-      mainWindow && mainWindow.webContents.send('store-folders', { folders })
-    })
-
-  executeQuery(library, `SELECT * FROM library ORDER BY path ASC`)
-    .then(library => {
-      mainWindow && mainWindow.webContents.send('store-library', { library })
-    })
 })

@@ -1,12 +1,4 @@
-CREATE TABLE IF NOT EXISTS library (
+CREATE TABLE IF NOT EXISTS folders (
   path TEXT PRIMARY KEY,
-  artist TEXT,
-  album TEXT,
-  title TEXT,
-  year TEXT,
-  track TEXT,
-  disk TEXT,
-  genre TEXT,
-  picture TEXT,
-  duration REAL
+  lastModified NUMERIC
 );

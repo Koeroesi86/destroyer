@@ -25,7 +25,8 @@ const createWindow = (app, windowLocation) => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    titleBarStyle: 'hidden',
+    // titleBarStyle: 'hidden',
+    frame: true,
     darkTheme: true,
     show: false,
     webPreferences: {
