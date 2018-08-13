@@ -37,7 +37,7 @@ createDatabase(libraryLocation)
     library = db
 
     initWindow()
-    setupListeners(db, mainWindow)
+    setupListeners(db)
 
     app.on('ready', initWindow)
 
