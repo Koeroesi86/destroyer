@@ -11,13 +11,14 @@ function addListeners (eventNames, store) {
   })
 }
 
-const middleware = store => {
-  const eventNames = [
-    'STORE_FOLDERS',
-    'STORE_LIBRARY',
-    'FOLDERS_ADDED_TO_LIBRARY'
-  ]
+const eventNames = [
+  'STORE_FOLDERS',
+  'STORE_LIBRARY',
+  'FOLDERS_ADDED_TO_LIBRARY',
+  'TRACKS_ADDED_TO_LIBRARY'
+]
 
+const middleware = store => {
   addListeners(eventNames, store)
 
   ipcRenderer.send('APP_READY', 'Ready to receive')

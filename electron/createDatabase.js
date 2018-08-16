@@ -7,12 +7,13 @@ const migrations = fs.readdirSync(
   path.resolve(__dirname, '../database/migrations'),
   'utf8'
 )
-const createQueries = migrations.map(migration => (
-  fs.readFileSync(
+const createQueries = migrations.map(migration => ({
+  query: fs.readFileSync(
     path.resolve(__dirname, `../database/migrations/${migration}`),
     'utf8'
-  )
-))
+  ),
+  variables: []
+}))
 
 const createDatabase = databaseLocation => new Promise((resolve, reject) => {
   let db = new sqlite3.Database(databaseLocation, err => {

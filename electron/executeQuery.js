@@ -1,7 +1,7 @@
 /** return Promise */
 function executeQuery (db, query) {
   return new Promise((resolve, reject) => {
-    db.all(query, [], (err, result) => {
+    db.all(query.query, query.variables, (err, result) => {
       if (err) {
         reject(err.message)
       } else {
