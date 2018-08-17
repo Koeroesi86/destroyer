@@ -1,9 +1,9 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import connectionMiddleware from './redux/connection/middleware'
+import reducers from './redux/reducers'
 
 const initialState = {}
 
-const reducers = (state, action) => state
 const middlewares = [
   connectionMiddleware
 ]

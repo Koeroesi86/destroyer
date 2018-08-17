@@ -1,14 +1,13 @@
-const walk = require('walk')
+const { walk } = require('walk')
 const musicMetadata = require('musicmetadata')
 const fs = require('fs')
 const dateFns = require('date-fns')
 
 /** @returns {Promise} */
 function scanFolder (currentPath) {
-  const tracks = []
   return new Promise((resolve, reject) => {
-    // console.log('currentPath', currentPath)
-    const directory = walk.walk(currentPath, { followLinks: false })
+    const tracks = []
+    const directory = walk(currentPath, { followLinks: false })
     directory.on('file', (root, fileStats, next) => {
       let fileName = root + '/' + fileStats.name
       if (
@@ -30,11 +29,11 @@ function scanFolder (currentPath) {
               Number(
                 dateFns.format(new Date(fileStats.ctime), 'YYYYMMDDmm')
               ) * -1
+            if (metadata.picture.length > 0) {
+              const picture = metadata.picture[0]
+              metadata.picture = `data:image/${picture.format};base64, ${picture.data.toString('base64')}`
+            }
             tracks.push(metadata)
-            // store.dispatch({
-            //   type: 'SCANNING',
-            //   message: 'SCANNING: ' + metadata.artist + ' - ' + metadata.album
-            // })
             readStream.close()
           }
         })
@@ -42,12 +41,6 @@ function scanFolder (currentPath) {
           // next()
         })
       }
-      // else if (
-      //   fileStats.name.indexOf('.jpg') > 0 ||
-      //   fileStats.name.indexOf('.png') > 0
-      // ) {
-      //   this.covers.push(fileName)
-      // }
       next()
     })
     directory.on('end', () => {

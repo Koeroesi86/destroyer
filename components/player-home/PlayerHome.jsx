@@ -44,21 +44,55 @@ export default class PlayerHome extends Component {
             Controls
           </div>
           <div className={style.library}>
-            <div
-              className={style.addItems}
-              onClick={() => { this.upload.click() }}
-            >
-              Drop music collection here
-              <input
-                type='file'
-                ref={ref => { this.upload = ref }}
-                className={style.fileInput}
-                multiple
-                onChange={this.handleFileChange}
-              />
+            <div className={style.manageLibrary}>
+              <div className={style.sectionTitle}>
+                Folders
+              </div>
+              <div className={style.folders}>
+                {this.props.folders.map(folder => (
+                  <div
+                    key={folder.path}
+                    title={folder.lastModified}
+                    className={style.folder}
+                  >
+                    {folder.path}
+                  </div>
+                ))}
+                <div
+                  className={style.addItems}
+                  onClick={() => { this.upload.click() }}
+                >
+                  Drop music folders here
+                  <input
+                    type='file'
+                    ref={ref => { this.upload = ref }}
+                    className={style.fileInput}
+                    multiple
+                    onChange={this.handleFileChange}
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              Library placeholder
+            <div className={style.collection}>
+              {this.props.library.length === 0 && (
+                <div>Library placeholder</div>
+              )}
+              {this.props.library.map(track => (
+                <div key={track.path} className={style.album}>
+                  <div
+                    title={track.album}
+                    className={style.cover}
+                    style={{
+                      backgroundImage: track.picture ? `url("${track.picture}")` : ''
+                    }}
+                  />
+                  <div className={style.meta}>
+                    <div>{track.artist}</div>
+                    <div>{track.album}</div>
+                    <div>{track.title}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -71,9 +105,29 @@ export default class PlayerHome extends Component {
 }
 
 PlayerHome.defaultProps = {
-  addFiles: () => {}
+  addFiles: () => {},
+  folders: [],
+  library: []
 }
 
 PlayerHome.propTypes = {
-  addFiles: PropTypes.func
+  addFiles: PropTypes.func,
+  folders: PropTypes.arrayOf(
+    PropTypes.shape({
+      lastModified: PropTypes.number,
+      path: PropTypes.string
+    })
+  ),
+  library: PropTypes.arrayOf(PropTypes.shape({
+    album: PropTypes.string,
+    artist: PropTypes.string,
+    disk: PropTypes.string,
+    duration: PropTypes.number,
+    genre: PropTypes.string,
+    path: PropTypes.string,
+    picture: PropTypes.string,
+    title: PropTypes.string,
+    track: PropTypes.string,
+    year: PropTypes.string
+  }))
 }

@@ -3,6 +3,7 @@ const fs = require('fs')
 const executeQuery = require('./executeQuery')
 const executeQueries = require('./executeQueries')
 const scanFolder = require('./scanFolder')
+const addTrack = require('./addTrack')
 
 function setupListeners (database) {
   ipcMain.on('APP_READY', (event) => {
@@ -33,39 +34,28 @@ function setupListeners (database) {
       .then(() => {
         event.sender.send('FOLDERS_ADDED_TO_LIBRARY', { folders })
 
+        let tracks = []
         const addedToLibrary = folders.map(folder => {
           return new Promise((resolve, reject) => {
             scanFolder(folder.path)
-              .then(tracks => {
-                // console.log('scanFolder', tracks.length)
-                const trackQueries = tracks.map(track => executeQuery(database, {
-                  query: `INSERT OR REPLACE INTO library (path, artist, album, title, year, track, disk, genre, picture, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                  variables: [
-                    track.path,
-                    track.artist,
-                    track.album,
-                    track.title,
-                    track.year,
-                    track.track,
-                    track.disk,
-                    track.genre,
-                    track.picture,
-                    track.duration
-                  ]
-                }))
+              .then(folderTracks => {
+                const trackQueries = folderTracks.map(folderTrack => {
+                  return addTrack(database, folderTrack)
+                    .then(() => {
+                      tracks.push(folderTrack)
+                      return Promise.resolve()
+                    })
+                })
 
-                Promise.all(trackQueries)
-                  .then(() => resolve(...tracks))
-                  .catch(msg => reject(msg))
+                Promise.all(trackQueries).then(() => resolve())
               })
               .catch(msg => reject(msg))
           })
         })
 
         Promise.all(addedToLibrary)
-          .then((...tracks) => {
-            // console.log('tracks', tracks.length)
-            // event.sender.send('TRACKS_ADDED_TO_LIBRARY', { tracks })
+          .then(() => {
+            event.sender.send('TRACKS_ADDED_TO_LIBRARY', { tracks })
           })
       })
       .catch(e => console.error(e))
