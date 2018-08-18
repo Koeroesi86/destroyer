@@ -24,7 +24,7 @@ const middleware = store => {
   ipcRenderer.send('APP_READY', 'Ready to receive')
 
   return next => action => {
-    console.log(action.type, action.payload)
+    if (action.type !== 'SET_CURRENT_TIME') console.log(action.type, action.payload)
 
     if (action.type === 'FILES_ADDED') {
       /** @var {FileList} fileList */

@@ -1,27 +1,31 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faVolumeUp, faVolumeDown } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
+import AlbumView from '../album-view'
+import TrackView from '../track-view'
+import Slider from '../slider/Slider'
 // import Fuzz from '../fuzz'
+
+export function formatTime (seconds) {
+  return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
+}
 
 export default class PlayerHome extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      duration: 1,
-      currentTime: 0,
-      volume: 0.5,
-      albums: {},
-      currentSong: {},
-      nowPlaying: []
+      albums: {}
     }
 
     this.handleDrop = this.handleDrop.bind(this)
     this.handleFileChange = this.handleFileChange.bind(this)
     this.playTrack = this.playTrack.bind(this)
+    this.playAlbum = this.playAlbum.bind(this)
     this.play = this.play.bind(this)
     this.pause = this.pause.bind(this)
   }
@@ -33,7 +37,37 @@ export default class PlayerHome extends Component {
     }
 
     if (this.audio) {
-      this.audio.volume = this.state.volume
+      this.setVolume()
+    }
+
+    this.seekTo(this.props.currentTime)
+
+    this.timer = setInterval(() => {
+      if (this.audio.currentTime !== this.props.currentTime) {
+        this.props.setCurrentTime(this.audio.currentTime)
+      }
+    }, 1000 / this.props.currentTimeFPS)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.timer)
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.currentSong !== this.props.currentSong) {
+      if (this.props.currentSong) {
+        this.playTrack(this.props.currentSong)
+      } else {
+        this.pause()
+      }
+    }
+
+    if (prevProps.volume !== this.props.volume) {
+      this.setVolume()
+    }
+
+    if (prevProps.currentTime !== this.props.currentTime) {
+      this.seekTo(this.props.currentTime)
     }
   }
 
@@ -55,13 +89,10 @@ export default class PlayerHome extends Component {
   playTrack (track) {
     this.audio.src = track.path
     this.audio.play()
-    this.setState({ currentSong: track })
   }
 
   playAlbum (album) {
     this.props.playTracks(album.tracks)
-    this.playTrack(album.tracks[0])
-    this.setState({ nowPlaying: album.tracks })
   }
 
   play () {
@@ -72,30 +103,18 @@ export default class PlayerHome extends Component {
     this.audio.pause()
   }
 
-  setVolume (volume) {
-    this.audio.volume = volume
-    this.setState({ volume })
-  }
-
-  onTimeUpdate (currentTime) {
-    this.setState({ currentTime })
-  }
-
-  onDurationChange (duration) {
-    this.setState({ duration })
-  }
-
   seekTo (currentTime) {
-    this.setState({ currentTime }, () => {
+    if (this.audio.currentTime !== currentTime) {
       this.audio.currentTime = currentTime
-    })
+    }
   }
 
-  formatTime (seconds) {
-    return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
+  setVolume () {
+    this.audio.volume = this.props.volume
   }
 
   render () {
+    const { currentSong, currentTime, setCurrentTime, setVolume, volume, folders, view, nowPlaying } = this.props
     return (
       <div
         className={style.PlayerHome}
@@ -104,24 +123,14 @@ export default class PlayerHome extends Component {
       >
         <div className={style.mainPanel}>
           <div className={style.controls}>
-            <div className={style.seekSliderContainer}>
-              <input
-                type='range'
-                step={0.01}
-                min={0}
-                max={this.state.duration}
-                value={this.state.currentTime}
-                className={style.seekSlider}
-                onInput={e => { this.seekTo(e.target.value) }}
-                onChange={() => {}}
-              />
-              <div
-                className={style.lowerFill}
-                style={{ width: `${(this.state.currentTime / this.state.duration) * 100}%` }}
-              >
-                &nbsp;
-              </div>
-            </div>
+            <Slider
+              min={0}
+              max={currentSong ? currentSong.duration : 0}
+              step={0.0001}
+              value={currentTime}
+              onInput={e => { setCurrentTime(e.target.value) }}
+              onChange={() => {}}
+            />
             <div className={style.mainControlContainer}>
               <button
                 onClick={this.play}
@@ -138,43 +147,49 @@ export default class PlayerHome extends Component {
               <div className={style.volume}>
                 <div
                   className={style.volumeIcon}
-                  onClick={() => { this.setVolume(0) }}
+                  onClick={() => { setVolume(0) }}
                 >
                   <FontAwesomeIcon icon={faVolumeDown} size='sm' />
                 </div>
-                <div className={style.volumeSliderContainer}>
-                  <input
-                    type='range'
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={this.state.volume}
-                    className={style.volumeSlider}
-                    onInput={e => { this.setVolume(e.target.value) }}
-                    onChange={() => {}}
-                  />
-                  <div
-                    className={style.lowerFill}
-                    style={{ width: `${this.state.volume * 100}%` }}
-                  >
-                    &nbsp;
-                  </div>
-                </div>
+                <Slider
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onInput={e => { setVolume(e.target.value) }}
+                  onChange={() => {}}
+                />
                 <div
                   className={style.volumeIcon}
-                  onClick={() => { this.setVolume(1) }}
+                  onClick={() => { this.props.setVolume(1) }}
                 >
                   <FontAwesomeIcon icon={faVolumeUp} size='sm' />
                 </div>
               </div>
-              <div className={style.time}>
-                {this.formatTime(this.state.currentTime)} / {this.formatTime(this.state.duration)}
-              </div>
+              {currentSong && (
+                <div className={style.meta}>
+                  {currentSong.picture && (
+                    <div
+                      className={style.picture}
+                      style={{ backgroundImage: `url("${currentSong.picture}")` }}
+                    />
+                  )}
+                  <div className={style.artist}>{currentSong.artist}</div>
+                  <div className={style.separator}>//</div>
+                  <div className={style.album}>{currentSong.album}</div>
+                  <div className={style.separator}>//</div>
+                  <div className={style.title}>{currentSong.title}</div>
+                </div>
+              )}
+              {currentSong && (
+                <div className={style.time}>
+                  {formatTime(currentTime)} / {formatTime(currentSong.duration)}
+                </div>
+              )}
             </div>
             <audio
               ref={a => { this.audio = a }}
-              onTimeUpdate={e => { this.onTimeUpdate(e.target.currentTime) }}
-              onDurationChange={e => { this.onDurationChange(e.target.duration) }}
+              onEnded={() => { this.props.trackEnded() }}
             />
           </div>
           <div className={style.library}>
@@ -183,11 +198,11 @@ export default class PlayerHome extends Component {
                 Folders
               </div>
               <div className={style.folders}>
-                {this.props.folders.map(folder => (
+                {folders.map(folder => (
                   <div
                     key={folder.path}
-                    title={folder.lastModified}
                     className={style.folder}
+                    title={folder.path}
                   >
                     {folder.path}
                   </div>
@@ -208,44 +223,62 @@ export default class PlayerHome extends Component {
               </div>
             </div>
             <div className={style.collection}>
-              {this.props.library.length === 0 && (
+              {this.props.tracks.length === 0 && (
                 <div>Library placeholder</div>
               )}
-              {this.props.albums.map(album => (
+              <div className={style.viewControls}>
                 <div
-                  key={album.id}
-                  className={style.album}
-                  onDoubleClick={() => this.playAlbum(album)}
-                  onTouchEnd={() => this.playAlbum(album)}
+                  className={classNames(style.view, {
+                    [style.current]: view === 'albums'
+                  })}
+                  onClick={() => this.props.setView('albums')}
                 >
-                  <div
-                    title={album.title}
-                    className={style.cover}
-                    style={{
-                      backgroundImage: album.cover ? `url("${album.cover}")` : ''
-                    }}
-                  />
-                  <div className={style.meta}>
-                    <div className={style.metaData}>{album.artist}</div>
-                    <div className={style.metaData}>{album.title}</div>
-                    <div className={style.metaData}>{this.formatTime(album.duration)}</div>
-                    <div
-                      className={style.metaData}
-                      onClick={() => this.playAlbum(album)}
-                    >Play</div>
-                  </div>
+                  Albums
                 </div>
-                ))}
+                <div
+                  className={classNames(style.view, {
+                    [style.current]: view === 'tracks'
+                  })}
+                  onClick={() => this.props.setView('tracks')}
+                >
+                  Songs
+                </div>
+              </div>
+              <div className={style.viewPanels}>
+                <div className={classNames(style.albums, {
+                  [style.active]: view === 'albums'
+                })}>
+                  <AlbumView
+                    albums={this.props.albums}
+                    playAlbum={this.playAlbum}
+                  />
+                </div>
+                <div className={classNames(style.albums, {
+                  [style.active]: view === 'tracks'
+                })}>
+                  <TrackView />
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div className={style.nowPlaying}>
-          Now playing
-          {this.state.nowPlaying.map(track => (
-            <div key={track.path}>
-              {track.title}
-            </div>
-          ))}
+          <div className={style.header}>Now playing</div>
+          <div className={style.tracks}>
+            {nowPlaying.map(track => (
+              <div
+                key={track.path}
+                className={classNames(style.track, {
+                  [style.current]: currentSong && track.path === currentSong.path
+                })}
+                onDoubleClick={() => this.props.playTrack(track)}
+                title={`${track.track ? track.track + ' - ' : ''}${track.title}`}
+                >
+                {track.track && track.track + ' - '}
+                {track.title}
+              </div>
+              ))}
+          </div>
         </div>
       </div>
     )
@@ -253,14 +286,24 @@ export default class PlayerHome extends Component {
 }
 
 PlayerHome.defaultProps = {
+  view: 'albums',
   addFiles: () => {},
+  playTrack: () => {},
+  trackEnded: () => {},
   playTracks: () => {},
+  setView: () => {},
+  setCurrentTime: () => {},
   folders: [],
   albums: [],
-  library: []
+  tracks: [],
+  currentSong: null,
+  currentTime: 0,
+  currentTimeFPS: 100,
+  volume: 0.5,
+  setVolume: () => {}
 }
 
-export const trackType = PropTypes.shape({
+export const trackType = {
   album: PropTypes.string,
   artist: PropTypes.string,
   disk: PropTypes.string,
@@ -271,19 +314,28 @@ export const trackType = PropTypes.shape({
   title: PropTypes.string,
   track: PropTypes.string,
   year: PropTypes.string
-})
+}
 
 PlayerHome.propTypes = {
+  view: PropTypes.string,
   addFiles: PropTypes.func,
+  playTrack: PropTypes.func,
+  trackEnded: PropTypes.func,
   playTracks: PropTypes.func,
+  volume: PropTypes.number,
+  setVolume: PropTypes.func,
+  setView: PropTypes.func,
+  setCurrentTime: PropTypes.func,
+  currentTimeFPS: PropTypes.number,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,
       path: PropTypes.string
     })
   ),
-  currentSong: trackType,
-  nowPlaying: PropTypes.arrayOf(trackType),
+  currentSong: PropTypes.shape(trackType),
+  currentTime: PropTypes.number,
+  nowPlaying: PropTypes.arrayOf(PropTypes.shape(trackType)),
   albums: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string,
@@ -292,8 +344,8 @@ PlayerHome.propTypes = {
       cover: PropTypes.string,
       duration: PropTypes.number,
       year: PropTypes.string,
-      tracks: PropTypes.arrayOf(trackType)
+      tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
     })
   ),
-  library: PropTypes.arrayOf(trackType)
+  tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
 }

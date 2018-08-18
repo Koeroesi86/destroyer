@@ -1,0 +1,105 @@
+.tracks {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px;
+
+  .controls {
+    position: absolute;
+    bottom: 0;
+    right: 20px;
+    padding: 12px;
+
+    button {
+      position: relative;
+      display: inline-block;
+      border-radius: 0;
+      line-height: 24px;
+      padding: 0 12px;
+      margin-left: -1px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #ccc;
+      background: rgba(239, 239, 239, 0.25);
+      border: 1px solid #a7a7a7;
+      transition: all .2s ease-in-out;
+
+      &:hover {
+        border-color: #fff;
+        z-index: 1;
+      }
+    }
+  }
+
+  .listing {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+
+  .track {
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    transition: all .2s ease-in-out;
+
+    &:not(.header) {
+      cursor: pointer;
+    }
+
+    &.header {
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 3px 0;
+    }
+
+    &.selected {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.current {
+      font-weight: 600;
+    }
+
+    .field {
+      padding-right: 12px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.duration {
+        width: 70px;
+        padding-left: 6px;
+      }
+
+      &.artist {
+        width: 150px;
+      }
+
+      &.year {
+        width: 50px;
+      }
+
+      &.album {
+        width: 150px;
+      }
+
+      &.trackNo {
+        width: 25px;
+        text-align: right;
+      }
+
+      &.title {
+        flex-grow: 1;
+      }
+    }
+  }
+}
