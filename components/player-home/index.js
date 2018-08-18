@@ -2,7 +2,8 @@ import connect from 'react-redux/es/connect/connect'
 import PlayerHome from './PlayerHome.jsx'
 
 const mapState = state => ({
-  library: state.library,
+  library: state.library.tracks,
+  albums: state.library.albums,
   folders: state.folders
 })
 const mapDispatch = dispatch => ({

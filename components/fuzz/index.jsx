@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
-const paper = require('paper/dist/paper-full')
+// import paper from 'paper'
 
 export default class Fuzz extends Component {
-  componentDidMount() {
-    paper.install(window)
-    paper.setup('oscilloscope')
-    this.canvas = document.getElementById('oscilloscope')
-    this.canvas.width = window.innerWidth
-    this.canvas.height = window.innerHeight
+  componentDidMount () {
+    // paper.install(window)
+    // paper.setup('oscilloscope')
+    // this.canvas = document.getElementById('oscilloscope')
+    // this.canvas.width = window.innerWidth
+    // this.canvas.height = window.innerHeight
     this.path = new Path()
     this.path.smooth()
     this.path.strokeColor = 'rgba(92, 67, 232, 1)'
@@ -16,7 +15,7 @@ export default class Fuzz extends Component {
 
     this.context = new window.AudioContext()
     this.source = this.context.createMediaElementSource(
-      document.getElementById('xxx')
+      this.props.audio
     )
     this.analyser = this.context.createAnalyser()
     this.analyser.fftSize = 64
@@ -28,7 +27,7 @@ export default class Fuzz extends Component {
     this.analyser.connect(this.context.destination)
     this.draw()
   }
-  draw = () => {
+  draw () {
     requestAnimationFrame(this.draw)
     if (window.throttle) return
     window.throttle = true
@@ -55,12 +54,13 @@ export default class Fuzz extends Component {
 
     window.view.draw()
   }
-  render() {
+  render () {
     return (
       <canvas
-        id="oscilloscope"
-        height="100%"
-        width="100%"
+        ref={o => { this.canvas = o }}
+        id='oscilloscope'
+        height='100%'
+        width='100%'
         style={{
           opacity: 0.8,
           width: '100%',

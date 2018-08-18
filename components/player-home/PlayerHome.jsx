@@ -4,6 +4,7 @@ import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faVolumeUp, faVolumeDown } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
+// import Fuzz from '../fuzz'
 
 export default class PlayerHome extends Component {
   constructor (props) {
@@ -12,7 +13,10 @@ export default class PlayerHome extends Component {
     this.state = {
       duration: 1,
       currentTime: 0,
-      volume: 0.5
+      volume: 0.5,
+      albums: {},
+      currentSong: {},
+      nowPlaying: []
     }
 
     this.handleDrop = this.handleDrop.bind(this)
@@ -33,10 +37,6 @@ export default class PlayerHome extends Component {
     }
   }
 
-  componentDidUpdate () {
-    //
-  }
-
   handleDrop (event) {
     event.preventDefault()
     event.stopPropagation()
@@ -53,9 +53,15 @@ export default class PlayerHome extends Component {
   }
 
   playTrack (track) {
-    this.props.playTrack(track)
     this.audio.src = track.path
     this.audio.play()
+    this.setState({ currentSong: track })
+  }
+
+  playAlbum (album) {
+    this.props.playTracks(album.tracks)
+    this.playTrack(album.tracks[0])
+    this.setState({ nowPlaying: album.tracks })
   }
 
   play () {
@@ -79,14 +85,13 @@ export default class PlayerHome extends Component {
     this.setState({ duration })
   }
 
-  seekTo(currentTime) {
+  seekTo (currentTime) {
     this.setState({ currentTime }, () => {
       this.audio.currentTime = currentTime
     })
   }
 
   formatTime (seconds) {
-    // return moment(seconds, 's', true).format('HH:mm:ss')
     return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
   }
 
@@ -206,32 +211,41 @@ export default class PlayerHome extends Component {
               {this.props.library.length === 0 && (
                 <div>Library placeholder</div>
               )}
-              {this.props.library.map(track => (
+              {this.props.albums.map(album => (
                 <div
-                  key={track.path}
+                  key={album.id}
                   className={style.album}
-                  onDoubleClick={() => this.playTrack(track)}
-                  onTouchEnd={() => this.playTrack(track)}
+                  onDoubleClick={() => this.playAlbum(album)}
+                  onTouchEnd={() => this.playAlbum(album)}
                 >
                   <div
-                    title={track.album}
+                    title={album.title}
                     className={style.cover}
                     style={{
-                      backgroundImage: track.picture ? `url("${track.picture}")` : ''
+                      backgroundImage: album.cover ? `url("${album.cover}")` : ''
                     }}
                   />
                   <div className={style.meta}>
-                    <div>{track.artist}</div>
-                    <div>{track.album}</div>
-                    <div>{track.title}</div>
+                    <div className={style.metaData}>{album.artist}</div>
+                    <div className={style.metaData}>{album.title}</div>
+                    <div className={style.metaData}>{this.formatTime(album.duration)}</div>
+                    <div
+                      className={style.metaData}
+                      onClick={() => this.playAlbum(album)}
+                    >Play</div>
                   </div>
                 </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
         <div className={style.nowPlaying}>
           Now playing
+          {this.state.nowPlaying.map(track => (
+            <div key={track.path}>
+              {track.title}
+            </div>
+          ))}
         </div>
       </div>
     )
@@ -240,30 +254,46 @@ export default class PlayerHome extends Component {
 
 PlayerHome.defaultProps = {
   addFiles: () => {},
-  playTrack: () => {},
+  playTracks: () => {},
   folders: [],
+  albums: [],
   library: []
 }
 
+export const trackType = PropTypes.shape({
+  album: PropTypes.string,
+  artist: PropTypes.string,
+  disk: PropTypes.string,
+  duration: PropTypes.number,
+  genre: PropTypes.string,
+  path: PropTypes.string,
+  picture: PropTypes.string,
+  title: PropTypes.string,
+  track: PropTypes.string,
+  year: PropTypes.string
+})
+
 PlayerHome.propTypes = {
   addFiles: PropTypes.func,
-  playTrack: PropTypes.func,
+  playTracks: PropTypes.func,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,
       path: PropTypes.string
     })
   ),
-  library: PropTypes.arrayOf(PropTypes.shape({
-    album: PropTypes.string,
-    artist: PropTypes.string,
-    disk: PropTypes.string,
-    duration: PropTypes.number,
-    genre: PropTypes.string,
-    path: PropTypes.string,
-    picture: PropTypes.string,
-    title: PropTypes.string,
-    track: PropTypes.string,
-    year: PropTypes.string
-  }))
+  currentSong: trackType,
+  nowPlaying: PropTypes.arrayOf(trackType),
+  albums: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      title: PropTypes.string,
+      artist: PropTypes.string,
+      cover: PropTypes.string,
+      duration: PropTypes.number,
+      year: PropTypes.string,
+      tracks: PropTypes.arrayOf(trackType)
+    })
+  ),
+  library: PropTypes.arrayOf(trackType)
 }
