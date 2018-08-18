@@ -15,7 +15,7 @@ const touchBar = new TouchBar([
   time
 ])
 
-const createWindow = (app, windowLocation) => {
+const createWindow = (app) => {
   let mainWindowState = windowStateKeeper({
     defaultWidth: 1200,
     defaultHeight: 800
@@ -25,12 +25,12 @@ const createWindow = (app, windowLocation) => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    // titleBarStyle: 'hidden',
     frame: true,
     darkTheme: true,
     show: false,
     webPreferences: {
-      backgroundThrottling: false
+      backgroundThrottling: false,
+      webSecurity: false
     }
   })
   mainWindowState.manage(mainWindow)

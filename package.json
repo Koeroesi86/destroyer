@@ -17,6 +17,9 @@
   "author": "omar mashaal",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.2",
+    "@fortawesome/free-solid-svg-icons": "^5.2.0",
+    "@fortawesome/react-fontawesome": "^0.1.2",
     "cross-env": "^5.2.0",
     "date-fns": "^1.28.2",
     "electron": "^1.6.5",
@@ -26,6 +29,7 @@
     "key": "^0.1.11",
     "leftpad": "0.0.0",
     "minimist": "^1.2.0",
+    "moment": "^2.22.2",
     "musicmetadata": "^2.0.5",
     "prop-types": "^15.6.2",
     "radium": "^0.18.2",
