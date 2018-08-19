@@ -3,12 +3,13 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faVolumeUp, faVolumeDown } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faPause, faVolumeUp, faVolumeDown, faSignal } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
 import AlbumView from '../album-view'
 import TrackView from '../track-view'
 import Slider from '../slider/Slider'
 import AlbumDetails from '../album-details'
+import Equalizer from '../equalizer'
 // import Fuzz from '../fuzz'
 
 export function formatTime (seconds) {
@@ -20,13 +21,13 @@ export default class PlayerHome extends Component {
     super(props)
 
     this.state = {
-      albums: {}
+      audioSource: null,
+      audioContext: new AudioContext()
     }
 
     this.handleDrop = this.handleDrop.bind(this)
     this.handleFileChange = this.handleFileChange.bind(this)
     this.playTrack = this.playTrack.bind(this)
-    this.playAlbum = this.playAlbum.bind(this)
     this.play = this.play.bind(this)
     this.pause = this.pause.bind(this)
   }
@@ -39,6 +40,9 @@ export default class PlayerHome extends Component {
 
     if (this.audio) {
       this.setVolume()
+      this.setState({
+        audioSource: this.state.audioContext.createMediaElementSource(this.audio)
+      })
     }
 
     this.seekTo(this.props.currentTime)
@@ -89,11 +93,7 @@ export default class PlayerHome extends Component {
 
   playTrack (track) {
     this.audio.src = track.path
-    this.audio.play()
-  }
-
-  playAlbum (album) {
-    this.props.playTracks(album.tracks)
+    this.play()
   }
 
   play () {
@@ -144,6 +144,12 @@ export default class PlayerHome extends Component {
                 className={style.mainControlButton}
               >
                 <FontAwesomeIcon icon={faPause} size='sm' />
+              </button>
+              <button
+                onClick={this.props.openEqualizer}
+                className={style.mainControlButton}
+              >
+                <FontAwesomeIcon icon={faSignal} size='sm' />
               </button>
               <div className={style.volume}>
                 <div
@@ -254,10 +260,7 @@ export default class PlayerHome extends Component {
                 <div className={classNames(style.albums, {
                   [style.active]: view === 'albums'
                 })}>
-                  <AlbumView
-                    albums={this.props.albums}
-                    playAlbum={this.playAlbum}
-                  />
+                  <AlbumView />
                 </div>
                 <div className={classNames(style.albums, {
                   [style.active]: view === 'tracks'
@@ -287,6 +290,10 @@ export default class PlayerHome extends Component {
           </div>
         </div>
         <AlbumDetails />
+        <Equalizer
+          source={this.state.audioSource}
+          context={this.state.audioContext}
+        />
       </div>
     )
   }
@@ -297,11 +304,10 @@ PlayerHome.defaultProps = {
   addFiles: () => {},
   playTrack: () => {},
   trackEnded: () => {},
-  playTracks: () => {},
+  openEqualizer: () => {},
   setView: () => {},
   setCurrentTime: () => {},
   folders: [],
-  albums: [],
   tracks: [],
   currentSong: null,
   currentTime: 0,
@@ -329,7 +335,7 @@ PlayerHome.propTypes = {
   addFiles: PropTypes.func,
   playTrack: PropTypes.func,
   trackEnded: PropTypes.func,
-  playTracks: PropTypes.func,
+  openEqualizer: PropTypes.func,
   rescanLibrary: PropTypes.func,
   volume: PropTypes.number,
   setVolume: PropTypes.func,
@@ -345,16 +351,5 @@ PlayerHome.propTypes = {
   currentSong: PropTypes.shape(trackType),
   currentTime: PropTypes.number,
   nowPlaying: PropTypes.arrayOf(PropTypes.shape(trackType)),
-  albums: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      title: PropTypes.string,
-      artist: PropTypes.string,
-      cover: PropTypes.string,
-      duration: PropTypes.number,
-      year: PropTypes.string,
-      tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
-    })
-  ),
   tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
 }

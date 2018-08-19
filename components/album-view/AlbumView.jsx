@@ -6,7 +6,7 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons'
 import style from './AlbumView.scss'
 import { formatTime } from '../player-home/PlayerHome'
 
-function AlbumView ({ albums, playAlbum, selectAlbum }) {
+function AlbumView ({ albums, playTracks, selectAlbum }) {
   return (
     <div className={style.albums}>
       {albums.map(album => (
@@ -14,8 +14,8 @@ function AlbumView ({ albums, playAlbum, selectAlbum }) {
           key={album.id}
           className={style.album}
           onClick={() => selectAlbum(album)}
-          onDoubleClick={() => playAlbum(album)}
-          onTouchEnd={() => playAlbum(album)}
+          onDoubleClick={() => playTracks(album.tracks)}
+          onTouchEnd={() => playTracks(album.tracks)}
         >
           <div
             title={album.title}
@@ -30,7 +30,10 @@ function AlbumView ({ albums, playAlbum, selectAlbum }) {
             <div className={style.metaData}>{formatTime(album.duration)}</div>
             <div
               className={classNames(style.metaData, style.icon)}
-              onClick={() => playAlbum(album)}
+              onClick={e => {
+                e.stopPropagation()
+                playTracks(album.tracks)
+              }}
             >
               <FontAwesomeIcon icon={faPlay} size='sm' />
             </div>
@@ -42,13 +45,13 @@ function AlbumView ({ albums, playAlbum, selectAlbum }) {
 }
 
 AlbumView.defaultProps = {
-  playAlbum: () => {},
+  playTracks: () => {},
   selectAlbum: () => {},
   albums: []
 }
 
 AlbumView.propTypes = {
-  playAlbum: PropTypes.func,
+  playTracks: PropTypes.func,
   selectAlbum: PropTypes.func,
   albums: PropTypes.arrayOf(PropTypes.shape())
 }

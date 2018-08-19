@@ -4,7 +4,8 @@ const initialState = {
   currentSong: null,
   currentTime: 0,
   volume: 0.5,
-  selectedAlbum: null
+  selectedAlbum: null,
+  showEqualizer: false
 }
 
 const reducer = (state = initialState, action) => {
@@ -56,6 +57,18 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'SELECT_ALBUM') {
     return Object.assign({}, state, {
       selectedAlbum: action.payload.album || null
+    })
+  }
+
+  if (action.type === 'OPEN_EQUALIZER') {
+    return Object.assign({}, state, {
+      showEqualizer: true
+    })
+  }
+
+  if (action.type === 'CLOSE_EQUALIZER') {
+    return Object.assign({}, state, {
+      showEqualizer: false
     })
   }
 

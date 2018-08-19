@@ -3,7 +3,6 @@ import PlayerHome from './PlayerHome.jsx'
 
 const mapState = state => ({
   tracks: state.library.tracks,
-  albums: state.library.albums,
   volume: state.uiState.volume,
   view: state.uiState.view,
   currentSong: state.uiState.currentSong,
@@ -17,7 +16,7 @@ const mapDispatch = dispatch => ({
   setView: (view) => dispatch({ type: 'SET_VIEW', payload: { view } }),
   setVolume: (volume) => dispatch({ type: 'SET_VOLUME', payload: { volume } }),
   setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } }),
-  playTracks: (tracks) => dispatch({ type: 'PLAY_TRACKS', payload: { tracks } }),
+  openEqualizer: () => dispatch({ type: 'OPEN_EQUALIZER', payload: {} }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
   trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),
   rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} })

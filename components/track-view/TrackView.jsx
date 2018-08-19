@@ -69,7 +69,7 @@ class TrackView extends PureComponent {
               <div className={classNames(style.field, style.year)}>{track.year || '-'}</div>
               <div className={classNames(style.field, style.album)}>{track.album || '-'}</div>
               <div className={classNames(style.field, style.trackNo)}>{track.track || '-'}</div>
-              <div className={classNames(style.field, style.title)}>{track.title || '-'}</div>
+              <div className={classNames(style.field, style.title)}><div>{track.title || '-'}</div></div>
             </div>
           ))}
         </div>
