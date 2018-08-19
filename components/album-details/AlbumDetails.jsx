@@ -20,7 +20,7 @@ class AlbumDetails extends PureComponent {
       if (!this.props.album) {
         setTimeout(() => {
           this.updateDisplayed()
-        }, 200)
+        }, 2)
       } else {
         this.updateDisplayed()
       }

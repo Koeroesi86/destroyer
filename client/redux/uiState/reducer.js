@@ -56,13 +56,15 @@ const reducer = (state = initialState, action) => {
 
   if (action.type === 'SELECT_ALBUM') {
     return Object.assign({}, state, {
-      selectedAlbum: action.payload.album || null
+      selectedAlbum: action.payload.album || null,
+      showEqualizer: action.payload.album ? false : state.showEqualizer
     })
   }
 
   if (action.type === 'OPEN_EQUALIZER') {
     return Object.assign({}, state, {
-      showEqualizer: true
+      showEqualizer: true,
+      selectedAlbum: null
     })
   }
 

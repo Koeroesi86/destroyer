@@ -17,7 +17,6 @@
   box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.3);
   opacity: 0;
   transition: opacity .2s ease-in-out, margin-top .2s ease-in-out;
-  transition-delay: .2s;
   will-change: opacity, margin-top;
 
   &.show {
