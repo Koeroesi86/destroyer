@@ -1,0 +1,132 @@
+.albumDetails {
+  display: flex;
+  position: fixed;
+  top: -100vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  max-height: 90vh;
+  max-width: 60vw;
+  min-width: 268px;
+  margin-top: 20px;
+  padding: 28px 24px 12px 24px;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+  background: #fff;
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity .2s ease-in-out, margin-top .2s ease-in-out;
+  transition-delay: .2s;
+  will-change: opacity, margin-top;
+
+  &.hasAlbum {
+    top: 50%;
+    opacity: 1;
+    margin-top: 0;
+  }
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #333;
+  }
+
+  .cover {
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 12px;
+    background: transparent center center no-repeat;
+    background-size: cover;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.12) inset, 0 0 3px #000;
+  }
+
+  .artist {
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .title {
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .meta {
+    flex-shrink: 0;
+    margin: 6px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    font-size: 10px;
+    line-height: 18px;
+    font-weight: 600;
+  }
+
+  .year,
+  .duration {
+    padding: 0 6px;
+  }
+
+  .year {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .tracks {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 12px;
+    min-width: 100%;
+    padding: 6px 12px;
+    box-shadow: inset -3px 1px 6px rgba(0, 0, 0, 0.22);
+
+    .track {
+
+    }
+  }
+
+  .playAlbum {
+    flex-shrink: 0;
+    margin-top: 12px;
+    padding: 0 12px;
+    height: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    background: #333333;
+    font-size: 13px;
+
+    path {
+      fill: #efefef;
+    }
+
+    .label {
+      color: #efefef;
+      margin-left: 8px;
+    }
+  }
+
+  .close {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    cursor: pointer;
+  }
+}

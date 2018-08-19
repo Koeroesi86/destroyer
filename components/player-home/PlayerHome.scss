@@ -195,8 +195,32 @@ $FontPath: './fonts/fonts';
         flex-shrink: 0;
         display: flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
         padding: 12px 12px 0 12px;
+
+        .libraryControls {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+
+          button {
+            padding: 0 6px;
+            line-height: 32px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: #efefef;
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.4);
+              border-color: #fff;
+              color: #ffffff;
+            }
+          }
+        }
 
         .view {
           margin-right: 12px;
@@ -204,6 +228,10 @@ $FontPath: './fonts/fonts';
           cursor: pointer;
           border-bottom: 2px solid transparent;
           transition: all .2s ease-in-out;
+
+          &:hover:not(.current) {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+          }
 
           &.current {
             border-bottom-color: rgba(255, 255, 255, 0.6);
@@ -221,19 +249,20 @@ $FontPath: './fonts/fonts';
         .tracks {
           position: relative;
           display: flex;
-          max-height: 0;
+          height: 0;
           transform: rotateX(90deg);
           transform-origin: top;
           transition: all .2s ease-in-out;
           opacity: 0;
           overflow: hidden;
+          will-change: transform, opacity, height;
 
           &.active {
             z-index: 1;
             flex-grow: 1;
-            max-height: 100ch;
+            height: auto;
             opacity: 1;
-            transform: none;
+            transform: rotateX(0deg);
           }
         }
       }

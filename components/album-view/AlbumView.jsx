@@ -6,13 +6,14 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons'
 import style from './AlbumView.scss'
 import { formatTime } from '../player-home/PlayerHome'
 
-function AlbumView ({ albums, playAlbum }) {
+function AlbumView ({ albums, playAlbum, selectAlbum }) {
   return (
     <div className={style.albums}>
       {albums.map(album => (
         <div
           key={album.id}
           className={style.album}
+          onClick={() => selectAlbum(album)}
           onDoubleClick={() => playAlbum(album)}
           onTouchEnd={() => playAlbum(album)}
         >
@@ -42,11 +43,13 @@ function AlbumView ({ albums, playAlbum }) {
 
 AlbumView.defaultProps = {
   playAlbum: () => {},
+  selectAlbum: () => {},
   albums: []
 }
 
 AlbumView.propTypes = {
   playAlbum: PropTypes.func,
+  selectAlbum: PropTypes.func,
   albums: PropTypes.arrayOf(PropTypes.shape())
 }
 

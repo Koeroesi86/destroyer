@@ -6,3 +6,4 @@ Destroyer-win32-x64
 Destroyer-linux-x64
 .idea
 database/*.sqlite
+database/*.sqlite-journal

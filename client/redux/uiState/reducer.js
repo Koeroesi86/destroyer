@@ -3,7 +3,8 @@ const initialState = {
   nowPlaying: [],
   currentSong: null,
   currentTime: 0,
-  volume: 0.5
+  volume: 0.5,
+  selectedAlbum: null
 }
 
 const reducer = (state = initialState, action) => {
@@ -49,6 +50,12 @@ const reducer = (state = initialState, action) => {
     return Object.assign({}, state, {
       currentSong: nextSong,
       currentTime: 0
+    })
+  }
+
+  if (action.type === 'SELECT_ALBUM') {
+    return Object.assign({}, state, {
+      selectedAlbum: action.payload.album || null
     })
   }
 

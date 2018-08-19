@@ -19,7 +19,8 @@ const mapDispatch = dispatch => ({
   setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } }),
   playTracks: (tracks) => dispatch({ type: 'PLAY_TRACKS', payload: { tracks } }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
-  trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} })
+  trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),
+  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} })
 })
 
 const ConnectedPlayerHome = connect(

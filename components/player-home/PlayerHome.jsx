@@ -8,6 +8,7 @@ import style from './PlayerHome.scss'
 import AlbumView from '../album-view'
 import TrackView from '../track-view'
 import Slider from '../slider/Slider'
+import AlbumDetails from '../album-details'
 // import Fuzz from '../fuzz'
 
 export function formatTime (seconds) {
@@ -243,6 +244,11 @@ export default class PlayerHome extends Component {
                 >
                   Songs
                 </div>
+                <div className={style.libraryControls}>
+                  <button onClick={this.props.rescanLibrary}>
+                    Rescan
+                  </button>
+                </div>
               </div>
               <div className={style.viewPanels}>
                 <div className={classNames(style.albums, {
@@ -280,6 +286,7 @@ export default class PlayerHome extends Component {
               ))}
           </div>
         </div>
+        <AlbumDetails />
       </div>
     )
   }
@@ -298,9 +305,10 @@ PlayerHome.defaultProps = {
   tracks: [],
   currentSong: null,
   currentTime: 0,
-  currentTimeFPS: 100,
+  currentTimeFPS: 30,
   volume: 0.5,
-  setVolume: () => {}
+  setVolume: () => {},
+  rescanLibrary: () => {}
 }
 
 export const trackType = {
@@ -322,6 +330,7 @@ PlayerHome.propTypes = {
   playTrack: PropTypes.func,
   trackEnded: PropTypes.func,
   playTracks: PropTypes.func,
+  rescanLibrary: PropTypes.func,
   volume: PropTypes.number,
   setVolume: PropTypes.func,
   setView: PropTypes.func,
