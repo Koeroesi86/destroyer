@@ -8,7 +8,7 @@
     "clean": "rm -r bundle || true",
     "prebuild": "yarn run clean",
     "postinstall-win": "npx electron-builder install-app-deps",
-    "dev": "node scripts/start.js",
+    "dev": "node --max_old_space_size=2048 scripts/start.js",
     "build": "webpack --progress --config config/webpack.config.base.js",
     "start": "electron index.js",
     "pack:osx": "rm -rf Destroyer-darwin-x64 && NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --platform=darwin --arch=x64 --icon=icons.icns --prune",

@@ -1,47 +1,83 @@
 const { walk } = require('walk')
 const musicMetadata = require('musicmetadata')
 const fs = require('fs')
+const path = require('path')
 const dateFns = require('date-fns')
+const addTrack = require('./addTrack')
+
+const supportedFormats = ['flac', 'm4a', 'mp3', 'mp4', 'aac']
+
+const parsePicture = picture => `data:image/${picture.format};base64, ${picture.data.toString('base64')}`
+const formatTime = time => Number(dateFns.format(new Date(time), 'YYYYMMDDmm')) * -1
+const scannedFolders = []
 
 /** @returns {Promise} */
-function scanFolder (currentPath) {
+function scanFolder (database, currentPath, sender) {
   return new Promise((resolve, reject) => {
     const tracks = []
+    sender.send('SCANNING_FOLDER', { folder: currentPath })
     const directory = walk(currentPath, { followLinks: false })
     directory.on('file', (root, fileStats, next) => {
-      let fileName = root + '/' + fileStats.name
+      const fileName = path.join(root, '/' + fileStats.name)
       if (
-        ['flac', 'm4a', 'mp3', 'mp4', 'aac'].indexOf(
-          fileName.split('.').pop()
-        ) > -1
+        supportedFormats.includes(path.extname(fileName).replace('.', ''))
       ) {
-        let readStream = fs.createReadStream(fileName)
-        musicMetadata(readStream, (error, metadata) => {
-          if (error) {
-            reject(error)
-          } else {
-            metadata.artist = metadata.artist[0] || ''
-            metadata.title = metadata.title || ''
-            metadata.album = metadata.album || ''
-            metadata.root = root
-            metadata.path = fileName
-            metadata.time =
-              Number(
-                dateFns.format(new Date(fileStats.ctime), 'YYYYMMDDmm')
-              ) * -1
-            if (metadata.picture.length > 0) {
-              const picture = metadata.picture[0]
-              metadata.picture = `data:image/${picture.format};base64, ${picture.data.toString('base64')}`
-            }
-            tracks.push(metadata)
-            readStream.close()
+        try {
+          let readStream = fs.createReadStream(fileName)
+          const writeMeta = metadata => {
+            Object.assign(metadata, {
+              artist: (metadata.artist && metadata.artist[0]) || '',
+              title: metadata.title || '',
+              album: metadata.album || '',
+              track: (metadata.track && metadata.track.no) || '',
+              disk: (metadata.disk && metadata.disk.no) || '',
+              root: root,
+              path: fileName,
+              time: formatTime(fileStats.ctime),
+              picture: metadata.picture[0] ? parsePicture(metadata.picture[0]) : null
+            })
           }
-        })
-        readStream.on('close', () => {
-          // next()
-        })
+          musicMetadata(readStream, (error, metadata) => {
+            if (error) {
+              console.error(fileName, error)
+            } else {
+              writeMeta(metadata)
+              addTrack(database, metadata)
+                .then(() => {
+                  readStream.close()
+                  setTimeout(() => {
+                    next()
+                  }, 100)
+                })
+            }
+          })
+        } catch (e) {
+          console.error(e)
+          next()
+        }
+      } else {
+        next()
       }
-      next()
+    })
+    directory.on('directory', async (root, dirStats, next) => {
+      const folderName = path.join(root, `/${dirStats.name}`)
+      if (scannedFolders.includes(folderName)) {
+        next()
+      } else {
+        scannedFolders.push(folderName)
+        try {
+          const childTracks = await scanFolder(database, folderName, sender)
+          childTracks.forEach(track => {
+            tracks.push(track)
+          })
+          setTimeout(() => {
+            next()
+          }, 200)
+        } catch (e) {
+          console.log('error at ', folderName)
+          reject(e)
+        }
+      }
     })
     directory.on('end', () => {
       resolve(tracks)

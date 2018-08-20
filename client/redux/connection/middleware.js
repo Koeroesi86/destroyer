@@ -15,11 +15,12 @@ const eventNames = [
   'STORE_FOLDERS',
   'STORE_LIBRARY',
   'FOLDERS_ADDED_TO_LIBRARY',
-  'TRACKS_ADDED_TO_LIBRARY'
+  'TRACKS_ADDED_TO_LIBRARY',
+  'SCANNING_FOLDER'
 ]
 
-function rescanLibrary () {
-  ipcRenderer.send('RESCAN_LIBRARY', 'Scan please :)')
+function rescanLibrary (forced = false) {
+  ipcRenderer.send('RESCAN_LIBRARY', { forced })
 }
 
 const middleware = store => {
@@ -28,10 +29,10 @@ const middleware = store => {
   ipcRenderer.send('APP_READY', 'Ready to receive')
 
   setInterval(() => {
-    rescanLibrary()
+    rescanLibrary(false)
   }, 1000 * 60 * 60)
 
-  rescanLibrary()
+  // rescanLibrary(false)
 
   return next => action => {
     if (action.type !== 'SET_CURRENT_TIME') {
@@ -55,7 +56,7 @@ const middleware = store => {
     }
 
     if (action.type === 'RESCAN_LIBRARY') {
-      rescanLibrary()
+      rescanLibrary(true)
     }
 
     next(action)

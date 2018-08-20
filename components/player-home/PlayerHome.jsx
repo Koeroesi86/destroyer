@@ -10,6 +10,7 @@ import TrackView from '../track-view'
 import Slider from '../slider/Slider'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
+import Confirm from '../confirm'
 // import Fuzz from '../fuzz'
 
 export function formatTime (seconds) {
@@ -22,7 +23,8 @@ export default class PlayerHome extends Component {
 
     this.state = {
       audioSource: null,
-      audioContext: new AudioContext()
+      audioContext: new AudioContext(),
+      confirmMessage: null
     }
 
     this.handleDrop = this.handleDrop.bind(this)
@@ -30,6 +32,8 @@ export default class PlayerHome extends Component {
     this.playTrack = this.playTrack.bind(this)
     this.play = this.play.bind(this)
     this.pause = this.pause.bind(this)
+    this.confirm = this.confirm.bind(this)
+    this.confirmCallback = () => {}
   }
 
   componentDidMount () {
@@ -48,7 +52,7 @@ export default class PlayerHome extends Component {
     this.seekTo(this.props.currentTime)
 
     this.timer = setInterval(() => {
-      if (this.audio.currentTime !== this.props.currentTime) {
+      if (Math.floor(this.audio.currentTime * 10) !== Math.floor(this.props.currentTime * 10)) {
         this.props.setCurrentTime(this.audio.currentTime)
       }
     }, 1000 / this.props.currentTimeFPS)
@@ -76,11 +80,48 @@ export default class PlayerHome extends Component {
     }
   }
 
+  confirm (message, callback) {
+    this.setState((prevState, props) => {
+      this.confirmCallback = callback
+      return { confirmMessage: message }
+    })
+  }
+
+  checkFile (files) {
+    let contained = false
+    const { folders } = this.props
+
+    Array.prototype.forEach.call(files, file => {
+      // exact match
+      if (folders.find(folder => folder.path === file.path)) {
+        contained = file.path
+      }
+
+      // parent directory
+      if (folders.find(folder => folder.path.indexOf(file.path) === 0)) {
+        contained = file.path
+      }
+
+      // child directory
+      if (folders.find(folder => file.path.indexOf(folder.path) === 0)) {
+        contained = file.path
+      }
+    })
+
+    return contained
+  }
+
   handleDrop (event) {
     event.preventDefault()
     event.stopPropagation()
-    if (event.dataTransfer.files.length > 0) {
-      this.props.addFiles(event.dataTransfer.files)
+    const { files } = event.dataTransfer
+
+    if (files.length > 0) {
+      let contained = this.checkFile(files)
+
+      contained && this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+        this.props.addFiles(files)
+      })
     }
   }
 
@@ -88,7 +129,13 @@ export default class PlayerHome extends Component {
     event.stopPropagation()
     event.preventDefault()
     const { files } = event.target
-    this.props.addFiles(files)
+    if (files.length > 0) {
+      let contained = this.checkFile(files)
+
+      contained && this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+        this.props.addFiles(files)
+      })
+    }
   }
 
   playTrack (track) {
@@ -293,6 +340,17 @@ export default class PlayerHome extends Component {
         <Equalizer
           source={this.state.audioSource}
           context={this.state.audioContext}
+        />
+        <Confirm
+          message={this.state.confirmMessage}
+          confirm={() => {
+            this.confirmCallback()
+            this.setState({ confirmMessage: null })
+          }}
+          cancel={() => {
+            this.confirmCallback = () => {}
+            this.setState({ confirmMessage: null })
+          }}
         />
       </div>
     )

@@ -6,24 +6,10 @@ const addTrack = require('./addTrack')
  * @param {Array} folders
  * @return {Promise<Array>|Promise<Error>}
  */
-function scanFolders (database, folders) {
+function scanFolders (database, folders, sender) {
   let tracks = []
   const addedToLibrary = folders.map(folder => {
-    return new Promise((resolve, reject) => {
-      scanFolder(folder.path)
-        .then(folderTracks => {
-          const trackQueries = folderTracks.map(folderTrack => {
-            return addTrack(database, folderTrack)
-              .then(() => {
-                tracks.push(folderTrack)
-                return Promise.resolve()
-              })
-          })
-
-          Promise.all(trackQueries).then(() => resolve())
-        })
-        .catch(msg => reject(msg))
-    })
+    return scanFolder(database, folder.path, sender)
   })
 
   return Promise.all(addedToLibrary)
