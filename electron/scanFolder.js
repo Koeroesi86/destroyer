@@ -11,11 +11,16 @@ const parsePicture = picture => `data:image/${picture.format};base64, ${picture.
 const formatTime = time => Number(dateFns.format(new Date(time), 'YYYYMMDDmm')) * -1
 const scannedFolders = []
 
-/** @returns {Promise} */
+/** Scan a defined folder for tracks
+ * @param database
+ * @param currentPath
+ * @param sender
+ * @returns {Promise}
+ * */
 function scanFolder (database, currentPath, sender) {
   return new Promise((resolve, reject) => {
-    const tracks = []
     sender.send('SCANNING_FOLDER', { folder: currentPath })
+    scannedFolders.push(currentPath)
     const directory = walk(currentPath, { followLinks: false })
     directory.on('file', (root, fileStats, next) => {
       const fileName = path.join(root, '/' + fileStats.name)
@@ -47,7 +52,7 @@ function scanFolder (database, currentPath, sender) {
                   readStream.close()
                   setTimeout(() => {
                     next()
-                  }, 100)
+                  }, 500)
                 })
             }
           })
@@ -64,15 +69,11 @@ function scanFolder (database, currentPath, sender) {
       if (scannedFolders.includes(folderName)) {
         next()
       } else {
-        scannedFolders.push(folderName)
         try {
-          const childTracks = await scanFolder(database, folderName, sender)
-          childTracks.forEach(track => {
-            tracks.push(track)
-          })
+          await scanFolder(database, folderName, sender)
           setTimeout(() => {
             next()
-          }, 200)
+          }, 1000)
         } catch (e) {
           console.log('error at ', folderName)
           reject(e)
@@ -80,7 +81,7 @@ function scanFolder (database, currentPath, sender) {
       }
     })
     directory.on('end', () => {
-      resolve(tracks)
+      resolve()
     })
   })
 }

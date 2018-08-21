@@ -1,3 +1,5 @@
+import path from 'path'
+
 const initialState = {
   tracks: [],
   albums: []
@@ -5,10 +7,13 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   if (action.type === 'STORE_LIBRARY') {
-    const tracks = action.payload.library
+    const { library: tracks, from, to } = action.payload
     const albumsObject = {}
+    state.albums.forEach(album => {
+      albumsObject[album.id] = album
+    })
     tracks.forEach(track => {
-      const albumKey = `${track.artist} - ${track.year} - ${track.album}`
+      const albumKey = `${path.dirname(track.path)} - ${track.album}`
       if (!albumsObject[albumKey]) {
         albumsObject[albumKey] = {
           title: track.album,
@@ -24,13 +29,12 @@ const reducer = (state = initialState, action) => {
         album.duration += track.duration
       }
     })
-    const albums = Object.getOwnPropertyNames(albumsObject).map(id =>
+    const receivedAlbums = Object.getOwnPropertyNames(albumsObject).map(id =>
       Object.assign({}, albumsObject[id], { id })
     )
-    console.log('received albums', albums)
     return {
-      tracks,
-      albums
+      tracks: to ? state.tracks.slice().splice(from, to, tracks) : tracks,
+      albums: receivedAlbums
     }
   }
 

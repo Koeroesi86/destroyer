@@ -1,10 +1,9 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
-import path from 'path'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faVolumeUp, faVolumeDown, faSignal } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faPause, faVolumeUp, faVolumeDown, faSignal, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
 import AlbumView from '../album-view'
 import TrackView from '../track-view'
@@ -12,6 +11,7 @@ import Slider from '../slider/Slider'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
 import Confirm from '../confirm'
+import { shell } from 'electron'
 // import Fuzz from '../fuzz'
 
 export function formatTime (seconds) {
@@ -148,7 +148,7 @@ export default class PlayerHome extends Component {
   }
 
   playTrack (track) {
-    this.audio.src = 'file://' + path.resolve(track.path)
+    this.audio.src = 'file://' + track.path
     this.play()
   }
 
@@ -192,12 +192,14 @@ export default class PlayerHome extends Component {
               <button
                 onClick={this.play}
                 className={style.mainControlButton}
+                disabled={!this.props.currentSong}
               >
                 <FontAwesomeIcon icon={faPlay} size='sm' />
               </button>
               <button
                 onClick={this.pause}
                 className={style.mainControlButton}
+                disabled={!this.props.currentSong}
               >
                 <FontAwesomeIcon icon={faPause} size='sm' />
               </button>
@@ -286,9 +288,6 @@ export default class PlayerHome extends Component {
               </div>
             </div>
             <div className={style.collection}>
-              {this.props.tracks.length === 0 && (
-                <div>Library placeholder</div>
-              )}
               <div className={style.viewControls}>
                 <div
                   className={classNames(style.view, {
@@ -307,12 +306,22 @@ export default class PlayerHome extends Component {
                   Songs
                 </div>
                 <div className={style.libraryControls}>
-                  <button onClick={this.props.rescanLibrary}>
+                  <button
+                    onClick={this.props.rescanLibrary}
+                    disabled={!!this.props.scanningFolder}
+                    className={classNames({
+                      [style.spinning]: this.props.scanningFolder
+                    })}
+                  >
+                    <FontAwesomeIcon icon={faSyncAlt} size='sm' />
                     Rescan
                   </button>
                 </div>
               </div>
               <div className={style.viewPanels}>
+                {this.props.tracks.length === 0 && (
+                  <div>Library placeholder</div>
+                )}
                 <div className={classNames(style.albums, {
                   [style.active]: view === 'albums'
                 })}>
@@ -361,6 +370,13 @@ export default class PlayerHome extends Component {
             this.setState({ confirmMessage: null })
           }}
         />
+        <div
+          className={classNames(style.scanningFolder, {
+            [style.show]: this.props.scanningFolder
+          })}
+        >
+          Currently scanning: <a onClick={() => shell.openItem(this.props.scanningFolder)}>{this.props.scanningFolder}</a>
+        </div>
       </div>
     )
   }
@@ -417,6 +433,7 @@ PlayerHome.propTypes = {
   ),
   currentSong: PropTypes.shape(trackType),
   currentTime: PropTypes.number,
+  scanningFolder: PropTypes.string,
   nowPlaying: PropTypes.arrayOf(PropTypes.shape(trackType)),
   tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
 }

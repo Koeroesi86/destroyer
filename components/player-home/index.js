@@ -8,7 +8,8 @@ const mapState = state => ({
   currentSong: state.uiState.currentSong,
   currentTime: state.uiState.currentTime,
   nowPlaying: state.uiState.nowPlaying,
-  folders: state.folders
+  folders: state.folders,
+  scanningFolder: state.uiState.scanningFolder
 })
 const mapDispatch = dispatch => ({
   /** @param {FileList} fileList */

@@ -6,6 +6,45 @@ const scanFolders = require('./scanFolders')
 const addTrack = require('./addTrack')
 const rescanLibrary = require('./rescanLibrary')
 
+function memorySizeOf (obj) {
+  let bytes = 0
+
+  function sizeOf (obj) {
+    if (obj !== null && obj !== undefined) {
+      switch (typeof obj) {
+        case 'number':
+          bytes += 8
+          break
+        case 'string':
+          bytes += obj.length * 2
+          break
+        case 'boolean':
+          bytes += 4
+          break
+        case 'object':
+          const objClass = Object.prototype.toString.call(obj).slice(8, -1)
+          if (objClass === 'Object' || objClass === 'Array') {
+            for (let key in obj) {
+              if (!obj.hasOwnProperty(key)) continue
+              sizeOf(obj[key])
+            }
+          } else bytes += obj.toString().length * 2
+          break
+      }
+    }
+    return bytes
+  };
+
+  function formatByteSize (bytes) {
+    if (bytes < 1024) return bytes + ' bytes'
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + ' KiB'
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + ' MiB'
+    else return (bytes / 1073741824).toFixed(3) + ' GiB'
+  }
+
+  return formatByteSize(sizeOf(obj))
+}
+
 function setupListeners (database) {
   ipcMain.on('APP_READY', (event) => {
     executeQuery(database, {
@@ -13,14 +52,29 @@ function setupListeners (database) {
       variables: []
     }).then(folders => {
       event.sender.send('STORE_FOLDERS', { folders })
-    })
+    }).catch(e => console.error(e))
 
     executeQuery(database, {
       query: `SELECT * FROM library ORDER BY path ASC`,
       variables: []
     }).then(library => {
-      event.sender.send('STORE_LIBRARY', { library })
-    })
+      console.log('library size', memorySizeOf({ library }))
+      if (library.length <= 200) {
+        event.sender.send('STORE_LIBRARY', { library })
+      } else {
+        let chunks = []
+        let from = 0
+        library.forEach((track, index) => {
+          if (chunks.length === 200) {
+            event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from })
+            chunks.splice(0)
+            from = index
+          }
+          chunks.push(track)
+        })
+        event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from })
+      }
+    }).catch(e => console.error(e))
   })
 
   /** @param {Array} files */

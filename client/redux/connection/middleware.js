@@ -35,7 +35,7 @@ const middleware = store => {
   // rescanLibrary(false)
 
   return next => action => {
-    if (action.type !== 'SET_CURRENT_TIME') {
+    if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER'].includes(action.type)) {
       console.log(action.type, action.payload)
     }
 

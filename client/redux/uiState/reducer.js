@@ -5,7 +5,8 @@ const initialState = {
   currentTime: 0,
   volume: 0.5,
   selectedAlbum: null,
-  showEqualizer: false
+  showEqualizer: false,
+  scanningFolder: null
 }
 
 const reducer = (state = initialState, action) => {
@@ -71,6 +72,19 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'CLOSE_EQUALIZER') {
     return Object.assign({}, state, {
       showEqualizer: false
+    })
+  }
+
+  if (action.type === 'SCANNING_FOLDER') {
+    const { folder } = action.payload
+    return Object.assign({}, state, {
+      scanningFolder: folder
+    })
+  }
+
+  if (action.type === 'STORE_LIBRARY') {
+    return Object.assign({}, state, {
+      scanningFolder: null
     })
   }
 

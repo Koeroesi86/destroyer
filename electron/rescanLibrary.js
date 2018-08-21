@@ -11,7 +11,7 @@ function rescanLibrary (database, sender, forced = false) {
   })
     .then(folders => Promise.resolve(
       folders.filter(folder =>
-        folder.lastModified < Math.floor(fs.statSync(folder.path).mtimeMs) || forced
+        fs.existsSync(folder.path) && (folder.lastModified < Math.floor(fs.statSync(folder.path).mtimeMs) || forced)
       )
     ))
     .then(folders => scanFolders(database, folders, sender))
