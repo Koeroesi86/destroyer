@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
+import path from 'path'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faVolumeUp, faVolumeDown, faSignal } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
@@ -119,9 +120,13 @@ export default class PlayerHome extends Component {
     if (files.length > 0) {
       let contained = this.checkFile(files)
 
-      contained && this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+      if (contained) {
+        this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+          this.props.addFiles(files)
+        })
+      } else {
         this.props.addFiles(files)
-      })
+      }
     }
   }
 
@@ -132,14 +137,18 @@ export default class PlayerHome extends Component {
     if (files.length > 0) {
       let contained = this.checkFile(files)
 
-      contained && this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+      if (contained) {
+        this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
+          this.props.addFiles(files)
+        })
+      } else {
         this.props.addFiles(files)
-      })
+      }
     }
   }
 
   playTrack (track) {
-    this.audio.src = track.path
+    this.audio.src = 'file://' + path.resolve(track.path)
     this.play()
   }
 
