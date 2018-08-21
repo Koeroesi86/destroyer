@@ -53,7 +53,7 @@ export default class PlayerHome extends Component {
     this.seekTo(this.props.currentTime)
 
     this.timer = setInterval(() => {
-      if (Math.floor(this.audio.currentTime * 10) !== Math.floor(this.props.currentTime * 10)) {
+      if (Math.floor(this.audio.currentTime * 100) !== Math.floor(this.props.currentTime * 100)) {
         this.props.setCurrentTime(this.audio.currentTime)
       }
     }, 1000 / this.props.currentTimeFPS)

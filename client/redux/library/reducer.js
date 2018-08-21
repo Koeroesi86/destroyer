@@ -17,6 +17,7 @@ const reducer = (state = initialState, action) => {
       if (!albumsObject[albumKey]) {
         albumsObject[albumKey] = {
           title: track.album,
+          path: path.dirname(track.path),
           artist: track.artist,
           cover: track.picture,
           duration: track.duration,
@@ -32,10 +33,13 @@ const reducer = (state = initialState, action) => {
     const receivedAlbums = Object.getOwnPropertyNames(albumsObject).map(id =>
       Object.assign({}, albumsObject[id], { id })
     )
-    return {
-      tracks: to ? state.tracks.slice().splice(from, to, tracks) : tracks,
+    console.log('received albums', receivedAlbums)
+    const receivedTracks = state.tracks.slice()
+    if (to) receivedTracks.splice(from, to, ...tracks)
+    return Object.assign({}, state, {
+      tracks: to ? receivedTracks : tracks,
       albums: receivedAlbums
-    }
+    })
   }
 
   return state

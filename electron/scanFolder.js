@@ -42,7 +42,7 @@ function scanFolder (database, currentPath, sender) {
               picture: metadata.picture[0] ? parsePicture(metadata.picture[0]) : null
             })
           }
-          musicMetadata(readStream, (error, metadata) => {
+          musicMetadata(readStream, { duration: true, fileSize: fs.statSync(fileName).size }, (error, metadata) => {
             if (error) {
               console.error(fileName, error)
             } else {
@@ -52,7 +52,7 @@ function scanFolder (database, currentPath, sender) {
                   readStream.close()
                   setTimeout(() => {
                     next()
-                  }, 500)
+                  }, 100)
                 })
             }
           })
@@ -73,7 +73,7 @@ function scanFolder (database, currentPath, sender) {
           await scanFolder(database, folderName, sender)
           setTimeout(() => {
             next()
-          }, 1000)
+          }, 4000)
         } catch (e) {
           console.log('error at ', folderName)
           reject(e)
