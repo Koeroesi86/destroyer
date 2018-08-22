@@ -1,7 +1,7 @@
-const sqlite3 = require('sqlite3').verbose()
 const fs = require('fs')
 const path = require('path')
 const executeQueries = require('./executeQueries')
+const connectDatabase = require('./connectDatabase')
 
 const migrations = fs.readdirSync(
   path.resolve(__dirname, '../database/migrations'),
@@ -15,16 +15,16 @@ const createQueries = migrations.map(migration => ({
   variables: []
 }))
 
-const createDatabase = databaseLocation => new Promise((resolve, reject) => {
-  let db = new sqlite3.Database(databaseLocation, err => {
-    if (err) {
-      reject(err.message)
-    } else {
-      executeQueries(db, createQueries)
-        .then(() => resolve(db))
-        .catch(message => reject(message))
-    }
-  })
-})
+const createDatabase = () => {
+  let db
+  let databaseLocation
+  return connectDatabase()
+    .then(({ database, libraryLocation }) => {
+      db = database
+      databaseLocation = libraryLocation
+      return executeQueries(database, createQueries)
+    })
+    .then(() => Promise.resolve({ database: db, libraryLocation: databaseLocation }))
+}
 
 module.exports = createDatabase

@@ -1,5 +1,4 @@
 const { app, ipcMain } = require('electron')
-const { resolve } = require('path')
 const createWindow = require('./electron/createWindow')
 const createDatabase = require('./electron/createDatabase')
 const setupListeners = require('./electron/setupListeners')
@@ -11,9 +10,7 @@ const argv = require('minimist')(process.argv.slice(2))
 let mainWindow
 let library
 
-const libraryLocation = resolve(__dirname, './database/library.sqlite')
-
-let windowLocation = `file://${__dirname}/components/app/index.html`
+let windowLocation = `file://${__dirname}/bundle/index.html`
 
 if (argv.webpackPort) {
   windowLocation = `http://localhost:${argv.webpackPort}/index.html`
@@ -31,13 +28,13 @@ const initWindow = () => {
   })
 }
 
-createDatabase(libraryLocation)
-  .then(db => {
+createDatabase()
+  .then(({ database, libraryLocation }) => {
     console.log(`Connected to library ${libraryLocation}`)
-    library = db
+    library = database
 
     initWindow()
-    setupListeners(db)
+    setupListeners(library)
 
     app.on('ready', initWindow)
 

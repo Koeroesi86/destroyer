@@ -5,7 +5,6 @@ const appConfig = require('./appConfig')
 
 const config = {
   entry: {
-    // destroyer: path.resolve(__dirname, '../client.js'),
     client: path.resolve(__dirname, '../client/app.js'),
     htmlGenerator: path.resolve(__dirname, '../client/htmlGenerator.js')
   },
@@ -13,7 +12,7 @@ const config = {
     pathinfo: true,
     libraryTarget: 'umd',
     path: path.resolve(__dirname, '../bundle'),
-    publicPath: '/',
+    publicPath: './',
     globalObject: 'this',
     filename: '[name].js'
   },

@@ -59,16 +59,17 @@ function setupListeners (database) {
       variables: []
     }).then(library => {
       console.log('library size', memorySizeOf({ library }))
-      if (library.length <= 200) {
+      const chunkLimit = 200
+      if (library.length <= chunkLimit) {
         event.sender.send('STORE_LIBRARY', { library })
       } else {
-        let chunks = []
+        const chunks = []
         let from = 0
         library.forEach((track, index) => {
-          if (chunks.length === 200) {
+          if (chunks.length === chunkLimit) {
             event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from })
             chunks.splice(0)
-            from = index
+            from = index + 1
           }
           chunks.push(track)
         })

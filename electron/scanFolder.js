@@ -1,5 +1,4 @@
-const { walk } = require('walk')
-const musicMetadata = require('musicmetadata')
+const musicMeta = require('music-metadata')
 const fs = require('fs')
 const path = require('path')
 const dateFns = require('date-fns')
@@ -11,6 +10,41 @@ const parsePicture = picture => `data:image/${picture.format};base64, ${picture.
 const formatTime = time => Number(dateFns.format(new Date(time), 'YYYYMMDDmm')) * -1
 const scannedFolders = []
 
+const writeMeta = (fileName, fileStats, database) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const transformMeta = metadata => {
+        Object.assign(metadata, {
+          artist: (metadata.artist && metadata.artist[0]) || '',
+          title: metadata.title || '',
+          album: metadata.album || '',
+          track: (metadata.track && metadata.track.no) || '',
+          disk: (metadata.disk && metadata.disk.no) || '',
+          genre: (metadata.genre && metadata.genre[0]) || '',
+          root: path.dirname(fileName),
+          path: fileName,
+          time: formatTime(fileStats.ctime),
+          picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0]) : null
+        })
+      }
+      musicMeta.parseFile(fileName)
+        .then((metadata) => {
+          transformMeta(metadata)
+          addTrack(database, metadata)
+            .then(() => {
+              resolve()
+            })
+        })
+        .catch(err => {
+          console.error(err.message)
+          reject(err.message)
+        })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 /** Scan a defined folder for tracks
  * @param database
  * @param currentPath
@@ -21,67 +55,39 @@ function scanFolder (database, currentPath, sender) {
   return new Promise((resolve, reject) => {
     sender.send('SCANNING_FOLDER', { folder: currentPath })
     scannedFolders.push(currentPath)
-    const directory = walk(currentPath, { followLinks: false })
-    directory.on('file', (root, fileStats, next) => {
-      const fileName = path.join(root, '/' + fileStats.name)
-      if (
-        supportedFormats.includes(path.extname(fileName).replace('.', ''))
-      ) {
-        try {
-          let readStream = fs.createReadStream(fileName)
-          const writeMeta = metadata => {
-            Object.assign(metadata, {
-              artist: (metadata.artist && metadata.artist[0]) || '',
-              title: metadata.title || '',
-              album: metadata.album || '',
-              track: (metadata.track && metadata.track.no) || '',
-              disk: (metadata.disk && metadata.disk.no) || '',
-              root: root,
-              path: fileName,
-              time: formatTime(fileStats.ctime),
-              picture: metadata.picture[0] ? parsePicture(metadata.picture[0]) : null
+
+    const files = fs.readdirSync(currentPath).map(file => path.join(currentPath, '/' + file))
+    // console.log(currentPath)
+    // console.log(files)
+    files.forEach((filePath, index) => {
+      const stats = fs.statSync(filePath)
+      if (stats.isDirectory()) {
+        if (!scannedFolders.includes(filePath)) {
+          scanFolder(database, filePath, sender)
+            .then(() => {
+              if (index === files.length - 1) resolve()
             })
-          }
-          musicMetadata(readStream, { duration: true, fileSize: fs.statSync(fileName).size }, (error, metadata) => {
-            if (error) {
-              console.error(fileName, error)
-            } else {
-              writeMeta(metadata)
-              addTrack(database, metadata)
-                .then(() => {
-                  readStream.close()
-                  setTimeout(() => {
-                    next()
-                  }, 100)
-                })
-            }
-          })
-        } catch (e) {
-          console.error(e)
-          next()
+            .catch(e => {
+              console.error('error at folder', filePath)
+              reject(e)
+              throw new Error(`error at folder${filePath}`)
+            })
         }
       } else {
-        next()
-      }
-    })
-    directory.on('directory', async (root, dirStats, next) => {
-      const folderName = path.join(root, `/${dirStats.name}`)
-      if (scannedFolders.includes(folderName)) {
-        next()
-      } else {
-        try {
-          await scanFolder(database, folderName, sender)
-          setTimeout(() => {
-            next()
-          }, 4000)
-        } catch (e) {
-          console.log('error at ', folderName)
-          reject(e)
+        const extension = path.extname(filePath).replace('.', '')
+
+        if (supportedFormats.includes(extension)) {
+          sender.send('SCANNING_FILE', { filePath })
+          writeMeta(filePath, stats, database)
+            .then(() => {
+              if (index === files.length - 1) resolve()
+            })
+            .catch(e => {
+              console.error(filePath, e)
+              if (index === files.length - 1) resolve()
+            })
         }
       }
-    })
-    directory.on('end', () => {
-      resolve()
     })
   })
 }
