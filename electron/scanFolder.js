@@ -2,14 +2,26 @@ const musicMeta = require('music-metadata')
 const path = require('path')
 const { walk } = require('walk')
 const dateFns = require('date-fns')
+const fs = require('fs')
+const crypto = require('crypto')
 const addTrack = require('./addTrack')
 
 const supportedFormats = ['flac', 'm4a', 'mp3', 'mp4', 'aac']
 
 const folderDelay = 400
-const fileDelay = 100
+const fileDelay = 200
+const fileReadTimeout = 5000
 
-const parsePicture = picture => `data:image/${picture.format};base64, ${picture.data.toString('base64')}`
+const parsePicture = picture => {
+  const fileName = crypto.createHash('md5').update(picture.data.toString('base64')).digest('hex')
+  const filePath = path.resolve(__dirname, `../albumart/${fileName}.${picture.format}`)
+  fs.writeFileSync(
+    filePath,
+    picture.data
+  )
+  // return `data:image/${picture.format};base64, ${picture.data.toString('base64')}`
+  return `file://${filePath}`
+}
 const formatTime = time => Number(dateFns.format(new Date(time), 'YYYYMMDDmm')) * -1
 const scannedFolders = []
 
@@ -30,11 +42,17 @@ const writeMeta = (fileName, fileStats, database) => {
           picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0]) : null
         })
       }
+      const timer = setTimeout(() => {
+        const err = new Error(`File access timeout ${fileName}`)
+        reject(err.message)
+        throw err
+      }, fileReadTimeout)
       musicMeta.parseFile(fileName)
         .then((metadata) => {
           transformMeta(metadata)
           addTrack(database, metadata)
             .then(() => {
+              clearTimeout(timer)
               resolve()
             })
         })

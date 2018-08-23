@@ -3,13 +3,27 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { formatTime, trackType } from '../player-home/PlayerHome'
 import style from './TrackView.scss'
+import { debounce } from 'lodash'
 
 class TrackView extends PureComponent {
   constructor (props) {
     super(props)
 
     this.state = {
-      selectedTracks: []
+      selectedTracks: [],
+      tracks: []
+    }
+
+    this.update = debounce(() => {
+      this.setState({
+        tracks: this.props.tracks
+      })
+    }, 200)
+  }
+
+  componentDidUpdate (prevProps) {
+    if (JSON.stringify(prevProps.tracks) !== JSON.stringify(this.props.tracks)) {
+      this.update()
     }
   }
 
