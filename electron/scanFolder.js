@@ -6,11 +6,21 @@ const fs = require('fs')
 const crypto = require('crypto')
 const addTrack = require('./addTrack')
 
-const supportedFormats = ['flac', 'm4a', 'mp3', 'mp4', 'aac']
+const supportedFormats = [
+  'ape',
+  'aif', 'aiff', 'aifc',
+  'asf', 'wma', 'wmv',
+  'flac',
+  'm4a', 'm4b', 'm4p', 'm4v', 'm4r', '3gp', 'mp4', 'aac',
+  'mp2', 'mp3', 'm2a',
+  'ogv', 'oga', 'ogx', 'ogg', 'opus',
+  'wav',
+  'wv', 'wvp'
+]
 
-const folderDelay = 400
-const fileDelay = 200
-const fileReadTimeout = 5000
+const folderDelay = 200
+const fileDelay = 100
+const fileReadTimeout = 2000
 
 const parsePicture = picture => {
   const fileName = crypto.createHash('md5').update(picture.data.toString('base64')).digest('hex')
@@ -28,8 +38,8 @@ const scannedFolders = []
 const writeMeta = (fileName, fileStats, database) => {
   return new Promise((resolve, reject) => {
     try {
-      const transformMeta = metadata => {
-        Object.assign(metadata, {
+      const transformMeta = metadata => Promise.resolve(
+        Object.assign({}, metadata, {
           artist: (metadata.artist && metadata.artist[0]) || '',
           title: metadata.title || '',
           album: metadata.album || '',
@@ -41,24 +51,22 @@ const writeMeta = (fileName, fileStats, database) => {
           time: formatTime(fileStats.ctime),
           picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0]) : null
         })
-      }
+      )
       const timer = setTimeout(() => {
         const err = new Error(`File access timeout ${fileName}`)
-        reject(err.message)
+        reject(err)
         throw err
       }, fileReadTimeout)
       musicMeta.parseFile(fileName)
-        .then((metadata) => {
-          transformMeta(metadata)
-          addTrack(database, metadata)
-            .then(() => {
-              clearTimeout(timer)
-              resolve()
-            })
+        .then((metadata) => transformMeta(metadata))
+        .then(meta => addTrack(database, meta))
+        .then(() => {
+          clearTimeout(timer)
+          resolve()
         })
         .catch(err => {
           console.error(err.message)
-          reject(err.message)
+          reject(err)
         })
     } catch (e) {
       reject(e)
@@ -82,19 +90,20 @@ function scanFolder (database, currentPath, sender) {
       const fileName = path.join(fileRoot, '/' + fileStats.name)
       const extension = path.extname(fileName).replace('.', '')
 
+      const nextFile = () => setTimeout(() => next(), fileDelay)
       if (supportedFormats.includes(extension)) {
         sender.send('SCANNING_FILE', { fileName })
         writeMeta(fileName, fileStats, database)
-          .then(() => {
-            setTimeout(() => next(), fileDelay)
-          })
+          .then(() => nextFile())
           .catch(e => {
             console.error(fileName, e)
-            setTimeout(() => next(), fileDelay)
+            nextFile()
           })
+      } else {
+        nextFile()
       }
     })
-    directory.on('directory', async (dirRoot, dirStats, next) => {
+    directory.on('directory', (dirRoot, dirStats, next) => {
       const folderName = path.join(dirRoot, `/${dirStats.name}`)
       if (scannedFolders.includes(folderName)) {
         next()
