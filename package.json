@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rm -r bundle || true",
     "prebuild": "yarn run clean",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall-win": "electron-builder install-app-deps",
     "dev": "node --max_old_space_size=2048 scripts/start.js",
     "build": "webpack --progress --config config/webpack.config.base.js",
     "start": "electron index.js",

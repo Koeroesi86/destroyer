@@ -24,7 +24,9 @@ const fileReadTimeout = 2000
 
 const parsePicture = picture => {
   const fileName = crypto.createHash('md5').update(picture.data.toString('base64')).digest('hex')
-  const filePath = path.resolve(__dirname, `../albumart/${fileName}.${picture.format}`)
+  const folderPath = path.resolve(__dirname, `../albumart/`)
+  if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath)
+  const filePath = path.resolve(__dirname, `../albumart/${fileName}.${picture.format.replace(/^image\//, '').replace('jpeg', 'jpg')}`)
   fs.writeFileSync(
     filePath,
     picture.data
@@ -38,7 +40,7 @@ const scannedFolders = []
 const writeMeta = (fileName, fileStats, database) => {
   return new Promise((resolve, reject) => {
     try {
-      const transformMeta = metadata => Promise.resolve(
+      const transformMeta = ({ common: metadata, format }) => Promise.resolve(
         Object.assign({}, metadata, {
           artist: (metadata.artist && metadata.artist[0]) || '',
           title: metadata.title || '',
@@ -49,7 +51,8 @@ const writeMeta = (fileName, fileStats, database) => {
           root: path.dirname(fileName),
           path: fileName,
           time: formatTime(fileStats.ctime),
-          picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0]) : null
+          picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0]) : null,
+          duration: format.duration
         })
       )
       const timer = setTimeout(() => {

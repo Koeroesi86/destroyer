@@ -15,6 +15,10 @@ function rescanLibrary (database, sender, forced = false) {
       )
     ))
     .then(folders => scanFolders(database, folders, sender))
+    .then(() => executeQuery(database, {
+      query: `SELECT * FROM library ORDER BY path ASC`,
+      variables: []
+    }))
     .then(tracks => {
       console.log(`Updating ${tracks.length} track metadata`)
       return Promise.all(
