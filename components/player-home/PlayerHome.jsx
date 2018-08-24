@@ -265,7 +265,7 @@ export default class PlayerHome extends Component {
               <div className={style.folders}>
                 {folders.map(folder => (
                   <div
-                    key={folder.path}
+                    key={`folder-${folder.path}`}
                     className={style.folder}
                     title={folder.path}
                   >
@@ -341,7 +341,7 @@ export default class PlayerHome extends Component {
           <div className={style.tracks}>
             {nowPlaying.map(track => (
               <div
-                key={track.path}
+                key={`track-${track.path}`}
                 className={classNames(style.track, {
                   [style.current]: currentSong && track.path === currentSong.path
                 })}
