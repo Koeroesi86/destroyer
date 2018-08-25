@@ -1,36 +1,14 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import _, { debounce } from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay } from '@fortawesome/free-solid-svg-icons'
 import style from './AlbumView.scss'
 import { formatTime } from '../player-home/PlayerHome'
 
 class AlbumView extends PureComponent {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      albums: []
-    }
-
-    this.update = debounce(() => {
-      this.setState({
-        albums: this.props.albums
-      })
-    }, 200)
-  }
-
-  componentDidUpdate (prevProps) {
-    if (JSON.stringify(prevProps.albums) !== JSON.stringify(this.props.albums)) {
-      this.update()
-    }
-  }
-
   render () {
-    const { playTracks, selectAlbum } = this.props
-    const { albums } = this.state
+    const { albums, playTracks, selectAlbum } = this.props
     return (
       <div className={style.albums}>
         {albums.map(album => (
@@ -59,7 +37,7 @@ class AlbumView extends PureComponent {
                   playTracks(album.tracks)
                 }}
               >
-                <FontAwesomeIcon icon={faPlay} size='sm'/>
+                <FontAwesomeIcon icon={faPlay} size='sm' />
               </div>
             </div>
           </div>

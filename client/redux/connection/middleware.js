@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron'
+import _ from 'lodash'
 
 function addListeners (eventNames, store) {
   eventNames.forEach(eventName => {
@@ -16,6 +17,7 @@ const eventNames = [
   'STORE_LIBRARY',
   'FOLDERS_ADDED_TO_LIBRARY',
   'TRACKS_ADDED_TO_LIBRARY',
+  'LIBRARY_SIZE',
   // 'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]
@@ -24,13 +26,17 @@ function rescanLibrary (forced = false) {
   ipcRenderer.send('RESCAN_LIBRARY', { forced })
 }
 
+const appLoaded = _.debounce(() => {
+  ipcRenderer.send('APP_LOADED', {})
+}, 200)
+
 const middleware = store => {
   addListeners(eventNames, store)
 
   ipcRenderer.send('APP_READY', 'Ready to receive')
 
   setInterval(() => {
-    rescanLibrary(false)
+    // rescanLibrary(false)
   }, 1000 * 60 * 60)
 
   // rescanLibrary(false)
@@ -58,6 +64,10 @@ const middleware = store => {
 
     if (action.type === 'RESCAN_LIBRARY') {
       rescanLibrary(true)
+    }
+
+    if (action.type === 'STORE_LIBRARY') {
+      appLoaded()
     }
 
     next(action)

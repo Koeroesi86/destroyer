@@ -19,6 +19,11 @@
     width: 100px;
     margin-right: 12px;
     margin-bottom: 12px;
+    animation-name: showAlbum;
+    animation-duration: .2s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+    will-change: opacity;
 
     .cover {
       width: 100px;
@@ -81,5 +86,14 @@
         transition-delay: 50ms;
       }
     }
+  }
+}
+
+@keyframes showAlbum {
+  0% {
+    opacity: .2;
+  }
+  100% {
+    opacity: 1;
   }
 }

@@ -4,6 +4,7 @@ const appConfig = {
     title: 'EMusic'
   },
   paths: [
+    '/loading.html',
     '/index.html'
   ]
 }

@@ -1,11 +1,13 @@
 import { applyMiddleware, compose, createStore } from 'redux'
 import connectionMiddleware from './redux/connection/middleware'
+import uiStateMiddleware from './redux/uiState/middleware'
 import reducers from './redux/reducers'
 
 const initialState = {}
 
 const middlewares = [
-  connectionMiddleware
+  connectionMiddleware,
+  uiStateMiddleware
 ]
 
 const middlewareEnhancers = applyMiddleware(...middlewares)

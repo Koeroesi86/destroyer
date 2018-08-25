@@ -1,0 +1,88 @@
+.controls {
+  padding-bottom: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+  .mainControlContainer {
+    margin-top: 12px;
+    padding-left: 6px;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: row;
+
+    .mainControlButton {
+      display: inline-block;
+      line-height: 24px;
+      padding: 0 6px;
+      margin-right: 6px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 0;
+      cursor: pointer;
+
+      path {
+        fill: #000;
+      }
+    }
+
+    .volume {
+      display: flex;
+      flex-direction: row;
+
+      .volumeIcon {
+        cursor: pointer;
+        margin: 0 12px;
+
+        path {
+          fill: rgba(255, 255, 255, 0.3);
+          transition: all .2s;
+        }
+
+        &:hover {
+          path {
+            fill: rgba(255, 255, 255, 0.6);
+          }
+        }
+      }
+    }
+
+    .meta {
+      margin-left: 16px;
+      text-align: left;
+      font-size: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding-right: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      .picture {
+        height: 23px;
+        width: 23px;
+        background: transparent center center no-repeat;
+        background-size: cover;
+        margin-right: 12px;
+      }
+
+      .separator {
+        margin: 0 6px;
+      }
+
+      .artist {
+
+      }
+
+      .album {
+
+      }
+
+      .title {
+
+      }
+    }
+
+    .time {
+      flex-grow: 1;
+      text-align: right;
+    }
+  }
+}

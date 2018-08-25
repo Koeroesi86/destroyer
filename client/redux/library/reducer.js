@@ -33,7 +33,6 @@ const reducer = (state = initialState, action) => {
     const receivedAlbums = Object.getOwnPropertyNames(albumsObject).map(id =>
       Object.assign({}, albumsObject[id], { id })
     )
-    console.log('received albums', receivedAlbums)
     const receivedTracks = state.tracks.slice()
     if (to) receivedTracks.splice(from, to, ...tracks)
     return Object.assign({}, state, {

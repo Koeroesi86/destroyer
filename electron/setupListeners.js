@@ -3,7 +3,6 @@ const fs = require('fs')
 const executeQuery = require('./executeQuery')
 const executeQueries = require('./executeQueries')
 const scanFolders = require('./scanFolders')
-const addTrack = require('./addTrack')
 const rescanLibrary = require('./rescanLibrary')
 
 function memorySizeOf (obj) {
@@ -45,8 +44,19 @@ function memorySizeOf (obj) {
   return formatByteSize(sizeOf(obj))
 }
 
-function setupListeners (database) {
+function setupListeners (database, windows) {
+  // loading.openDevTools()
+
+  ipcMain.once('APP_LOADED', () => {
+    windows.loading.close()
+    windows.loading = null
+    setTimeout(() => {
+      windows.main.show()
+    }, 200)
+  })
+
   ipcMain.on('APP_READY', (event) => {
+    // main.openDevTools()
     executeQuery(database, {
       query: `SELECT * FROM folders ORDER BY path ASC`,
       variables: []
@@ -58,7 +68,7 @@ function setupListeners (database) {
       query: `SELECT * FROM library ORDER BY path ASC`,
       variables: []
     }).then(library => {
-      console.log('library size', memorySizeOf({ library }))
+      event.sender.send('LIBRARY_SIZE', { size: memorySizeOf({ library }), length: library.length })
       const chunkLimit = 200
       if (library.length <= chunkLimit) {
         event.sender.send('STORE_LIBRARY', { library })

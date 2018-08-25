@@ -3,15 +3,18 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faVolumeUp, faVolumeDown, faSignal, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
 import AlbumView from '../album-view'
 import TrackView from '../track-view'
-import Slider from '../slider/Slider'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
 import Confirm from '../confirm'
 import { shell } from 'electron'
+import NowPlaying from '../now-playing'
+import PlayerControls from '../player-controls'
+import FolderManagement from '../folder-management'
+import AudioComponent from '../audio-component'
 // import Fuzz from '../fuzz'
 
 export function formatTime (seconds) {
@@ -24,65 +27,22 @@ export default class PlayerHome extends Component {
 
     this.state = {
       audioSource: null,
-      audioContext: new AudioContext(),
+      audioContext: new AudioContext(), // eslint-disable-line no-undef
       confirmMessage: null
     }
 
     this.handleDrop = this.handleDrop.bind(this)
     this.handleFileChange = this.handleFileChange.bind(this)
-    this.playTrack = this.playTrack.bind(this)
     this.play = this.play.bind(this)
     this.pause = this.pause.bind(this)
     this.confirm = this.confirm.bind(this)
+    this.handleCancel = this.handleCancel.bind(this)
+    this.handleConfirm = this.handleConfirm.bind(this)
     this.confirmCallback = () => {}
   }
 
-  componentDidMount () {
-    if (this.upload) {
-      this.upload.allowdirs = true
-      this.upload.webkitdirectory = true
-    }
-
-    if (this.audio) {
-      this.setVolume()
-      this.setState({
-        audioSource: this.state.audioContext.createMediaElementSource(this.audio)
-      })
-    }
-
-    this.seekTo(this.props.currentTime)
-
-    this.timer = setInterval(() => {
-      if (Math.floor(this.audio.currentTime * 100) !== Math.floor(this.props.currentTime * 100)) {
-        this.props.setCurrentTime(this.audio.currentTime)
-      }
-    }, 1000 / this.props.currentTimeFPS)
-  }
-
-  componentWillUnmount () {
-    clearInterval(this.timer)
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.currentSong !== this.props.currentSong) {
-      if (this.props.currentSong) {
-        this.playTrack(this.props.currentSong)
-      } else {
-        this.pause()
-      }
-    }
-
-    if (prevProps.volume !== this.props.volume) {
-      this.setVolume()
-    }
-
-    if (prevProps.currentTime !== this.props.currentTime) {
-      this.seekTo(this.props.currentTime)
-    }
-  }
-
   confirm (message, callback) {
-    this.setState((prevState, props) => {
+    this.setState(() => {
       this.confirmCallback = callback
       return { confirmMessage: message }
     })
@@ -147,31 +107,28 @@ export default class PlayerHome extends Component {
     }
   }
 
-  playTrack (track) {
-    this.audio.src = 'file://' + track.path
-    this.play()
+  handleCancel () {
+    this.confirmCallback = () => {}
+    this.setState({ confirmMessage: null })
+  }
+
+  handleConfirm () {
+    this.confirmCallback()
+    this.confirmCallback = () => {}
+    this.setState({ confirmMessage: null })
   }
 
   play () {
-    this.audio.play()
+    if (this.audio) this.audio.play()
   }
 
   pause () {
-    this.audio.pause()
-  }
-
-  seekTo (currentTime) {
-    if (this.audio.currentTime !== currentTime) {
-      this.audio.currentTime = currentTime
-    }
-  }
-
-  setVolume () {
-    this.audio.volume = this.props.volume
+    if (this.audio) this.audio.pause()
   }
 
   render () {
-    const { currentSong, currentTime, setCurrentTime, setVolume, volume, folders, view, nowPlaying } = this.props
+    const { view, setView, rescanLibrary, scanningFolder, tracks, trackEnded } = this.props
+    const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
         className={style.PlayerHome}
@@ -179,113 +136,13 @@ export default class PlayerHome extends Component {
         onDrop={this.handleDrop}
       >
         <div className={style.mainPanel}>
-          <div className={style.controls}>
-            <Slider
-              min={0}
-              max={currentSong ? currentSong.duration : 0}
-              step={0.0001}
-              value={currentTime}
-              onInput={e => { setCurrentTime(e.target.value) }}
-              onChange={() => {}}
-            />
-            <div className={style.mainControlContainer}>
-              <button
-                onClick={this.play}
-                className={style.mainControlButton}
-                disabled={!this.props.currentSong}
-              >
-                <FontAwesomeIcon icon={faPlay} size='sm' />
-              </button>
-              <button
-                onClick={this.pause}
-                className={style.mainControlButton}
-                disabled={!this.props.currentSong}
-              >
-                <FontAwesomeIcon icon={faPause} size='sm' />
-              </button>
-              <button
-                onClick={this.props.openEqualizer}
-                className={style.mainControlButton}
-              >
-                <FontAwesomeIcon icon={faSignal} size='sm' />
-              </button>
-              <div className={style.volume}>
-                <div
-                  className={style.volumeIcon}
-                  onClick={() => { setVolume(0) }}
-                >
-                  <FontAwesomeIcon icon={faVolumeDown} size='sm' />
-                </div>
-                <Slider
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={volume}
-                  onInput={e => { setVolume(e.target.value) }}
-                  onChange={() => {}}
-                />
-                <div
-                  className={style.volumeIcon}
-                  onClick={() => { this.props.setVolume(1) }}
-                >
-                  <FontAwesomeIcon icon={faVolumeUp} size='sm' />
-                </div>
-              </div>
-              {currentSong && (
-                <div className={style.meta}>
-                  {currentSong.picture && (
-                    <div
-                      className={style.picture}
-                      style={{ backgroundImage: `url("${currentSong.picture}")` }}
-                    />
-                  )}
-                  <div className={style.artist}>{currentSong.artist}</div>
-                  <div className={style.separator}>//</div>
-                  <div className={style.album}>{currentSong.album}</div>
-                  <div className={style.separator}>//</div>
-                  <div className={style.title}>{currentSong.title}</div>
-                </div>
-              )}
-              {currentSong && (
-                <div className={style.time}>
-                  {formatTime(currentTime)} / {formatTime(currentSong.duration)}
-                </div>
-              )}
-            </div>
-            <audio
-              ref={a => { this.audio = a }}
-              onEnded={() => { this.props.trackEnded() }}
-            />
-          </div>
+          <PlayerControls
+            play={this.play}
+            pause={this.pause}
+          />
           <div className={style.library}>
             <div className={style.manageLibrary}>
-              <div className={style.sectionTitle}>
-                Folders
-              </div>
-              <div className={style.folders}>
-                {folders.map(folder => (
-                  <div
-                    key={`folder-${folder.path}`}
-                    className={style.folder}
-                    title={folder.path}
-                  >
-                    {folder.path}
-                  </div>
-                ))}
-                <div
-                  className={style.addItems}
-                  onClick={() => { this.upload.click() }}
-                >
-                  Drop music folders here
-                  <input
-                    type='file'
-                    ref={ref => { this.upload = ref }}
-                    className={style.fileInput}
-                    multiple
-                    onChange={this.handleFileChange}
-                  />
-                </div>
-              </div>
+              <FolderManagement handleFileChange={this.handleFileChange} />
             </div>
             <div className={style.collection}>
               <div className={style.viewControls}>
@@ -293,7 +150,7 @@ export default class PlayerHome extends Component {
                   className={classNames(style.view, {
                     [style.current]: view === 'albums'
                   })}
-                  onClick={() => this.props.setView('albums')}
+                  onClick={() => setView('albums')}
                 >
                   Albums
                 </div>
@@ -301,16 +158,16 @@ export default class PlayerHome extends Component {
                   className={classNames(style.view, {
                     [style.current]: view === 'tracks'
                   })}
-                  onClick={() => this.props.setView('tracks')}
+                  onClick={() => setView('tracks')}
                 >
                   Songs
                 </div>
                 <div className={style.libraryControls}>
                   <button
-                    onClick={this.props.rescanLibrary}
-                    disabled={!!this.props.scanningFolder}
+                    onClick={rescanLibrary}
+                    disabled={!!scanningFolder}
                     className={classNames({
-                      [style.spinning]: this.props.scanningFolder
+                      [style.spinning]: scanningFolder
                     })}
                   >
                     <FontAwesomeIcon icon={faSyncAlt} size='sm' />
@@ -319,7 +176,7 @@ export default class PlayerHome extends Component {
                 </div>
               </div>
               <div className={style.viewPanels}>
-                {this.props.tracks.length === 0 && (
+                {tracks.length === 0 && (
                   <div>Library placeholder</div>
                 )}
                 <div className={classNames(style.albums, {
@@ -337,46 +194,39 @@ export default class PlayerHome extends Component {
           </div>
         </div>
         <div className={style.nowPlaying}>
-          <div className={style.header}>Now playing</div>
-          <div className={style.tracks}>
-            {nowPlaying.map(track => (
-              <div
-                key={`track-${track.path}`}
-                className={classNames(style.track, {
-                  [style.current]: currentSong && track.path === currentSong.path
-                })}
-                onDoubleClick={() => this.props.playTrack(track)}
-                title={`${track.track ? track.track + ' - ' : ''}${track.title}`}
-                >
-                {track.track && track.track + ' - '}
-                {track.title}
-              </div>
-              ))}
-          </div>
+          <NowPlaying />
         </div>
         <AlbumDetails />
         <Equalizer
-          source={this.state.audioSource}
-          context={this.state.audioContext}
+          source={audioSource}
+          context={audioContext}
         />
         <Confirm
-          message={this.state.confirmMessage}
-          confirm={() => {
-            this.confirmCallback()
-            this.setState({ confirmMessage: null })
-          }}
-          cancel={() => {
-            this.confirmCallback = () => {}
-            this.setState({ confirmMessage: null })
-          }}
+          message={confirmMessage}
+          confirm={this.handleConfirm}
+          cancel={this.handleCancel}
         />
         <div
           className={classNames(style.scanningFolder, {
-            [style.show]: this.props.scanningFolder
+            [style.show]: scanningFolder
           })}
         >
-          Currently scanning: <a onClick={() => shell.openItem(this.props.scanningFolder)}>{this.props.scanningFolder}</a>
+          Currently scanning:&nbsp;
+          <a
+            onClick={() => shell.openItem(scanningFolder)}
+            title={`Click to open ${scanningFolder}`}
+          >
+            {scanningFolder}
+          </a>
         </div>
+        <AudioComponent
+          createSource={node => {
+            this.audio = node
+            this.setState({
+              audioSource: this.state.audioContext.createMediaElementSource(node)
+            })
+          }}
+        />
       </div>
     )
   }
@@ -385,9 +235,7 @@ export default class PlayerHome extends Component {
 PlayerHome.defaultProps = {
   view: 'albums',
   addFiles: () => {},
-  playTrack: () => {},
   trackEnded: () => {},
-  openEqualizer: () => {},
   setView: () => {},
   setCurrentTime: () => {},
   folders: [],
@@ -396,7 +244,6 @@ PlayerHome.defaultProps = {
   currentTime: 0,
   currentTimeFPS: 30,
   volume: 0.5,
-  setVolume: () => {},
   rescanLibrary: () => {}
 }
 
@@ -416,24 +263,15 @@ export const trackType = {
 PlayerHome.propTypes = {
   view: PropTypes.string,
   addFiles: PropTypes.func,
-  playTrack: PropTypes.func,
   trackEnded: PropTypes.func,
-  openEqualizer: PropTypes.func,
   rescanLibrary: PropTypes.func,
-  volume: PropTypes.number,
-  setVolume: PropTypes.func,
   setView: PropTypes.func,
-  setCurrentTime: PropTypes.func,
-  currentTimeFPS: PropTypes.number,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,
       path: PropTypes.string
     })
   ),
-  currentSong: PropTypes.shape(trackType),
-  currentTime: PropTypes.number,
   scanningFolder: PropTypes.string,
-  nowPlaying: PropTypes.arrayOf(PropTypes.shape(trackType)),
   tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
 }

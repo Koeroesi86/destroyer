@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rm -r bundle || true",
     "prebuild": "yarn run clean",
-    "postinstall-win": "electron-builder install-app-deps",
+    "postinstall": "node scripts/postinstall.js",
     "dev": "node --max_old_space_size=2048 scripts/start.js",
     "build": "webpack --progress --config config/webpack.config.base.js",
     "start": "electron index.js",
@@ -43,6 +43,7 @@
     "react-redux": "^5.0.7",
     "redux": "^3.6.0",
     "scroll-animator": "^1.1.0",
+    "slugify": "^1.3.1",
     "sqlite3": "^4.0.2",
     "walk": "^2.3.9"
   },

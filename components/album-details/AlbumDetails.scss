@@ -112,6 +112,20 @@
     justify-content: space-around;
     background: #333333;
     font-size: 13px;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+
+    &:hover {
+      background: #000000;
+
+      path {
+        fill: #ffffff;
+      }
+
+      label {
+        color: #ffffff;
+      }
+    }
 
     path {
       fill: #efefef;
