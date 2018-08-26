@@ -1,0 +1,101 @@
+.localCollection {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+
+  .viewControls {
+    -webkit-app-region: drag;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px;
+
+    .libraryControls {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+
+      button {
+        -webkit-app-region: no-drag;
+        padding: 0 10px;
+        line-height: 30px;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 0;
+        color: #efefef;
+        cursor: pointer;
+        transition: all .2s ease-in-out;
+        border-radius: 3px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+        }
+
+        &.spinning {
+          > svg {
+            animation-play-state: running;
+          }
+        }
+
+        > svg {
+          margin-left: 2px;
+          margin-right: 4px;
+          animation-name: spin;
+          animation-duration: 1s;
+          animation-iteration-count: infinite;
+          animation-timing-function: linear;
+          animation-play-state: paused;
+        }
+      }
+    }
+
+    .view {
+      -webkit-app-region: no-drag;
+      margin-right: 12px;
+      line-height: 32px;
+      cursor: pointer;
+      transition: all .2s ease-in-out;
+
+      &:hover:not(.current) {
+        color: #c78080;
+      }
+
+      &.current {
+        color: #ff8686;
+      }
+    }
+  }
+
+  .viewPanels {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+
+    .albums,
+    .tracks {
+      flex: 0 0;
+      position: relative;
+      display: flex;
+      height: 0;
+      width: 0;
+      transform: translateY(20px);
+      transform-origin: top;
+      transition: transform .2s ease-in-out, opacity .2s ease-in-out;
+      opacity: 0;
+      overflow: hidden;
+      will-change: transform, opacity, height;
+
+      &.active {
+        flex: 1 1 auto;
+        height: auto;
+        width: auto;
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}

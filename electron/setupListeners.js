@@ -1,5 +1,6 @@
 const { ipcMain } = require('electron')
 const fs = require('fs')
+const electronVibrancy = require('electron-vibrancy')
 const executeQuery = require('./executeQuery')
 const executeQueries = require('./executeQueries')
 const scanFolders = require('./scanFolders')
@@ -52,6 +53,7 @@ function setupListeners (database, windows) {
     windows.loading = null
     setTimeout(() => {
       windows.main.show()
+      electronVibrancy.SetVibrancy(windows.main, 0)
     }, 200)
   })
 

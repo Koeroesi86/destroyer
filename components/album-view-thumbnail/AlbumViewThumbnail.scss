@@ -1,0 +1,93 @@
+.albumViewThumbnail {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100px;
+  margin-right: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  .cover {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    height: 100px;
+    background: #efefef url(./assets/album-placeholder.png) no-repeat center center;
+    background-size: cover;
+    border: 0;
+    transition: all .2s ease-in-out;
+    border-radius: 3px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8), inset 0 0 0px 2px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+
+      .overlay {
+        opacity: 1;
+        transition-delay: 50ms;
+      }
+    }
+  }
+
+  .overlay {
+    flex: 1 1 auto;
+    position: relative;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    will-change: opacity;
+    font-size: 10px;
+  }
+
+  .meta {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 3px #000;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    color: #ffffff;
+
+    .title {
+      margin-top: 3px;
+      line-height: 16px;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .artist,
+    .duration {
+      line-height: 12px;
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .icon {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: space-around;
+    width: 20px;
+    height: 20px;
+    background: rgba(51, 51, 51, 0.4);
+    border-radius: 50%;
+    box-shadow: 0 0 3px #fff;
+
+    path {
+      fill: rgba(255, 255, 255, 0.6);
+    }
+  }
+}

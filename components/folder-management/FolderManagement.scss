@@ -1,11 +1,11 @@
 .folderManagement {
+  padding-left: 12px;
+
   .sectionTitle {
     font-size: 16px;
     line-height: 24px;
     font-weight: 100;
-    padding: 6px;
-    margin-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 0;
   }
 
   .fileInput {
@@ -14,8 +14,8 @@
 
   .folders {
     .folder {
-      margin-bottom: 12px;
-      padding-left: 6px;
+      -webkit-app-region: no-drag;
+      margin-bottom: 6px;
       font-size: 12px;
       overflow-x: hidden;
       white-space: nowrap;
@@ -23,7 +23,7 @@
     }
 
     .addItems {
-      padding-left: 6px;
+      -webkit-app-region: no-drag;
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;

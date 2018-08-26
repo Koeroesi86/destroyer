@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { formatTime, trackType } from '../player-home/PlayerHome'
+import _ from 'lodash'
+import { trackType } from '../player-home/PlayerHome'
 import style from './TrackView.scss'
+import TrackViewItem from '../track-view-item'
 
 class TrackView extends PureComponent {
   constructor (props) {
@@ -10,23 +12,84 @@ class TrackView extends PureComponent {
 
     this.state = {
       selectedTracks: [],
-      tracks: []
+      tracks: this.props.tracks,
+      scrolledTop: true
+    }
+    this.toggleTrack = this.toggleTrack.bind(this)
+    this.doubleClickTrack = this.doubleClickTrack.bind(this)
+    this.onScroll = this.onScroll.bind(this)
+    this.updateTracks = _.debounce((tracks) => {
+      this.setState({ tracks })
+    }, 200)
+  }
+
+  componentDidMount () {
+    if (this.listing) {
+      this.listing.addEventListener('scroll', this.onScroll)
+    }
+  }
+
+  componentWillUnmount () {
+    if (this.listing) {
+      this.listing.removeEventListener('scroll', this.onScroll)
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tracks.length !== prevProps.tracks.length) {
+      this.updateTracks(this.props.tracks)
+    }
+  }
+
+  shouldComponentUpdate (prevProps, prevState) {
+    if (this.state.scrolledTop !== prevState.scrolledTop) {
+      return true
+    }
+
+    if (this.state.selectedTracks.length !== prevState.selectedTracks.length) {
+      return true
+    }
+
+    if (this.props.currentSong !== prevProps.currentSong || this.props.playTracks !== prevProps.playTracks) {
+      return true
+    }
+
+    if (JSON.stringify(this.props.tracks) !== JSON.stringify(prevProps.tracks)) {
+      return true
+    }
+
+    if (JSON.stringify(this.state.tracks) !== JSON.stringify(prevState.tracks)) {
+      return true
+    }
+
+    return false
+  }
+
+  onScroll (e) {
+    const { scrollTop } = e.target
+    if (scrollTop > 0) {
+      if (this.state.scrolledTop) {
+        this.setState({ scrolledTop: false })
+      }
+    } else {
+      if (!this.state.scrolledTop) {
+        this.setState({ scrolledTop: true })
+      }
     }
   }
 
   toggleTrack (track) {
-    if (!this.state.selectedTracks.includes(track)) {
-      const selectedTracks = this.state.selectedTracks.slice()
-      selectedTracks.push(track)
+    const prevSelectedTracks = this.state.selectedTracks.slice(0)
+    if (!prevSelectedTracks.includes(track)) {
+      prevSelectedTracks.push(track)
       this.setState({
-        selectedTracks
+        selectedTracks: prevSelectedTracks
       })
     } else {
-      const selectedTracks = this.state.selectedTracks.slice()
-      const index = selectedTracks.indexOf(track)
-      selectedTracks.splice(index, 1)
+      const index = prevSelectedTracks.indexOf(track)
+      prevSelectedTracks.splice(index, 1)
       this.setState({
-        selectedTracks
+        selectedTracks: prevSelectedTracks
       })
     }
   }
@@ -40,48 +103,53 @@ class TrackView extends PureComponent {
   }
 
   render () {
-    const { tracks, currentSong, playTracks } = this.props
-    const { selectedTracks } = this.state
+    const { currentSong, playTracks } = this.props
+    const { selectedTracks, scrolledTop, tracks } = this.state
+    const headerLabels = {
+      duration: 'Duration',
+      artist: 'Artist',
+      year: 'Year',
+      album: 'Album',
+      track: '#',
+      title: 'Title'
+    }
     return (
       <div className={style.tracks}>
+        <TrackViewItem
+          track={headerLabels}
+          isHeader
+        />
         <div
-          className={classNames(style.track, style.header)}
-        >
-          <div className={classNames(style.field, style.duration)}>Duration</div>
-          <div className={classNames(style.field, style.artist)}>Artist</div>
-          <div className={classNames(style.field, style.year)}>Year</div>
-          <div className={classNames(style.field, style.album)}>Album</div>
-          <div className={classNames(style.field, style.trackNo)}>#</div>
-          <div className={classNames(style.field, style.title)}>Title</div>
-        </div>
-        <div className={style.listing}>
+          className={classNames(style.separator, {
+            [style.scrolled]: !scrolledTop
+          })}
+        />
+        <div className={style.listing} ref={l => { this.listing = l }}>
           {tracks.map(track => (
-            <div
+            <TrackViewItem
               key={track.path}
-              className={classNames(style.track, {
-                [style.selected]: selectedTracks.includes(track),
-                [style.current]: currentSong && currentSong.path === track.path
-              })}
-              onClick={() => this.toggleTrack(track)}
-              onDoubleClick={() => this.doubleClickTrack(track)}
-            >
-              <div className={classNames(style.field, style.duration)}>{formatTime(track.duration)}</div>
-              <div className={classNames(style.field, style.artist)}>{track.artist}</div>
-              <div className={classNames(style.field, style.year)}>{track.year || '-'}</div>
-              <div className={classNames(style.field, style.album)}>{track.album || '-'}</div>
-              <div className={classNames(style.field, style.trackNo)}>{track.track || '-'}</div>
-              <div className={classNames(style.field, style.title)}><div>{track.title || '-'}</div></div>
-            </div>
+              track={track}
+              isSelected={selectedTracks.includes(track)}
+              isCurrent={currentSong && currentSong.path === track.path}
+              clickTrack={this.toggleTrack}
+              doubleClickTrack={this.doubleClickTrack}
+            />
           ))}
         </div>
         <div className={style.controls}>
-          <button onClick={() => { this.setState({ selectedTracks: [] }) }}>
+          <button
+            onClick={() => { this.setState({ selectedTracks: [] }) }}
+          >
             Clear selection
           </button>
-          <button onClick={() => { this.setState({ selectedTracks: tracks }) }}>
+          <button
+            onClick={() => { this.setState({ selectedTracks: tracks }) }}
+          >
             Select All
           </button>
-          <button onClick={() => { playTracks(selectedTracks) }}>
+          <button
+            onClick={() => { playTracks(selectedTracks) }}
+          >
             Play selected
           </button>
         </div>

@@ -1,4 +1,6 @@
-const { app, ipcMain } = require('electron')
+const { app } = require('electron')
+// const electronAcrylic = require('electron-acrylic')
+const electronVibrancy = require('electron-vibrancy')
 const createWindow = require('./electron/createWindow')
 const getLoadingWindow = require('./electron/getLoadingWindow')
 const createDatabase = require('./electron/createDatabase')
@@ -42,6 +44,8 @@ createDatabase()
     windows.loading.loadURL(loadingLocation)
     windows.loading.once('ready-to-show', () => {
       windows.loading.show()
+      // electronAcrylic.setAcrylic(windows.loading, 0xFFFFFF)
+      electronVibrancy.SetVibrancy(windows.loading, 0)
     })
 
     initWindow()

@@ -15,7 +15,7 @@ import NowPlaying from '../now-playing'
 import PlayerControls from '../player-controls'
 import FolderManagement from '../folder-management'
 import AudioComponent from '../audio-component'
-// import Fuzz from '../fuzz'
+import LocalCollection from '../local-collection/LocalCollection'
 
 export function formatTime (seconds) {
   return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
@@ -127,7 +127,7 @@ export default class PlayerHome extends Component {
   }
 
   render () {
-    const { view, setView, rescanLibrary, scanningFolder, tracks, trackEnded } = this.props
+    const { view, setView, rescanLibrary, scanningFolder, tracks } = this.props
     const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
@@ -135,66 +135,33 @@ export default class PlayerHome extends Component {
         onDragOver={e => e.preventDefault()}
         onDrop={this.handleDrop}
       >
-        <div className={style.mainPanel}>
+        <div className={style.wrapper}>
+          <div className={style.mainPanel}>
+            <div className={style.library}>
+              <div className={style.manageLibrary}>
+                <div className={style.titleBar}>
+                  Emusic
+                </div>
+                <FolderManagement handleFileChange={this.handleFileChange} />
+              </div>
+              <div className={style.collection}>
+                <LocalCollection
+                  view={view}
+                  setView={setView}
+                  rescanLibrary={rescanLibrary}
+                  scanningFolder={scanningFolder}
+                  tracks={tracks}
+                />
+              </div>
+            </div>
+            <div className={style.nowPlaying}>
+              <NowPlaying />
+            </div>
+          </div>
           <PlayerControls
             play={this.play}
             pause={this.pause}
           />
-          <div className={style.library}>
-            <div className={style.manageLibrary}>
-              <FolderManagement handleFileChange={this.handleFileChange} />
-            </div>
-            <div className={style.collection}>
-              <div className={style.viewControls}>
-                <div
-                  className={classNames(style.view, {
-                    [style.current]: view === 'albums'
-                  })}
-                  onClick={() => setView('albums')}
-                >
-                  Albums
-                </div>
-                <div
-                  className={classNames(style.view, {
-                    [style.current]: view === 'tracks'
-                  })}
-                  onClick={() => setView('tracks')}
-                >
-                  Songs
-                </div>
-                <div className={style.libraryControls}>
-                  <button
-                    onClick={rescanLibrary}
-                    disabled={!!scanningFolder}
-                    className={classNames({
-                      [style.spinning]: scanningFolder
-                    })}
-                  >
-                    <FontAwesomeIcon icon={faSyncAlt} size='sm' />
-                    Rescan
-                  </button>
-                </div>
-              </div>
-              <div className={style.viewPanels}>
-                {tracks.length === 0 && (
-                  <div>Library placeholder</div>
-                )}
-                <div className={classNames(style.albums, {
-                  [style.active]: view === 'albums'
-                })}>
-                  <AlbumView />
-                </div>
-                <div className={classNames(style.albums, {
-                  [style.active]: view === 'tracks'
-                })}>
-                  <TrackView />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={style.nowPlaying}>
-          <NowPlaying />
         </div>
         <AlbumDetails />
         <Equalizer
@@ -251,7 +218,7 @@ export const trackType = {
   album: PropTypes.string,
   artist: PropTypes.string,
   disk: PropTypes.string,
-  duration: PropTypes.number,
+  duration: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   genre: PropTypes.string,
   path: PropTypes.string,
   picture: PropTypes.string,

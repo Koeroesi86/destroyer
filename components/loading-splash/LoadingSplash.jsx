@@ -10,10 +10,10 @@ const style = {
     WebkitAppRegion: 'drag',
     WebkitUserSelect: 'none',
     position: 'absolute',
-    top: '5%',
-    left: '5%',
-    width: '90%',
-    height: '90%',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -21,7 +21,7 @@ const style = {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     fontFamily: 'sans-serif',
     color: '#ffffff',
-    boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.3)'
+    borderRadius: '6px'
   },
   wrapper: {
     display: 'flex',

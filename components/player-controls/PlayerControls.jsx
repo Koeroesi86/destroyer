@@ -18,87 +18,91 @@ function PlayerControls ({
 }) {
   return (
     <div className={style.controls}>
-      <Slider
-        min={0}
-        max={currentSong ? currentSong.duration : 0}
-        step={0.0001}
-        value={currentTime}
-        onInput={e => {
-          setCurrentTime(e.target.value)
-        }}
-        onChange={() => {
-        }}
-      />
-      <div className={style.mainControlContainer}>
-        <button
-          onClick={play}
-          className={style.mainControlButton}
-          disabled={!currentSong}
-        >
-          <FontAwesomeIcon icon={faPlay} size='sm' />
-        </button>
-        <button
-          onClick={pause}
-          className={style.mainControlButton}
-          disabled={!currentSong}
-        >
-          <FontAwesomeIcon icon={faPause} size='sm' />
-        </button>
-        <button
-          onClick={openEqualizer}
-          className={style.mainControlButton}
-        >
-          <FontAwesomeIcon icon={faSignal} size='sm' />
-        </button>
-        <div className={style.volume}>
-          <div
-            className={style.volumeIcon}
-            onClick={() => {
-              setVolume(0)
-            }}
-          >
-            <FontAwesomeIcon icon={faVolumeDown} size='sm' />
+      {currentSong && (
+        <div className={style.meta}>
+          {currentSong.picture && (
+            <div
+              className={style.picture}
+              style={{ backgroundImage: `url("${currentSong.picture}")` }}
+            />
+          )}
+          <div className={style.details}>
+            <div className={style.title}>{currentSong.title}</div>
+            <div className={style.album}>{currentSong.album}</div>
+            <div className={style.artist}>{currentSong.artist}</div>
+            <div className={style.time}>
+              {formatTime(currentTime)} / {formatTime(currentSong.duration)}
+            </div>
           </div>
+        </div>
+      )}
+      <div className={style.controlsContainer}>
+        <div className={style.progress}>
           <Slider
             min={0}
-            max={1}
-            step={0.01}
-            value={volume}
+            max={currentSong ? currentSong.duration : 0}
+            step={0.0001}
+            value={currentTime}
             onInput={e => {
-              setVolume(e.target.value)
+              setCurrentTime(e.target.value)
             }}
             onChange={() => {
             }}
           />
-          <div
-            className={style.volumeIcon}
-            onClick={() => {
-              setVolume(1)
-            }}
-          >
-            <FontAwesomeIcon icon={faVolumeUp} size='sm' />
+        </div>
+        <div className={style.mainControlContainer}>
+          <div className={style.mainControlButtons}>
+            <button
+              onClick={play}
+              className={style.mainControlButton}
+              disabled={!currentSong}
+            >
+              <FontAwesomeIcon icon={faPlay} size='sm' />
+            </button>
+            <button
+              onClick={pause}
+              className={style.mainControlButton}
+              disabled={!currentSong}
+            >
+              <FontAwesomeIcon icon={faPause} size='sm' />
+            </button>
+            <button
+              onClick={openEqualizer}
+              className={style.mainControlButton}
+            >
+              <FontAwesomeIcon icon={faSignal} size='sm' />
+            </button>
+          </div>
+          <div className={style.volume}>
+            <div
+              className={style.volumeIcon}
+              onClick={() => {
+                setVolume(0)
+              }}
+            >
+              <FontAwesomeIcon icon={faVolumeDown} size='sm' />
+            </div>
+            <Slider
+              min={0}
+              max={1}
+              step={0.01}
+              value={volume}
+              onInput={e => {
+                setVolume(e.target.value)
+              }}
+              onChange={() => {
+              }}
+            />
+            <div
+              className={style.volumeIcon}
+              onClick={() => {
+                setVolume(1)
+              }}
+            >
+              <FontAwesomeIcon icon={faVolumeUp} size='sm' />
+            </div>
           </div>
         </div>
-        {currentSong && (
-          <div className={style.meta}>
-            {currentSong.picture && (
-              <div
-                className={style.picture}
-                style={{ backgroundImage: `url("${currentSong.picture}")` }}
-              />
-            )}
-            <div className={style.artist}>{currentSong.artist}</div>
-            <div className={style.separator}>//</div>
-            <div className={style.album}>{currentSong.album}</div>
-            <div className={style.separator}>//</div>
-            <div className={style.title}>{currentSong.title}</div>
-          </div>
-        )}
-        {currentSong && (
-          <div className={style.time}>
-            {formatTime(currentTime)} / {formatTime(currentSong.duration)}
-          </div>
-        )}
       </div>
     </div>
   )

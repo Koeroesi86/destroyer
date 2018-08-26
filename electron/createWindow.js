@@ -25,7 +25,8 @@ const createWindow = (app) => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    frame: true,
+    frame: false,
+    transparent: true,
     darkTheme: true,
     show: false,
     webPreferences: {
@@ -35,6 +36,7 @@ const createWindow = (app) => {
   })
   mainWindowState.manage(mainWindow)
   mainWindow.setTouchBar(touchBar)
+  mainWindow.setVibrancy('dark')
 
   app.updateTouchBar = metadata => {
     artist.label = metadata.artist

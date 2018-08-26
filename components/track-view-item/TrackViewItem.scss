@@ -1,0 +1,69 @@
+.trackViewItem {
+  flex-grow: 0;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  transition: all .2s ease-in-out;
+
+  &:not(.header) {
+    cursor: pointer;
+  }
+
+  &.header {
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px 0;
+  }
+
+  &.selected {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.current {
+    font-weight: 600;
+  }
+
+  .field {
+    padding-right: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.duration {
+      width: 70px;
+      padding-left: 6px;
+    }
+
+    &.artist {
+      width: 150px;
+    }
+
+    &.year {
+      width: 50px;
+    }
+
+    &.album {
+      width: 150px;
+    }
+
+    &.trackNo {
+      width: 35px;
+      text-align: right;
+    }
+
+    &.title {
+      flex: 1;
+      min-width: 0;
+
+      // TODO: something is bonkers here
+      &> div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}

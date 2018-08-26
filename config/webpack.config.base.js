@@ -42,7 +42,7 @@ const config = {
             options: {
               modules: true,
               importLoaders: 1,
-              localIdentName: '[sha1:hash:hex:4]'
+              localIdentName: (process.env.NODE_ENV === 'production' ? '[sha1:hash:hex:4]' : '[path][name]__[local]--[hash:base64:5]')
             }
           },
           {
