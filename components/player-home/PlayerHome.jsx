@@ -125,11 +125,13 @@ export default class PlayerHome extends Component {
   }
 
   render () {
-    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize } = this.props
+    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize, maximized } = this.props
     const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
-        className={style.PlayerHome}
+        className={classNames(style.playerHome, {
+          [style.maximized]: maximized
+        })}
         onDragOver={e => e.preventDefault()}
         onDrop={this.handleDrop}
       >
@@ -223,7 +225,8 @@ PlayerHome.defaultProps = {
   currentTime: 0,
   currentTimeFPS: 30,
   volume: 0.5,
-  rescanLibrary: () => {}
+  rescanLibrary: () => {},
+  maximized: false
 }
 
 export const trackType = {
@@ -240,6 +243,7 @@ export const trackType = {
 }
 
 PlayerHome.propTypes = {
+  maximized: PropTypes.bool,
   view: PropTypes.string,
   close: PropTypes.func,
   minimize: PropTypes.func,

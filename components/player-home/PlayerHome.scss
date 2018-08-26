@@ -10,7 +10,7 @@ html, body {
   -webkit-app-region: no-drag;
 }
 
-.PlayerHome {
+.playerHome {
   position: absolute;
   top: 0;
   left: 0;
@@ -24,6 +24,10 @@ html, body {
   font-family: "Open Sans", sans-serif;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.3);
+
+  &.maximized {
+    border-radius: 0;
+  }
 
   audio {
     display: none;

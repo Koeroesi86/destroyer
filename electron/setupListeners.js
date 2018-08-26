@@ -65,14 +65,16 @@ function setupListeners (database, windows) {
     windows.main.minimize()
   })
 
+  let isMaximized = false
   ipcMain.on('MAXIMIZE_APP', (event) => {
-    if (windows.main.isMaximized()) {
+    // windows.main.isMaximized() is not working
+    if (isMaximized) {
       windows.main.unmaximize()
-      event.sender.send('MAXIMIZED_APP', { maximized: false })
     } else {
       windows.main.maximize()
-      event.sender.send('MAXIMIZED_APP', { maximized: true })
     }
+    isMaximized = !isMaximized
+    event.sender.send('MAXIMIZED_APP', { maximized: isMaximized })
   })
 
   ipcMain.on('APP_READY', (event) => {

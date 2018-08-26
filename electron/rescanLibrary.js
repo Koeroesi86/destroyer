@@ -9,11 +9,20 @@ function rescanLibrary (database, sender, forced = false) {
     query: `SELECT * FROM folders ORDER BY path ASC`,
     variables: []
   })
-    .then(folders => Promise.resolve(
-      folders.filter(folder =>
-        fs.existsSync(folder.path) && (folder.lastModified < Math.floor(fs.statSync(folder.path).mtimeMs) || forced)
+    .then(folders => {
+      folders.map(folder => executeQuery(database, {
+        query: `INSERT OR REPLACE INTO folders (path, lastModified) VALUES (?, ?)`,
+        variables: [
+          folder.path,
+          Math.floor(fs.statSync(folder.path).mtimeMs)
+        ]
+      }))
+      return Promise.resolve(
+        folders.filter(folder =>
+          fs.existsSync(folder.path) && (folder.lastModified < Math.floor(fs.statSync(folder.path).mtimeMs) || forced)
+        )
       )
-    ))
+    })
     .then(folders => scanFolders(database, folders, sender))
     .then(() => executeQuery(database, {
       query: `SELECT * FROM library ORDER BY path ASC`,

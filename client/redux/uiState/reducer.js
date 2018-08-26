@@ -6,7 +6,8 @@ const initialState = {
   volume: 0.5,
   selectedAlbum: null,
   showEqualizer: false,
-  scanningFolder: null
+  scanningFolder: null,
+  maximized: false
 }
 
 const reducer = (state = initialState, action) => {
@@ -85,6 +86,12 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'STORE_LIBRARY') {
     return Object.assign({}, state, {
       scanningFolder: null
+    })
+  }
+
+  if (action.type === 'MAXIMIZED_APP') {
+    return Object.assign({}, state, {
+      maximized: action.payload.maximized
     })
   }
 

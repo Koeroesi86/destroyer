@@ -29,7 +29,7 @@ function rescanLibrary (forced = false) {
 
 const appLoaded = _.debounce(() => {
   ipcRenderer.send('APP_LOADED', {})
-}, 200)
+}, 1000)
 
 const middleware = store => {
   addListeners(eventNames, store)
@@ -37,10 +37,10 @@ const middleware = store => {
   ipcRenderer.send('APP_READY', 'Ready to receive')
 
   setInterval(() => {
-    // rescanLibrary(false)
+    rescanLibrary(false)
   }, 1000 * 60 * 60)
 
-  // rescanLibrary(false)
+  rescanLibrary(false)
 
   return next => action => {
     if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER'].includes(action.type)) {

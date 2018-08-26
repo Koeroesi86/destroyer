@@ -4,6 +4,7 @@ import PlayerHome from './PlayerHome.jsx'
 const mapState = state => ({
   tracks: state.library.tracks,
   volume: state.uiState.volume,
+  maximized: state.uiState.maximized,
   view: state.uiState.view,
   currentSong: state.uiState.currentSong,
   currentTime: state.uiState.currentTime,
