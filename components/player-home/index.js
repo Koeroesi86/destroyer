@@ -20,7 +20,10 @@ const mapDispatch = dispatch => ({
   openEqualizer: () => dispatch({ type: 'OPEN_EQUALIZER', payload: {} }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
   trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),
-  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} })
+  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} }),
+  close: () => dispatch({ type: 'CLOSE_APP', payload: {} }),
+  minimize: () => dispatch({ type: 'MINIMIZE_APP', payload: {} }),
+  maximize: () => dispatch({ type: 'MAXIMIZE_APP', payload: {} })
 })
 
 const ConnectedPlayerHome = connect(

@@ -57,6 +57,24 @@ function setupListeners (database, windows) {
     }, 200)
   })
 
+  ipcMain.on('CLOSE_APP', () => {
+    windows.main.close()
+  })
+
+  ipcMain.on('MINIMIZE_APP', () => {
+    windows.main.minimize()
+  })
+
+  ipcMain.on('MAXIMIZE_APP', (event) => {
+    if (windows.main.isMaximized()) {
+      windows.main.unmaximize()
+      event.sender.send('MAXIMIZED_APP', { maximized: false })
+    } else {
+      windows.main.maximize()
+      event.sender.send('MAXIMIZED_APP', { maximized: true })
+    }
+  })
+
   ipcMain.on('APP_READY', (event) => {
     // main.openDevTools()
     executeQuery(database, {

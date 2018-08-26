@@ -18,6 +18,7 @@ const eventNames = [
   'FOLDERS_ADDED_TO_LIBRARY',
   'TRACKS_ADDED_TO_LIBRARY',
   'LIBRARY_SIZE',
+  'MAXIMIZED_APP',
   // 'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]
@@ -68,6 +69,18 @@ const middleware = store => {
 
     if (action.type === 'STORE_LIBRARY') {
       appLoaded()
+    }
+
+    if (action.type === 'CLOSE_APP') {
+      ipcRenderer.send('CLOSE_APP', {})
+    }
+
+    if (action.type === 'MINIMIZE_APP') {
+      ipcRenderer.send('MINIMIZE_APP', {})
+    }
+
+    if (action.type === 'MAXIMIZE_APP') {
+      ipcRenderer.send('MAXIMIZE_APP', {})
     }
 
     next(action)

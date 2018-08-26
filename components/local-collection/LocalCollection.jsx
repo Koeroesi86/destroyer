@@ -44,7 +44,7 @@ class LocalCollection extends PureComponent {
           </div>
         </div>
         <div className={style.viewPanels}>
-          {tracks.length === 0 && (
+          {tracks.length === 0 && false && (
             <div>Library placeholder</div>
           )}
           <div className={classNames(style.albums, {

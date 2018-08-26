@@ -4,7 +4,6 @@ import classNames from 'classnames'
 import style from './AlbumView.scss'
 import AlbumViewThumbnail from '../album-view-thumbnail'
 import _ from 'lodash'
-import TrackViewItem from '../track-view-item'
 
 class AlbumView extends PureComponent {
   constructor (props) {
@@ -12,13 +11,19 @@ class AlbumView extends PureComponent {
 
     this.state = {
       albums: this.props.albums,
-      scrolledTop: true
+      scrolledTop: true,
+      loaded: false
     }
 
     this.updateAlbums = _.debounce(() => {
       this.setState({
         albums: this.props.albums
       })
+      if (!this.state.loaded) {
+        setTimeout(() => {
+          this.setState({ loaded: true })
+        }, 500)
+      }
     }, 200)
     this.onScroll = this.onScroll.bind(this)
   }
@@ -56,14 +61,19 @@ class AlbumView extends PureComponent {
 
   render () {
     const { playTracks, selectAlbum } = this.props
-    const { albums, scrolledTop } = this.state
+    const { albums, scrolledTop, loaded } = this.state
     return (
-      <div className={style.albums}>
+      <div className={classNames(style.albums, {
+        [style.loaded]: loaded
+      })}>
         <div
           className={classNames(style.separator, {
             [style.scrolled]: !scrolledTop
           })}
         />
+        <div className={style.loadingContainer}>
+          Loading library...
+        </div>
         <div
           className={style.listing}
           ref={l => { this.listing = l }}

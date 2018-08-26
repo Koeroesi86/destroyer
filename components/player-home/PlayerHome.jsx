@@ -3,10 +3,8 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { faWindowMinimize, faWindowMaximize, faTimes } from '@fortawesome/free-solid-svg-icons'
 import style from './PlayerHome.scss'
-import AlbumView from '../album-view'
-import TrackView from '../track-view'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
 import Confirm from '../confirm'
@@ -127,7 +125,7 @@ export default class PlayerHome extends Component {
   }
 
   render () {
-    const { view, setView, rescanLibrary, scanningFolder, tracks } = this.props
+    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize } = this.props
     const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
@@ -140,7 +138,18 @@ export default class PlayerHome extends Component {
             <div className={style.library}>
               <div className={style.manageLibrary}>
                 <div className={style.titleBar}>
-                  Emusic
+                  <div className={style.buttons}>
+                    <span className={style.button} onClick={close}>
+                      <FontAwesomeIcon icon={faTimes} size={'1x'} />
+                    </span>
+                    <span className={style.button} onClick={minimize}>
+                      <FontAwesomeIcon icon={faWindowMinimize} size={'1x'} />
+                    </span>
+                    <span className={style.button} onClick={maximize}>
+                      <FontAwesomeIcon icon={faWindowMaximize} size={'1x'} />
+                    </span>
+                  </div>
+                  <div className={style.title}>Emusic</div>
                 </div>
                 <FolderManagement handleFileChange={this.handleFileChange} />
               </div>
@@ -205,6 +214,9 @@ PlayerHome.defaultProps = {
   trackEnded: () => {},
   setView: () => {},
   setCurrentTime: () => {},
+  close: () => {},
+  minimize: () => {},
+  maximize: () => {},
   folders: [],
   tracks: [],
   currentSong: null,
@@ -229,6 +241,9 @@ export const trackType = {
 
 PlayerHome.propTypes = {
   view: PropTypes.string,
+  close: PropTypes.func,
+  minimize: PropTypes.func,
+  maximize: PropTypes.func,
   addFiles: PropTypes.func,
   trackEnded: PropTypes.func,
   rescanLibrary: PropTypes.func,

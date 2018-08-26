@@ -7,6 +7,7 @@ $FontPath: './fonts/fonts';
 
 html, body {
   background: transparent;
+  -webkit-app-region: no-drag;
 }
 
 .PlayerHome {
@@ -51,8 +52,39 @@ html, body {
 
   .titleBar {
     flex: 0;
-    line-height: 35px;
-    padding: 0 12px;
+
+    .buttons {
+      line-height: 56px;
+      padding-left: 22px;
+      background-color: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+
+      .button {
+        -webkit-app-region: no-drag;
+        display: inline-block;
+        margin-right: 16px;
+        cursor: pointer;
+
+        &:hover {
+          path {
+            fill: #ff8686;
+          }
+        }
+
+        path {
+          fill: #cccccc;
+          transition: all .2s ease-in-out;
+          will-change: fill;
+        }
+      }
+    }
+
+    .title {
+      line-height: 40px;
+      padding: 0 12px;
+      font-size: 18px;
+      color: #ff8686;
+    }
   }
 
   .wrapper {

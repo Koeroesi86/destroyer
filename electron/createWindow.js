@@ -18,7 +18,8 @@ const touchBar = new TouchBar([
 const createWindow = (app) => {
   let mainWindowState = windowStateKeeper({
     defaultWidth: 1200,
-    defaultHeight: 800
+    defaultHeight: 800,
+    maximize: false
   })
   const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
@@ -37,6 +38,7 @@ const createWindow = (app) => {
   mainWindowState.manage(mainWindow)
   mainWindow.setTouchBar(touchBar)
   mainWindow.setVibrancy('dark')
+  mainWindow.setFullScreenable(false)
 
   app.updateTouchBar = metadata => {
     artist.label = metadata.artist
