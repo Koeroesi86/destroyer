@@ -7,6 +7,8 @@ const initialState = {
   selectedAlbum: null,
   showEqualizer: false,
   scanningFolder: null,
+  progress: 0,
+  totalCount: 0,
   maximized: false
 }
 
@@ -80,6 +82,14 @@ const reducer = (state = initialState, action) => {
     const { folder } = action.payload
     return Object.assign({}, state, {
       scanningFolder: folder
+    })
+  }
+
+  if (action.type === 'SCANNING_FILE') {
+    const { progress, totalCount } = action.payload
+    return Object.assign({}, state, {
+      progress,
+      totalCount
     })
   }
 

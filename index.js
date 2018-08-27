@@ -1,6 +1,9 @@
 const { app } = require('electron')
 // const electronAcrylic = require('electron-acrylic')
 const electronVibrancy = require('electron-vibrancy')
+const { resolve } = require('path')
+const fs = require('fs')
+const package = require('./package')
 const createWindow = require('./electron/createWindow')
 const getLoadingWindow = require('./electron/getLoadingWindow')
 const createDatabase = require('./electron/createDatabase')
@@ -35,8 +38,16 @@ const initWindow = () => {
   })
 }
 
-createDatabase()
-  .then(({ database, libraryLocation }) => {
+const appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
+
+if (!fs.existsSync(appDataPath)) {
+  fs.mkdirSync(appDataPath)
+}
+
+const libraryLocation = resolve(appDataPath, './library.sqlite')
+
+createDatabase(libraryLocation)
+  .then((database) => {
     console.log(`Connected to library ${libraryLocation}`)
     library = database
 
@@ -49,7 +60,7 @@ createDatabase()
     })
 
     initWindow()
-    setupListeners(library, windows)
+    setupListeners(library, windows, appDataPath)
 
     app.on('ready', initWindow)
 

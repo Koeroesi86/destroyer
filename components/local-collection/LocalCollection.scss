@@ -77,24 +77,19 @@
 
     .albums,
     .tracks {
-      flex: 0 0;
+      flex-shrink: 1;
+      flex-grow: 0;
+      flex-basis: 0;
       position: relative;
       display: flex;
-      height: 0;
-      width: 0;
-      transform: translateY(20px);
+      width: auto;
       transform-origin: top;
-      transition: transform .2s ease-in-out, opacity .2s ease-in-out;
-      opacity: 0;
+      transition: all .2s ease-in-out;
       overflow: hidden;
       will-change: transform, opacity, height;
 
       &.active {
-        flex: 1 1 auto;
-        height: auto;
-        width: auto;
-        opacity: 1;
-        transform: translateY(0);
+        flex-grow: 1;
       }
     }
   }

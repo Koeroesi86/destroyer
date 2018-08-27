@@ -29,10 +29,12 @@ const breakMultiplier = 100 // multiply the default file delay on a break
 let existingTracks
 const scannedFolders = []
 let counter = 0
+let progress = 0
+let totalCount = 0
 
 const normalizePath = path => (path || '').replace(/\\/g, '/')
 
-const transformMeta = ({ common: metadata, format }, fileName) => Promise.resolve(
+const transformMeta = ({ common: metadata, format }, fileName, appDataPath) => Promise.resolve(
   Object.assign({}, {
     path: normalizePath(fileName),
     artist: metadata.artist || '',
@@ -42,7 +44,7 @@ const transformMeta = ({ common: metadata, format }, fileName) => Promise.resolv
     track: (metadata.track && metadata.track.no) || '',
     disk: (metadata.disk && metadata.disk.no) || '',
     genre: (metadata.genre && metadata.genre[0]) || '',
-    picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0], (metadata.album || '')) : null,
+    picture: (metadata.picture && metadata.picture[0]) ? parsePicture(metadata.picture[0], (metadata.album || ''), appDataPath) : null,
     duration: format.duration
   })
 )
@@ -56,10 +58,11 @@ const isEqual = (a, b) => _.isEqualWith(a, b, (one, two) => `${one}` === `${two}
  * @param {Object} picture
  * @property {String} picture.format
  * @property {Buffer} picture.data
+ * @param {String} appDataPath
  * @return {String|null}
  */
-const parsePicture = (picture, album) => {
-  const folderPath = path.resolve(__dirname, `../albumart/`)
+const parsePicture = (picture, album, appDataPath) => {
+  const folderPath = path.resolve(appDataPath, `./albumart/`)
   const fileHash = crypto.createHash('md5').update(picture.data.toString('base64')).digest('hex')
   const slug = slugify(album, { remove: /[*+~./()'",!:@\\]/g, lower: true })
   const fileName = `${slug}-${fileHash}`
@@ -80,18 +83,13 @@ const parsePicture = (picture, album) => {
   }
 
   if (!fs.existsSync(filePath)) {
-    if (extension !== 'jpg') {
-      console.log('filePath', filePath)
-      console.log('extension', extension)
-      console.log('fileHash', fileHash)
-    }
     fs.writeFileSync(filePath, picture.data)
   }
 
   return `file://${normalizePath(filePath)}`
 }
 
-const writeMeta = (fileName, fileStats, database) => {
+const writeMeta = (fileName, fileStats, database, appDataPath) => {
   return new Promise((resolve, reject) => {
     try {
       const timer = setTimeout(() => {
@@ -101,15 +99,12 @@ const writeMeta = (fileName, fileStats, database) => {
       }, fileReadTimeout)
       musicMeta.parseFile(fileName)
         .then(m => m)
-        .then(metadata => transformMeta(metadata, fileName))
+        .then(metadata => transformMeta(metadata, fileName, appDataPath))
         .then(meta => {
           const existingTrack = existingTracks.find(track => track.path === meta.path)
           if (isEqual(existingTrack, meta)) {
-            // console.log('Nothing to update on', fileName)
             return Promise.resolve()
           } else {
-            console.log('Updating', meta)
-            console.log('Previous', existingTrack)
             return addTrack(database, meta)
           }
         })
@@ -128,16 +123,31 @@ const writeMeta = (fileName, fileStats, database) => {
   })
 }
 
+const countFilesSync = (directory, fileCount = 0) => {
+  return fs.readdirSync(directory).reduce((prev, file) => {
+    const filePath = path.join(directory, file)
+    const stats = fs.statSync(filePath)
+    if (stats.isSymbolicLink()) return prev
+
+    return prev + (stats.isDirectory() ? countFilesSync(filePath) : 1)
+  }, fileCount)
+}
+
 /** Scan a defined folder for tracks
- * @param database
- * @param currentPath
- * @param sender
+ * @param {Object} database
+ * @param {String} currentPath
+ * @param {Object} sender
+ * @param {String} appDataPath
  * @returns {Promise}
  * */
-function scanFolder (database, currentPath, sender) {
+function scanFolder (database, currentPath, sender, appDataPath) {
   return new Promise((resolve, reject) => {
     sender.send('SCANNING_FOLDER', { folder: currentPath })
     scannedFolders.push(currentPath)
+
+    if (!totalCount) {
+      totalCount = countFilesSync(currentPath)
+    }
 
     function scan () {
       const directory = walk(currentPath, { followLinks: false })
@@ -153,6 +163,7 @@ function scanFolder (database, currentPath, sender) {
             console.log(`Taking a ${delay / 1000} second break...`)
           }
           setTimeout(() => {
+            progress += 1
             if (counter >= breakLimit) {
               console.log('I am back!')
               counter = 0
@@ -161,8 +172,8 @@ function scanFolder (database, currentPath, sender) {
           }, delay)
         }
         if (supportedFormats.includes(extension)) {
-          sender.send('SCANNING_FILE', { fileName })
-          writeMeta(fileName, fileStats, database)
+          sender.send('SCANNING_FILE', { fileName, progress, totalCount })
+          writeMeta(fileName, fileStats, database, appDataPath)
             .then(() => nextFile())
             .catch(e => {
               console.error(fileName, e)
@@ -177,7 +188,7 @@ function scanFolder (database, currentPath, sender) {
         if (scannedFolders.includes(folderName)) {
           next()
         } else {
-          scanFolder(database, folderName, sender)
+          scanFolder(database, folderName, sender, appDataPath)
             .then(() => {
               setTimeout(() => next(), folderDelay)
             })

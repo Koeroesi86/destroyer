@@ -8,7 +8,7 @@ if (isWin) {
     'electron-builder install-app-deps',
     {
       shell: true,
-      env: process.env,
+      env: Object.assign({}, process.env),
       stdio: 'inherit'
     }
   )

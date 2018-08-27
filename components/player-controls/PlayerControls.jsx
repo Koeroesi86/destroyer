@@ -5,6 +5,7 @@ import { faPause, faPlay, faSignal, faVolumeDown, faVolumeUp } from '@fortawesom
 import Slider from '../slider/Slider'
 import { formatTime, trackType } from '../player-home/PlayerHome'
 import style from './PlayerControls.scss'
+import ScanProgress from '../scan-progress'
 
 function PlayerControls ({
    currentSong,
@@ -72,6 +73,7 @@ function PlayerControls ({
             >
               <FontAwesomeIcon icon={faSignal} size='sm' />
             </button>
+            <ScanProgress />
           </div>
           <div className={style.volume}>
             <div

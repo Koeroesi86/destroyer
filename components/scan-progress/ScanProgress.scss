@@ -1,0 +1,46 @@
+.scanProgress {
+  flex-shrink: 1;
+  display: none;
+  font-size: 12px;
+  padding: 0 12px;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+
+  &.scanning {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .pre,
+  .link,
+  .progress {
+    display: inline;
+  }
+
+  .pre {
+    flex: 0 0;
+    margin-right: 6px;
+  }
+
+  .link {
+    flex-shrink: 1;
+    flex-grow: 1;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .progress {
+    flex: 0 0;
+    margin-left: 6px;
+  }
+}

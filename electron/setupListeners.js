@@ -45,7 +45,7 @@ function memorySizeOf (obj) {
   return formatByteSize(sizeOf(obj))
 }
 
-function setupListeners (database, windows) {
+function setupListeners (database, windows, appDataPath) {
   // loading.openDevTools()
 
   ipcMain.once('APP_LOADED', () => {
@@ -139,17 +139,16 @@ function setupListeners (database, windows) {
         event.sender.send('FOLDERS_ADDED_TO_LIBRARY', { folders })
 
         let tracks = []
-        scanFolders(database, folders, event.sender)
+        scanFolders(database, folders, event.sender, appDataPath)
           .then(() => {
             event.sender.send('TRACKS_ADDED_TO_LIBRARY', { tracks })
-            rescanLibrary(database, event.sender, false)
           })
       })
       .catch(e => console.error(e))
   })
 
   ipcMain.on('RESCAN_LIBRARY', (event, { forced }) => {
-    rescanLibrary(database, event.sender, forced)
+    rescanLibrary(database, event.sender, forced, appDataPath)
   })
 }
 

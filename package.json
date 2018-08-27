@@ -1,5 +1,5 @@
 {
-  "name": "Destroyer",
+  "name": "electron-music-player",
   "version": "2.0.1",
   "description": "Lossless Audio Player",
   "main": "index.js",
@@ -41,6 +41,7 @@
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-icons": "^3.0.5",
     "react-redux": "^5.0.7",
     "redux": "^3.6.0",
     "scroll-animator": "^1.1.0",
@@ -67,7 +68,7 @@
     "eslint-plugin-react": "^6.10.3",
     "eslint-plugin-standard": "^2.1.1",
     "exports-loader": "^0.6.4",
-    "file-loader": "^0.11.0",
+    "file-loader": "^2.0.0",
     "imports-loader": "^0.7.1",
     "node-sass": "^4.9.3",
     "react-dev-utils": "^5.0.1",

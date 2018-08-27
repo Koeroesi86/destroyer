@@ -28,7 +28,7 @@ const config = {
         }
       },
       {
-        test: /\.(svg|png|jpg|webm|mp4|woff|woff2)$/,
+        test: /\.(svg|png|jpg|webm|mp4|woff|woff2|ttf|eot)$/,
         loader: 'url-loader'
       },
       {

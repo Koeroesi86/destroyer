@@ -19,7 +19,7 @@ const eventNames = [
   'TRACKS_ADDED_TO_LIBRARY',
   'LIBRARY_SIZE',
   'MAXIMIZED_APP',
-  // 'SCANNING_FILE',
+  'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]
 
@@ -43,7 +43,7 @@ const middleware = store => {
   rescanLibrary(false)
 
   return next => action => {
-    if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER'].includes(action.type)) {
+    if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER', 'SCANNING_FILE'].includes(action.type)) {
       console.log(action.type, action.payload)
     }
 

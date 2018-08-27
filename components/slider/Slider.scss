@@ -35,16 +35,16 @@
       width: 16px;
       height: 16px;
       margin-top: -5px;
-      background: #efefef;
       cursor: pointer;
       border: 0;
       border-radius: 50%;
+      background: linear-gradient(to bottom, #ffffff 0%, #f7b7b7 47%, #c15757 100%);
       box-shadow: 0 0 5px #000;
     }
   }
 
   .lowerFill {
-    background: rgba(255, 255, 255, 0.3);
+    background-color: #ff8686;
     position: absolute;
     display: block;
     top: 9px;

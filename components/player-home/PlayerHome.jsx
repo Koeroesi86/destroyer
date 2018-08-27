@@ -2,18 +2,16 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faWindowMinimize, faWindowMaximize, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { FiX, FiMinimize2, FiMaximize } from 'react-icons/fi'
 import style from './PlayerHome.scss'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
 import Confirm from '../confirm'
-import { shell } from 'electron'
 import NowPlaying from '../now-playing'
 import PlayerControls from '../player-controls'
 import FolderManagement from '../folder-management'
 import AudioComponent from '../audio-component'
-import LocalCollection from '../local-collection/LocalCollection'
+import LocalCollection from '../local-collection'
 
 export function formatTime (seconds) {
   return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
@@ -125,11 +123,12 @@ export default class PlayerHome extends Component {
   }
 
   render () {
-    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize, maximized } = this.props
+    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize, maximized, enableTransparency } = this.props
     const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
         className={classNames(style.playerHome, {
+          [style.opaque]: enableTransparency,
           [style.maximized]: maximized
         })}
         onDragOver={e => e.preventDefault()}
@@ -142,13 +141,13 @@ export default class PlayerHome extends Component {
                 <div className={style.titleBar}>
                   <div className={style.buttons}>
                     <span className={style.button} onClick={close}>
-                      <FontAwesomeIcon icon={faTimes} size={'1x'} />
+                      <FiX size={'16px'} />
                     </span>
                     <span className={style.button} onClick={minimize}>
-                      <FontAwesomeIcon icon={faWindowMinimize} size={'1x'} />
+                      <FiMinimize2 size={'16px'} />
                     </span>
                     <span className={style.button} onClick={maximize}>
-                      <FontAwesomeIcon icon={faWindowMaximize} size={'1x'} />
+                      <FiMaximize size={'16px'} />
                     </span>
                   </div>
                   <div className={style.title}>Emusic</div>
@@ -184,19 +183,6 @@ export default class PlayerHome extends Component {
           confirm={this.handleConfirm}
           cancel={this.handleCancel}
         />
-        <div
-          className={classNames(style.scanningFolder, {
-            [style.show]: scanningFolder
-          })}
-        >
-          Currently scanning:&nbsp;
-          <a
-            onClick={() => shell.openItem(scanningFolder)}
-            title={`Click to open ${scanningFolder}`}
-          >
-            {scanningFolder}
-          </a>
-        </div>
         <AudioComponent
           createSource={node => {
             this.audio = node
@@ -213,7 +199,6 @@ export default class PlayerHome extends Component {
 PlayerHome.defaultProps = {
   view: 'albums',
   addFiles: () => {},
-  trackEnded: () => {},
   setView: () => {},
   setCurrentTime: () => {},
   close: () => {},
@@ -226,7 +211,8 @@ PlayerHome.defaultProps = {
   currentTimeFPS: 30,
   volume: 0.5,
   rescanLibrary: () => {},
-  maximized: false
+  maximized: false,
+  enableTransparency: true
 }
 
 export const trackType = {
@@ -243,13 +229,13 @@ export const trackType = {
 }
 
 PlayerHome.propTypes = {
+  enableTransparency: PropTypes.bool,
   maximized: PropTypes.bool,
   view: PropTypes.string,
   close: PropTypes.func,
   minimize: PropTypes.func,
   maximize: PropTypes.func,
   addFiles: PropTypes.func,
-  trackEnded: PropTypes.func,
   rescanLibrary: PropTypes.func,
   setView: PropTypes.func,
   folders: PropTypes.arrayOf(

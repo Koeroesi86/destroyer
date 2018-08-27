@@ -3,7 +3,7 @@ const executeQuery = require('./executeQuery')
 const scanFolders = require('./scanFolders')
 const addTrack = require('./addTrack')
 
-function rescanLibrary (database, sender, forced = false) {
+function rescanLibrary (database, sender, forced = false, appDataPath) {
   console.log(`Scanning library ${forced ? 'completely' : 'wisely'}...`)
   executeQuery(database, {
     query: `SELECT * FROM folders ORDER BY path ASC`,
@@ -23,7 +23,7 @@ function rescanLibrary (database, sender, forced = false) {
         )
       )
     })
-    .then(folders => scanFolders(database, folders, sender))
+    .then(folders => scanFolders(database, folders, sender, appDataPath))
     .then(() => executeQuery(database, {
       query: `SELECT * FROM library ORDER BY path ASC`,
       variables: []
