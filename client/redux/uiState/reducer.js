@@ -38,8 +38,11 @@ const reducer = (state = initialState, action) => {
   }
 
   if (action.type === 'SET_CURRENT_TIME') {
+    const currentTime = parseFloat(action.payload.currentTime || 0)
+    if (currentTime === state.currentTime) return state
+
     return Object.assign({}, state, {
-      currentTime: parseFloat(action.payload.currentTime || 0)
+      currentTime
     })
   }
 

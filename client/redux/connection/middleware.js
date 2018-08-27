@@ -32,20 +32,21 @@ const appLoaded = _.debounce(() => {
 }, 1000)
 
 const middleware = store => {
-  addListeners(eventNames, store)
+  if (window) {
+    addListeners(eventNames, store)
+    ipcRenderer.send('APP_READY', 'Ready to receive')
 
-  ipcRenderer.send('APP_READY', 'Ready to receive')
+    setInterval(() => {
+      rescanLibrary(false)
+    }, 1000 * 60 * 60)
 
-  setInterval(() => {
     rescanLibrary(false)
-  }, 1000 * 60 * 60)
-
-  rescanLibrary(false)
+  }
 
   return next => action => {
-    if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER', 'SCANNING_FILE'].includes(action.type)) {
-      console.log(action.type, action.payload)
-    }
+    // if (!['SET_CURRENT_TIME', 'SCANNING_FOLDER', 'SCANNING_FILE'].includes(action.type)) {
+    //   console.log(action.type, action.payload)
+    // }
 
     if (action.type === 'FILES_ADDED') {
       /** @var {FileList} fileList */

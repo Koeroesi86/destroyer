@@ -10,11 +10,9 @@ const mapDispatch = dispatch => ({
   playTracks: (tracks) => dispatch({ type: 'PLAY_TRACKS', payload: { tracks } })
 })
 
-const ConnectedTrackView = connect(
-  mapState,
-  mapDispatch
-)(TrackView)
-
-ConnectedTrackView.propTypes = Object.assign({}, TrackView.propTypes)
-
-export default ConnectedTrackView
+export default window
+  ? connect(
+      mapState,
+      mapDispatch
+    )(TrackView)
+  : TrackView

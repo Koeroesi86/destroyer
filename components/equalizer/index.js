@@ -9,11 +9,4 @@ const mapDispatch = dispatch => ({
   close: () => dispatch({ type: 'CLOSE_EQUALIZER', payload: {} })
 })
 
-const ConnectedEqualizer = connect(
-  mapState,
-  mapDispatch
-)(Equalizer)
-
-ConnectedEqualizer.propTypes = Object.assign({}, Equalizer.propTypes)
-
-export default ConnectedEqualizer
+export default window ? connect(mapState, mapDispatch)(Equalizer) : Equalizer

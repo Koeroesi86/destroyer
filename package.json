@@ -70,6 +70,7 @@
     "exports-loader": "^0.6.4",
     "file-loader": "^2.0.0",
     "imports-loader": "^0.7.1",
+    "mini-css-extract-plugin": "^0.4.2",
     "node-sass": "^4.9.3",
     "react-dev-utils": "^5.0.1",
     "sass-loader": "^7.1.0",

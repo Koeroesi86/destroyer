@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+// import PlayerHome from '../player-home'
 
 function IndexPage (props) {
+  // console.log('props', props)
   return (
     <html lang='en'>
       <head>
@@ -10,9 +12,12 @@ function IndexPage (props) {
         <meta name='theme-color' content='#222222' />
         <meta name='msapplication-TileColor' content='#ffffff' />
         <title>{props.locals.title}</title>
+        <link ref='stylesheet' type='text/css' href={props.locals.assets.clientStyle} />
       </head>
       <body>
-        <div id='root' />
+        <div id='root'>
+          {/*<PlayerHome />*/}
+        </div>
         <script src={props.locals.assets.client} />
       </body>
     </html>
@@ -24,7 +29,8 @@ IndexPage.propTypes = {
     title: PropTypes.string,
     doctype: PropTypes.string,
     assets: PropTypes.shape({
-      client: PropTypes.string
+      client: PropTypes.string,
+      clientStyle: PropTypes.string
     })
   })
 }

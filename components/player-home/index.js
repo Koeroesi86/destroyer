@@ -2,6 +2,7 @@ import connect from 'react-redux/es/connect/connect'
 import PlayerHome from './PlayerHome.jsx'
 
 const mapState = state => ({
+  loaded: state.library.loaded,
   tracks: state.library.tracks,
   volume: state.uiState.volume,
   maximized: state.uiState.maximized,
@@ -21,17 +22,9 @@ const mapDispatch = dispatch => ({
   openEqualizer: () => dispatch({ type: 'OPEN_EQUALIZER', payload: {} }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
   trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),
-  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} }),
-  close: () => dispatch({ type: 'CLOSE_APP', payload: {} }),
-  minimize: () => dispatch({ type: 'MINIMIZE_APP', payload: {} }),
-  maximize: () => dispatch({ type: 'MAXIMIZE_APP', payload: {} })
+  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} })
 })
 
-const ConnectedPlayerHome = connect(
-  mapState,
-  mapDispatch
-)(PlayerHome)
-
-ConnectedPlayerHome.propTypes = Object.assign({}, PlayerHome.propTypes)
-
-export default ConnectedPlayerHome
+export default window
+  ? connect(mapState, mapDispatch)(PlayerHome)
+  : PlayerHome

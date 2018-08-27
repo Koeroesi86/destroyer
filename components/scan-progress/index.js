@@ -8,11 +8,9 @@ const mapState = state => ({
 })
 const mapDispatch = dispatch => ({})
 
-const ConnectedScanProgress = connect(
-  mapState,
-  mapDispatch
-)(ScanProgress)
-
-ConnectedScanProgress.propTypes = Object.assign({}, ScanProgress.propTypes)
-
-export default ConnectedScanProgress
+export default window
+  ? connect(
+      mapState,
+      mapDispatch
+    )(ScanProgress)
+  : ScanProgress

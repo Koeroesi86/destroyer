@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import classNames from 'classnames'
-import { FiX, FiMinimize2, FiMaximize } from 'react-icons/fi'
 import style from './PlayerHome.scss'
 import AlbumDetails from '../album-details'
 import Equalizer from '../equalizer'
@@ -12,12 +11,13 @@ import PlayerControls from '../player-controls'
 import FolderManagement from '../folder-management'
 import AudioComponent from '../audio-component'
 import LocalCollection from '../local-collection'
+import TitleBar from '../title-bar'
 
 export function formatTime (seconds) {
   return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
 }
 
-export default class PlayerHome extends Component {
+export default class PlayerHome extends PureComponent {
   constructor (props) {
     super(props)
 
@@ -29,8 +29,6 @@ export default class PlayerHome extends Component {
 
     this.handleDrop = this.handleDrop.bind(this)
     this.handleFileChange = this.handleFileChange.bind(this)
-    this.play = this.play.bind(this)
-    this.pause = this.pause.bind(this)
     this.confirm = this.confirm.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.handleConfirm = this.handleConfirm.bind(this)
@@ -114,22 +112,15 @@ export default class PlayerHome extends Component {
     this.setState({ confirmMessage: null })
   }
 
-  play () {
-    if (this.audio) this.audio.play()
-  }
-
-  pause () {
-    if (this.audio) this.audio.pause()
-  }
-
   render () {
-    const { view, setView, rescanLibrary, scanningFolder, tracks, close, minimize, maximize, maximized, enableTransparency } = this.props
+    const { maximized, enableTransparency, loaded } = this.props
     const { audioContext, audioSource, confirmMessage } = this.state
     return (
       <div
         className={classNames(style.playerHome, {
           [style.opaque]: enableTransparency,
-          [style.maximized]: maximized
+          [style.maximized]: maximized,
+          [style.loaded]: loaded
         })}
         onDragOver={e => e.preventDefault()}
         onDrop={this.handleDrop}
@@ -138,40 +129,18 @@ export default class PlayerHome extends Component {
           <div className={style.mainPanel}>
             <div className={style.library}>
               <div className={style.manageLibrary}>
-                <div className={style.titleBar}>
-                  <div className={style.buttons}>
-                    <span className={style.button} onClick={close}>
-                      <FiX size={'16px'} />
-                    </span>
-                    <span className={style.button} onClick={minimize}>
-                      <FiMinimize2 size={'16px'} />
-                    </span>
-                    <span className={style.button} onClick={maximize}>
-                      <FiMaximize size={'16px'} />
-                    </span>
-                  </div>
-                  <div className={style.title}>Emusic</div>
-                </div>
+                <TitleBar />
                 <FolderManagement handleFileChange={this.handleFileChange} />
               </div>
               <div className={style.collection}>
-                <LocalCollection
-                  view={view}
-                  setView={setView}
-                  rescanLibrary={rescanLibrary}
-                  scanningFolder={scanningFolder}
-                  tracks={tracks}
-                />
+                <LocalCollection />
               </div>
             </div>
             <div className={style.nowPlaying}>
               <NowPlaying />
             </div>
           </div>
-          <PlayerControls
-            play={this.play}
-            pause={this.pause}
-          />
+          <PlayerControls audio={this.audio} />
         </div>
         <AlbumDetails />
         <Equalizer
@@ -197,22 +166,11 @@ export default class PlayerHome extends Component {
 }
 
 PlayerHome.defaultProps = {
-  view: 'albums',
   addFiles: () => {},
-  setView: () => {},
-  setCurrentTime: () => {},
-  close: () => {},
-  minimize: () => {},
-  maximize: () => {},
-  folders: [],
-  tracks: [],
   currentSong: null,
-  currentTime: 0,
-  currentTimeFPS: 30,
-  volume: 0.5,
-  rescanLibrary: () => {},
   maximized: false,
-  enableTransparency: true
+  enableTransparency: true,
+  loaded: false
 }
 
 export const trackType = {
@@ -230,20 +188,13 @@ export const trackType = {
 
 PlayerHome.propTypes = {
   enableTransparency: PropTypes.bool,
+  loaded: PropTypes.bool,
   maximized: PropTypes.bool,
-  view: PropTypes.string,
-  close: PropTypes.func,
-  minimize: PropTypes.func,
-  maximize: PropTypes.func,
   addFiles: PropTypes.func,
-  rescanLibrary: PropTypes.func,
-  setView: PropTypes.func,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,
       path: PropTypes.string
     })
-  ),
-  scanningFolder: PropTypes.string,
-  tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
+  )
 }

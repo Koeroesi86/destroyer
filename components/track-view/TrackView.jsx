@@ -12,15 +12,22 @@ class TrackView extends PureComponent {
 
     this.state = {
       selectedTracks: [],
-      tracks: this.props.tracks,
       scrolledTop: true
     }
     this.toggleTrack = this.toggleTrack.bind(this)
     this.doubleClickTrack = this.doubleClickTrack.bind(this)
-    this.onScroll = this.onScroll.bind(this)
-    this.updateTracks = _.debounce((tracks) => {
-      this.setState({ tracks })
-    }, 200)
+    this.onScroll = _.debounce((e) => {
+      const { scrollTop } = e.target
+      if (scrollTop > 0) {
+        if (this.state.scrolledTop) {
+          this.setState({ scrolledTop: false })
+        }
+      } else {
+        if (!this.state.scrolledTop) {
+          this.setState({ scrolledTop: true })
+        }
+      }
+    }, 100)
   }
 
   componentDidMount () {
@@ -35,48 +42,15 @@ class TrackView extends PureComponent {
     }
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.tracks.length !== prevProps.tracks.length) {
-      this.updateTracks(this.props.tracks)
-    }
-  }
-
-  shouldComponentUpdate (prevProps, prevState) {
-    if (this.state.scrolledTop !== prevState.scrolledTop) {
-      return true
-    }
-
-    if (this.state.selectedTracks.length !== prevState.selectedTracks.length) {
-      return true
-    }
-
-    if (this.props.currentSong !== prevProps.currentSong || this.props.playTracks !== prevProps.playTracks) {
-      return true
-    }
-
-    if (JSON.stringify(this.props.tracks) !== JSON.stringify(prevProps.tracks)) {
-      return true
-    }
-
-    if (JSON.stringify(this.state.tracks) !== JSON.stringify(prevState.tracks)) {
-      return true
-    }
-
-    return false
-  }
-
-  onScroll (e) {
-    const { scrollTop } = e.target
-    if (scrollTop > 0) {
-      if (this.state.scrolledTop) {
-        this.setState({ scrolledTop: false })
-      }
-    } else {
-      if (!this.state.scrolledTop) {
-        this.setState({ scrolledTop: true })
-      }
-    }
-  }
+  // shouldComponentUpdate (prevProps, prevState) {
+  //   if (this.state.scrolledTop !== prevState.scrolledTop) return true
+  //   if (this.state.selectedTracks.length !== prevState.selectedTracks.length) return true
+  //   if (this.props.playTracks !== prevProps.playTracks) return true
+  //   if (!_.isEqual(this.props.currentSong, prevProps.currentSong)) return true
+  //   if (!_.isEqual(this.props.tracks, prevProps.tracks)) return true
+  //
+  //   return false
+  // }
 
   toggleTrack (track) {
     const prevSelectedTracks = this.state.selectedTracks.slice(0)
@@ -103,8 +77,8 @@ class TrackView extends PureComponent {
   }
 
   render () {
-    const { currentSong, playTracks } = this.props
-    const { selectedTracks, scrolledTop, tracks } = this.state
+    const { currentSong, playTracks, tracks } = this.props
+    const { selectedTracks, scrolledTop } = this.state
     const headerLabels = {
       duration: 'Duration',
       artist: 'Artist',
@@ -160,14 +134,12 @@ class TrackView extends PureComponent {
 
 TrackView.defaultProps = {
   tracks: [],
-  show: true,
   playTracks: () => {}
 }
 
 TrackView.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.shape(trackType)),
   currentSong: PropTypes.shape(trackType),
-  show: PropTypes.bool,
   playTracks: PropTypes.func
 }
 

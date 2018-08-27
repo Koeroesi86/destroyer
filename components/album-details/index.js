@@ -10,11 +10,6 @@ const mapDispatch = dispatch => ({
   close: () => dispatch({ type: 'SELECT_ALBUM', payload: { album: null } })
 })
 
-const ConnectedAlbumDetails = connect(
-  mapState,
-  mapDispatch
-)(AlbumDetails)
-
-ConnectedAlbumDetails.propTypes = Object.assign({}, AlbumDetails.propTypes)
-
-export default ConnectedAlbumDetails
+export default window
+  ? connect(mapState, mapDispatch)(AlbumDetails)
+  : AlbumDetails

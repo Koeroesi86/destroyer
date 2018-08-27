@@ -54,13 +54,15 @@ class AudioComponent extends PureComponent {
   }
 
   seekTo (currentTime) {
-    if (this.audio.currentTime !== currentTime) {
+    if (!this.audio.paused && this.audio.currentTime !== currentTime) {
       this.audio.currentTime = currentTime
     }
   }
 
   setVolume () {
-    this.audio.volume = this.props.volume
+    if (this.audio.volume !== this.props.volume) {
+      this.audio.volume = this.props.volume
+    }
   }
 
   render () {
@@ -72,6 +74,9 @@ class AudioComponent extends PureComponent {
           this.audio = a
         }}
         onEnded={trackEnded}
+        // onTimeUpdate={(e) => {
+        //   this.props.setCurrentTime(Math.floor(e.target.currentTime))
+        // }}
       />
     )
   }

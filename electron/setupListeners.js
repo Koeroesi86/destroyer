@@ -25,7 +25,7 @@ function memorySizeOf (obj) {
           const objClass = Object.prototype.toString.call(obj).slice(8, -1)
           if (objClass === 'Object' || objClass === 'Array') {
             for (let key in obj) {
-              if (!obj.hasOwnProperty(key)) continue
+              if (!obj || !obj.hasOwnProperty(key)) continue
               sizeOf(obj[key])
             }
           } else bytes += obj.toString().length * 2
@@ -93,19 +93,19 @@ function setupListeners (database, windows, appDataPath) {
       event.sender.send('LIBRARY_SIZE', { size: memorySizeOf({ library }), length: library.length })
       const chunkLimit = 200
       if (library.length <= chunkLimit) {
-        event.sender.send('STORE_LIBRARY', { library })
+        event.sender.send('STORE_LIBRARY', { library, finished: true })
       } else {
         const chunks = []
         let from = 0
         library.forEach((track, index) => {
           if (chunks.length === chunkLimit) {
-            event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from })
+            event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from, finished: false })
             chunks.splice(0)
             from = index + 1
           }
           chunks.push(track)
         })
-        event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from })
+        event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from, finished: true })
       }
     }).catch(e => console.error(e))
   })

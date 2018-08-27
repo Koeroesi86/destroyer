@@ -5,7 +5,14 @@ import style from './ScanProgress.scss'
 import { shell } from 'electron'
 
 const Progress = ({ current = 0, total = 0 }) => (
-  <span className={style.progress}>file #{current} of #{total} ({!total ? 0 : (((current / total) * 1000) / 10).toFixed(1)}%)</span>
+  <span className={style.progress}>
+    <span>file&nbsp;#</span>
+    <span>{current}</span>
+    <span>&nbsp;of&nbsp;#</span>
+    <span>{total}</span>
+    <span>&nbsp;</span>
+    <span>({!total ? 0 : Math.floor(current / total) * 100}%)</span>
+  </span>
 )
 
 Progress.propTypes = {
@@ -20,6 +27,10 @@ const ScanningFolder = ({ scanningFolder }) => (
     className={style.link}
   >{scanningFolder}</span>
 )
+
+ScanningFolder.propTypes = {
+  scanningFolder: PropTypes.string
+}
 
 const ScanningLabel = () => (
   <span className={style.pre}>Currently scanning:</span>
@@ -36,9 +47,11 @@ function ScanProgress ({
         [style.scanning]: scanningFolder
       })}
     >
-      <ScanningLabel />
-      <ScanningFolder scanningFolder={scanningFolder} />
-      <Progress current={current} total={total} />
+      <div className={style.container}>
+        <ScanningLabel />
+        <ScanningFolder scanningFolder={scanningFolder} />
+        <Progress current={current} total={total} />
+      </div>
     </div>
   )
 }

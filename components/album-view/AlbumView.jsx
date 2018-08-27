@@ -10,29 +10,30 @@ class AlbumView extends PureComponent {
     super(props)
 
     this.state = {
-      albums: this.props.albums,
-      scrolledTop: true,
-      loaded: false
+      scrolledTop: true
     }
-
-    this.updateAlbums = _.debounce(() => {
-      this.setState({
-        albums: this.props.albums
-      })
-      if (!this.state.loaded) {
-        setTimeout(() => {
-          this.setState({ loaded: true })
-        }, 500)
+    this.onScroll = _.debounce((e) => {
+      const { scrollTop } = e.target
+      if (scrollTop > 0) {
+        if (this.state.scrolledTop) {
+          this.setState({ scrolledTop: false })
+        }
+      } else {
+        if (!this.state.scrolledTop) {
+          this.setState({ scrolledTop: true })
+        }
       }
     }, 200)
-    this.onScroll = this.onScroll.bind(this)
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.albums.length !== prevProps.albums.length) {
-      this.updateAlbums()
-    }
-  }
+  // shouldComponentUpdate (prevProps, prevState) {
+  //   if (this.state.scrolledTop !== prevState.scrolledTop) return true
+  //   if (this.props.playTracks !== prevProps.playTracks) return true
+  //   if (this.props.selectAlbum !== prevProps.selectAlbum) return true
+  //   if (!_.isEqual(this.props.albums, prevProps.albums)) return true
+  //
+  //   return false
+  // }
 
   componentDidMount () {
     if (this.listing) {
@@ -46,34 +47,16 @@ class AlbumView extends PureComponent {
     }
   }
 
-  onScroll (e) {
-    const { scrollTop } = e.target
-    if (scrollTop > 0) {
-      if (this.state.scrolledTop) {
-        this.setState({ scrolledTop: false })
-      }
-    } else {
-      if (!this.state.scrolledTop) {
-        this.setState({ scrolledTop: true })
-      }
-    }
-  }
-
   render () {
-    const { playTracks, selectAlbum } = this.props
-    const { albums, scrolledTop, loaded } = this.state
+    const { playTracks, selectAlbum, albums } = this.props
+    const { scrolledTop } = this.state
     return (
-      <div className={classNames(style.albums, {
-        [style.loaded]: loaded
-      })}>
+      <div className={style.albums}>
         <div
           className={classNames(style.separator, {
             [style.scrolled]: !scrolledTop
           })}
         />
-        <div className={style.loadingContainer}>
-          Loading library...
-        </div>
         <div
           className={style.listing}
           ref={l => { this.listing = l }}

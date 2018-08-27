@@ -12,11 +12,6 @@ const mapDispatch = dispatch => ({
   setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } })
 })
 
-const ConnectedAudioComponent = connect(
-  mapState,
-  mapDispatch
-)(AudioComponent)
-
-ConnectedAudioComponent.propTypes = Object.assign({}, AudioComponent.propTypes)
-
-export default ConnectedAudioComponent
+export default window
+  ? connect(mapState, mapDispatch)(AudioComponent)
+  : AudioComponent

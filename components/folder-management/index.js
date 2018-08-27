@@ -7,11 +7,6 @@ const mapState = state => ({
 
 const mapDispatch = dispatch => ({})
 
-const ConnectedFolderManagement = connect(
-  mapState,
-  mapDispatch
-)(FolderManagement)
-
-ConnectedFolderManagement.propTypes = Object.assign({}, FolderManagement.propTypes)
-
-export default ConnectedFolderManagement
+export default window
+  ? connect(mapState, mapDispatch)(FolderManagement)
+  : FolderManagement

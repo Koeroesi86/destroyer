@@ -13,11 +13,6 @@ const mapDispatch = (dispatch) => ({
   setVolume: (volume) => dispatch({ type: 'SET_VOLUME', payload: { volume } })
 })
 
-const ConnectedPlayerControls = connect(
-  mapState,
-  mapDispatch
-)(PlayerControls)
-
-ConnectedPlayerControls.propTypes = Object.assign({}, PlayerControls.propTypes)
-
-export default ConnectedPlayerControls
+export default window
+  ? connect(mapState, mapDispatch)(PlayerControls)
+  : PlayerControls

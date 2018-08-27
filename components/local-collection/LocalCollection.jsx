@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
+import { FaSyncAlt } from 'react-icons/fa'
 import AlbumView from '../album-view'
 import TrackView from '../track-view'
 import { trackType } from '../player-home/PlayerHome'
@@ -38,7 +37,7 @@ class LocalCollection extends PureComponent {
                 [style.spinning]: scanningFolder
               })}
             >
-              <FontAwesomeIcon icon={faSyncAlt} size='sm' />
+              <FaSyncAlt />
               Rescan
             </button>
           </div>

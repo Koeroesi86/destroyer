@@ -1,11 +1,8 @@
 .localCollection {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
 
   .viewControls {
     -webkit-app-region: drag;
-    flex-shrink: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -26,7 +23,7 @@
         border: 0;
         color: #efefef;
         cursor: pointer;
-        transition: all .2s ease-in-out;
+        transition: color .2s ease-in-out, background-color .2s ease-in-out;
         border-radius: 3px;
 
         &:hover {
@@ -36,6 +33,10 @@
 
         &.spinning {
           > svg {
+            animation-name: spin;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
             animation-play-state: running;
           }
         }
@@ -43,11 +44,6 @@
         > svg {
           margin-left: 2px;
           margin-right: 4px;
-          animation-name: spin;
-          animation-duration: 1s;
-          animation-iteration-count: infinite;
-          animation-timing-function: linear;
-          animation-play-state: paused;
         }
       }
     }
@@ -57,7 +53,7 @@
       margin-right: 12px;
       line-height: 32px;
       cursor: pointer;
-      transition: all .2s ease-in-out;
+      transition: color .2s ease-in-out;
 
       &:hover:not(.current) {
         color: #c78080;
@@ -70,26 +66,28 @@
   }
 
   .viewPanels {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
+    height: calc(100% - 56px);
     overflow: hidden;
+    position: relative;
 
     .albums,
     .tracks {
-      flex-shrink: 1;
-      flex-grow: 0;
-      flex-basis: 0;
-      position: relative;
-      display: flex;
-      width: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       transform-origin: top;
-      transition: all .2s ease-in-out;
+      opacity: 0;
+      transition: opacity .4s ease-in-out;
       overflow: hidden;
-      will-change: transform, opacity, height;
+      will-change: opacity;
+      z-index: 0;
 
       &.active {
-        flex-grow: 1;
+        height: 100%;
+        opacity: 1;
+        z-index: 1;
       }
     }
   }

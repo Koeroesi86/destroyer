@@ -2,12 +2,13 @@ import path from 'path'
 
 const initialState = {
   tracks: [],
-  albums: []
+  albums: [],
+  loaded: false
 }
 
 const reducer = (state = initialState, action) => {
   if (action.type === 'STORE_LIBRARY') {
-    const { library: tracks, from, to } = action.payload
+    const { library: tracks, from, to, finished } = action.payload
     const albumsObject = {}
     state.albums.forEach(album => {
       albumsObject[album.id] = album
@@ -37,7 +38,8 @@ const reducer = (state = initialState, action) => {
     if (to) receivedTracks.splice(from, to, ...tracks)
     return Object.assign({}, state, {
       tracks: to ? receivedTracks : tracks,
-      albums: receivedAlbums
+      albums: receivedAlbums,
+      loaded: !!finished
     })
   }
 

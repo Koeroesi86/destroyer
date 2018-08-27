@@ -10,9 +10,6 @@ const mapDispatch = dispatch => ({
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } })
 })
 
-const ConnectedNowPlaying = connect(
-  mapState,
-  mapDispatch
-)(NowPlaying)
-
-export default ConnectedNowPlaying
+export default window
+  ? connect(mapState, mapDispatch)(NowPlaying)
+  : NowPlaying

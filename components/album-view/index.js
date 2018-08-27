@@ -11,11 +11,6 @@ const mapDispatch = dispatch => ({
   playTracks: (tracks) => dispatch({ type: 'PLAY_TRACKS', payload: { tracks } })
 })
 
-const ConnectedAlbumView = connect(
-  mapState,
-  mapDispatch
-)(AlbumView)
-
-ConnectedAlbumView.propTypes = Object.assign({}, AlbumView.propTypes)
-
-export default ConnectedAlbumView
+export default window
+  ? connect(mapState, mapDispatch)(AlbumView)
+  : AlbumView
