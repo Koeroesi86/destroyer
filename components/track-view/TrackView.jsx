@@ -11,6 +11,7 @@ class TrackView extends PureComponent {
     super(props)
 
     this.state = {
+      tracks: [],
       selectedTracks: [],
       scrolledTop: true
     }
@@ -28,6 +29,11 @@ class TrackView extends PureComponent {
         }
       }
     }, 100)
+    this.updateTracks = _.debounce(() => {
+      this.setState({
+        tracks: this.props.tracks
+      })
+    }, 50)
   }
 
   componentDidMount () {
@@ -39,6 +45,12 @@ class TrackView extends PureComponent {
   componentWillUnmount () {
     if (this.listing) {
       this.listing.removeEventListener('scroll', this.onScroll)
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tracks !== prevProps.tracks) {
+      this.updateTracks()
     }
   }
 
@@ -77,8 +89,8 @@ class TrackView extends PureComponent {
   }
 
   render () {
-    const { currentSong, playTracks, tracks } = this.props
-    const { selectedTracks, scrolledTop } = this.state
+    const { currentSong, playTracks } = this.props
+    const { selectedTracks, scrolledTop, tracks } = this.state
     const headerLabels = {
       duration: 'Duration',
       artist: 'Artist',

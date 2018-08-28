@@ -19,6 +19,7 @@ const eventNames = [
   'TRACKS_ADDED_TO_LIBRARY',
   'LIBRARY_SIZE',
   'MAXIMIZED_APP',
+  'CLICKED_URL',
   'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]
@@ -40,7 +41,7 @@ const middleware = store => {
       rescanLibrary(false)
     }, 1000 * 60 * 60)
 
-    rescanLibrary(false)
+    // rescanLibrary(false)
   }
 
   return next => action => {
@@ -82,6 +83,16 @@ const middleware = store => {
 
     if (action.type === 'MAXIMIZE_APP') {
       ipcRenderer.send('MAXIMIZE_APP', {})
+    }
+
+    if (action.type === 'CLICKED_URL') {
+      const tracks = action.payload.playlist.map(item => ({
+        path: item.file,
+        title: item.title,
+        duration: 0
+      }))
+      console.log('tracks', tracks)
+      store.dispatch({ type: 'PLAY_TRACKS', payload: { tracks } })
     }
 
     next(action)

@@ -41,7 +41,12 @@ class AudioComponent extends PureComponent {
   }
 
   playTrack (track) {
-    this.audio.src = 'file://' + track.path
+    let src = track.path
+    console.log('src', src)
+    this.audio.src = /^http/.test(src) ? src : `file://${track.path}`
+    this.audio.onerror = () => {
+      console.log('error playing', track.title, src)
+    }
     this.play()
   }
 
@@ -74,9 +79,6 @@ class AudioComponent extends PureComponent {
           this.audio = a
         }}
         onEnded={trackEnded}
-        // onTimeUpdate={(e) => {
-        //   this.props.setCurrentTime(Math.floor(e.target.currentTime))
-        // }}
       />
     )
   }

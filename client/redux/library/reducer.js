@@ -27,8 +27,15 @@ const reducer = (state = initialState, action) => {
         }
       } else {
         const album = albumsObject[albumKey]
-        album.tracks.push(track)
-        album.duration += track.duration
+        const existingTrack = album.tracks.find(t => track.path === t.path)
+        if (!existingTrack) {
+          album.tracks.push(track)
+          album.duration += track.duration
+        } else {
+          album.duration -= existingTrack.duration
+          Object.assign(existingTrack, track)
+          album.duration += track.duration
+        }
       }
     })
     const receivedAlbums = Object.getOwnPropertyNames(albumsObject).map(id =>

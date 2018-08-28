@@ -20,7 +20,7 @@ class Slider extends PureComponent {
     const { max, value } = this.props
     if (this.slider.value !== value) {
       this.slider.value = value
-      this.lowerFill.style.width = `${(value / max) * 100}%`
+      this.lowerFill.style.width = `${max > 0 ? (value / max) * 100 : 0}%`
     }
   }
 

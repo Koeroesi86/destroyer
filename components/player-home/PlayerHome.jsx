@@ -8,10 +8,11 @@ import Equalizer from '../equalizer'
 import Confirm from '../confirm'
 import NowPlaying from '../now-playing'
 import PlayerControls from '../player-controls'
-import FolderManagement from '../folder-management'
 import AudioComponent from '../audio-component'
 import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
+import ShoutCastPanel from '../shoutcast-panel'
+import Navigation from '../navigation'
 
 export function formatTime (seconds) {
   return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
@@ -23,15 +24,16 @@ export default class PlayerHome extends PureComponent {
 
     this.state = {
       audioSource: null,
-      audioContext: new AudioContext(), // eslint-disable-line no-undef
       confirmMessage: null
     }
 
-    this.handleDrop = this.handleDrop.bind(this)
-    this.handleFileChange = this.handleFileChange.bind(this)
+    this.audioContext = new AudioContext() // eslint-disable-line no-undef
+
     this.confirm = this.confirm.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.handleConfirm = this.handleConfirm.bind(this)
+    this.createMediaElementSource = this.createMediaElementSource.bind(this)
+    this.addFiles = this.addFiles.bind(this)
     this.confirmCallback = () => {}
   }
 
@@ -66,28 +68,7 @@ export default class PlayerHome extends PureComponent {
     return contained
   }
 
-  handleDrop (event) {
-    event.preventDefault()
-    event.stopPropagation()
-    const { files } = event.dataTransfer
-
-    if (files.length > 0) {
-      let contained = this.checkFile(files)
-
-      if (contained) {
-        this.confirm(`Are you sure you want to add this folder? ${contained}`, () => {
-          this.props.addFiles(files)
-        })
-      } else {
-        this.props.addFiles(files)
-      }
-    }
-  }
-
-  handleFileChange (event) {
-    event.stopPropagation()
-    event.preventDefault()
-    const { files } = event.target
+  addFiles (files) {
     if (files.length > 0) {
       let contained = this.checkFile(files)
 
@@ -112,9 +93,16 @@ export default class PlayerHome extends PureComponent {
     this.setState({ confirmMessage: null })
   }
 
+  createMediaElementSource (node) {
+    this.audio = node
+    this.setState({
+      audioSource: this.audioContext.createMediaElementSource(node)
+    })
+  }
+
   render () {
-    const { maximized, enableTransparency, loaded } = this.props
-    const { audioContext, audioSource, confirmMessage } = this.state
+    const { maximized, enableTransparency, loaded, tab } = this.props
+    const { audioSource, confirmMessage } = this.state
     return (
       <div
         className={classNames(style.playerHome, {
@@ -122,22 +110,35 @@ export default class PlayerHome extends PureComponent {
           [style.maximized]: maximized,
           [style.loaded]: loaded
         })}
-        onDragOver={e => e.preventDefault()}
-        onDrop={this.handleDrop}
       >
         <div className={style.wrapper}>
           <div className={style.mainPanel}>
             <div className={style.library}>
               <div className={style.manageLibrary}>
-                <TitleBar />
-                <FolderManagement handleFileChange={this.handleFileChange} />
+                <div className={style.manageLibraryPanel}>
+                  <TitleBar />
+                  <div className={style.navigationContainer}>
+                    <Navigation />
+                  </div>
+                </div>
               </div>
               <div className={style.collection}>
-                <LocalCollection />
+                <div className={classNames(style.tab, {
+                  [style.active]: tab === 'local'
+                })}>
+                  <LocalCollection addFiles={this.addFiles} />
+                </div>
+                <div className={classNames(style.tab, {
+                  [style.active]: tab === 'now-playing'
+                })}>
+                  <NowPlaying />
+                </div>
+                <div className={classNames(style.tab, {
+                  [style.active]: tab === 'shoutcast'
+                })}>
+                  <ShoutCastPanel />
+                </div>
               </div>
-            </div>
-            <div className={style.nowPlaying}>
-              <NowPlaying />
             </div>
           </div>
           <PlayerControls audio={this.audio} />
@@ -145,7 +146,7 @@ export default class PlayerHome extends PureComponent {
         <AlbumDetails />
         <Equalizer
           source={audioSource}
-          context={audioContext}
+          context={this.audioContext}
         />
         <Confirm
           message={confirmMessage}
@@ -153,12 +154,7 @@ export default class PlayerHome extends PureComponent {
           cancel={this.handleCancel}
         />
         <AudioComponent
-          createSource={node => {
-            this.audio = node
-            this.setState({
-              audioSource: this.state.audioContext.createMediaElementSource(node)
-            })
-          }}
+          createSource={this.createMediaElementSource}
         />
       </div>
     )
@@ -167,6 +163,7 @@ export default class PlayerHome extends PureComponent {
 
 PlayerHome.defaultProps = {
   addFiles: () => {},
+  tab: 'local',
   currentSong: null,
   maximized: false,
   enableTransparency: true,
@@ -191,6 +188,7 @@ PlayerHome.propTypes = {
   loaded: PropTypes.bool,
   maximized: PropTypes.bool,
   addFiles: PropTypes.func,
+  tab: PropTypes.string,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,

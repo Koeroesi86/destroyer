@@ -1,13 +1,14 @@
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import slugify from 'slugify'
 import { trackType } from '../player-home/PlayerHome'
 import style from './NowPlaying.scss'
 
 function NowPlaying ({
   nowPlaying,
   currentSong,
-   playTrack
+  playTrack
 }) {
   return (
     <div className={style.nowPlaying}>
@@ -15,7 +16,7 @@ function NowPlaying ({
       <div className={style.tracks}>
         {nowPlaying.map(track => (
           <div
-            key={`track-${track.path}`}
+            key={`now-playing-track-${slugify(track.path, { remove: /[*+~./()'",!:@\\]/g, lower: true })}`}
             className={classNames(style.track, {
               [style.current]: currentSong && track.path === currentSong.path
             })}

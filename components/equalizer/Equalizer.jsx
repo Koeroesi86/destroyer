@@ -12,8 +12,8 @@ class Equalizer extends PureComponent {
     }
   }
 
-  componentDidUpdate () {
-    if (this.props.context && this.props.source) {
+  componentDidUpdate (prevProps) {
+    if (this.props.context !== prevProps.context || this.props.source !== prevProps.source) {
       this.setup()
     }
   }
@@ -77,9 +77,7 @@ class Equalizer extends PureComponent {
 
   changeGain (inputValue, index) {
     const connectedBand = this.connectedBands[index]
-    const value = parseFloat(inputValue) / 100.0
-
-    connectedBand.gainContext.gain.value = value
+    connectedBand.gainContext.gain.value = parseFloat(inputValue) / 100.0
   }
 
   render () {

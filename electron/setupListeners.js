@@ -1,6 +1,8 @@
-const { app, ipcMain } = require('electron')
+const { app, ipcMain, session } = require('electron')
 const fs = require('fs')
 const electronVibrancy = require('electron-vibrancy')
+const playlistParser = require('playlist-parser')
+const request = require('request')
 const executeQuery = require('./executeQuery')
 const executeQueries = require('./executeQueries')
 const scanFolders = require('./scanFolders')
@@ -33,7 +35,7 @@ function memorySizeOf (obj) {
       }
     }
     return bytes
-  };
+  }
 
   function formatByteSize (bytes) {
     if (bytes < 1024) return bytes + ' bytes'
@@ -51,7 +53,6 @@ function setupListeners (database, windows, appDataPath) {
   // loading.openDevTools()
 
   ipcMain.once('APP_LOADED', () => {
-    windows.loading.hide()
     setTimeout(() => {
       windows.main.show()
       if (isWin) electronVibrancy.SetVibrancy(windows.main, 0)
@@ -152,6 +153,18 @@ function setupListeners (database, windows, appDataPath) {
 
   ipcMain.on('RESCAN_LIBRARY', (event, { forced }) => {
     rescanLibrary(database, event.sender, forced, appDataPath)
+  })
+
+  session.defaultSession.on('will-download', (event, item, webContents) => {
+    event.preventDefault()
+    const url = item.getURL()
+    request(url, (error, response, body) => {
+      if (error) {
+        console.error(error)
+      }
+      const playlist = playlistParser.PLS.parse(body)
+      windows.main.webContents.send('CLICKED_URL', { playlist, url })
+    })
   })
 }
 

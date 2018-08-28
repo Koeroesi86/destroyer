@@ -1,5 +1,6 @@
 const initialState = {
   view: 'albums',
+  tab: 'local',
   nowPlaying: [],
   currentSong: null,
   currentTime: 0,
@@ -105,6 +106,12 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'MAXIMIZED_APP') {
     return Object.assign({}, state, {
       maximized: action.payload.maximized
+    })
+  }
+
+  if (action.type === 'SET_TAB') {
+    return Object.assign({}, state, {
+      tab: action.payload.tab
     })
   }
 

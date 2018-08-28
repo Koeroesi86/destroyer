@@ -3,6 +3,12 @@ import PropTypes from 'prop-types'
 import style from './FolderManagement.scss'
 
 class FolderManagement extends PureComponent {
+  constructor (props) {
+    super(props)
+
+    this.handleFileChange = this.handleFileChange.bind(this)
+  }
+
   componentDidMount () {
     if (this.upload) {
       this.upload.allowdirs = true
@@ -10,8 +16,16 @@ class FolderManagement extends PureComponent {
     }
   }
 
+  handleFileChange (event) {
+    event.stopPropagation()
+    event.preventDefault()
+    const { files } = event.target
+
+    this.props.addFiles(files)
+  }
+
   render () {
-    const { folders, handleFileChange } = this.props
+    const { folders, addFiles } = this.props
     return (
       <section className={style.folderManagement}>
         <div className={style.sectionTitle}>
@@ -37,7 +51,7 @@ class FolderManagement extends PureComponent {
               ref={ref => { this.upload = ref }}
               className={style.fileInput}
               multiple
-              onChange={handleFileChange}
+              onChange={addFiles}
             />
           </div>
         </div>
@@ -48,12 +62,12 @@ class FolderManagement extends PureComponent {
 
 FolderManagement.defaultProps = {
   folders: [],
-  handleFileChange: () => {}
+  addFiles: () => {}
 }
 
 FolderManagement.propTypes = {
   folders: PropTypes.arrayOf(PropTypes.shape({})),
-  handleFileChange: PropTypes.func
+  addFiles: PropTypes.func
 }
 
 export default FolderManagement

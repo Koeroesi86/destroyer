@@ -10,7 +10,8 @@ class AlbumView extends PureComponent {
     super(props)
 
     this.state = {
-      scrolledTop: true
+      scrolledTop: true,
+      albums: []
     }
     this.onScroll = _.debounce((e) => {
       const { scrollTop } = e.target
@@ -24,6 +25,11 @@ class AlbumView extends PureComponent {
         }
       }
     }, 200)
+    this.updateAlbums = _.debounce(() => {
+      this.setState({
+        albums: this.props.albums
+      })
+    }, 50)
   }
 
   // shouldComponentUpdate (prevProps, prevState) {
@@ -34,6 +40,12 @@ class AlbumView extends PureComponent {
   //
   //   return false
   // }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.albums !== prevProps.albums) {
+      this.updateAlbums()
+    }
+  }
 
   componentDidMount () {
     if (this.listing) {
@@ -48,8 +60,8 @@ class AlbumView extends PureComponent {
   }
 
   render () {
-    const { playTracks, selectAlbum, albums } = this.props
-    const { scrolledTop } = this.state
+    const { playTracks, selectAlbum } = this.props
+    const { scrolledTop, albums } = this.state
     return (
       <div className={style.albums}>
         <div

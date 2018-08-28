@@ -137,15 +137,14 @@ html, body {
   }
 
   .wrapper {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    height: 100%;
   }
 
   .mainPanel {
-    flex: 1 1 auto;
     display: flex;
     flex-direction: row;
+    height: calc(100% - 110px);
   }
 
   .controls {
@@ -159,32 +158,92 @@ html, body {
     flex-direction: row;
 
     .manageLibrary {
-      -webkit-app-region: drag;
       width: 200px;
       flex-shrink: 0;
-      overflow-x: hidden;
-      overflow-y: auto;
-      cursor: -webkit-grab;
+      position: relative;
 
-      &:focus {
-        cursor: -webkit-grabbing;
+      .manageLibraryPanel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        -webkit-app-region: drag;
+        overflow-x: hidden;
+        overflow-y: auto;
+        cursor: -webkit-grab;
+
+        &:focus {
+          cursor: -webkit-grabbing;
+        }
+
+        .navigationContainer {
+          flex: 1 1 auto;
+        }
+
+        .navigation {
+          padding-top: 40px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: 100%;
+
+          .item {
+            -webkit-app-region: no-drag;
+            padding-left: 12px;
+            margin-bottom: 12px;
+            line-height: 24px;
+            cursor: pointer;
+            color: #efefef;
+            border-left: 3px solid transparent;
+            transition: all .2s ease-in-out;
+
+            &:hover {
+              border-left-color: rgba(255, 255, 255, 0.2);
+            }
+
+            &.active {
+              color: #ff8686;
+              border-left-color: rgba(255, 134, 134, 0.6);
+
+              &:hover {
+                border-left-color: #ff8686;
+              }
+            }
+
+            .label {
+              padding-left: 6px;
+            }
+          }
+        }
       }
     }
 
     .collection {
       flex: 1 1 auto;
       height: 100%;
+      position: relative;
       background-color: #333333;
       box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-    }
-  }
 
-  .nowPlaying {
-    position: relative;
-    width: 200px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
+      .tab {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0;
+        transition: opacity .4s ease-in-out;
+        will-change: opacity;
+
+        &.active {
+          z-index: 1;
+          opacity: 1;
+        }
+      }
+    }
   }
 }
 
