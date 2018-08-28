@@ -30,6 +30,7 @@ const createWindow = (app) => {
     transparent: true,
     darkTheme: true,
     show: false,
+    vibrancy: 'dark',
     webPreferences: {
       backgroundThrottling: false,
       webSecurity: false
@@ -37,7 +38,6 @@ const createWindow = (app) => {
   })
   mainWindowState.manage(mainWindow)
   mainWindow.setTouchBar(touchBar)
-  mainWindow.setVibrancy('dark')
   mainWindow.setFullScreenable(false)
 
   app.updateTouchBar = metadata => {

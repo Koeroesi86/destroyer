@@ -11,6 +11,8 @@ const setupListeners = require('./electron/setupListeners')
 
 process.env.ELECTRON_ENABLE_LOGGING = '1'
 
+const isWin = process.platform === 'win32'
+
 const argv = require('minimist')(process.argv.slice(2))
 
 let mainWindow
@@ -56,7 +58,7 @@ createDatabase(libraryLocation)
     windows.loading.once('ready-to-show', () => {
       windows.loading.show()
       // electronAcrylic.setAcrylic(windows.loading, 0xFFFFFF)
-      electronVibrancy.SetVibrancy(windows.loading, 0)
+      if (isWin) electronVibrancy.SetVibrancy(windows.loading, 0)
     })
 
     initWindow()

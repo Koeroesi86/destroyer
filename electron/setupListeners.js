@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron')
+const { app, ipcMain } = require('electron')
 const fs = require('fs')
 const electronVibrancy = require('electron-vibrancy')
 const executeQuery = require('./executeQuery')
@@ -45,15 +45,18 @@ function memorySizeOf (obj) {
   return formatByteSize(sizeOf(obj))
 }
 
+const isWin = process.platform === 'win32'
+
 function setupListeners (database, windows, appDataPath) {
   // loading.openDevTools()
 
   ipcMain.once('APP_LOADED', () => {
-    windows.loading.close()
-    windows.loading = null
+    windows.loading.hide()
     setTimeout(() => {
       windows.main.show()
-      electronVibrancy.SetVibrancy(windows.main, 0)
+      if (isWin) electronVibrancy.SetVibrancy(windows.main, 0)
+      windows.loading.close()
+      windows.loading = null
     }, 200)
   })
 
