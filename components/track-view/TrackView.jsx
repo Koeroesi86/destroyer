@@ -38,13 +38,13 @@ class TrackView extends PureComponent {
 
   componentDidMount () {
     if (this.listing) {
-      this.listing.addEventListener('scroll', this.onScroll)
+      this.listing.addEventListener('scroll', this.onScroll, { passive: true })
     }
   }
 
   componentWillUnmount () {
     if (this.listing) {
-      this.listing.removeEventListener('scroll', this.onScroll)
+      this.listing.removeEventListener('scroll', this.onScroll, { passive: true })
     }
   }
 
@@ -53,16 +53,6 @@ class TrackView extends PureComponent {
       this.updateTracks()
     }
   }
-
-  // shouldComponentUpdate (prevProps, prevState) {
-  //   if (this.state.scrolledTop !== prevState.scrolledTop) return true
-  //   if (this.state.selectedTracks.length !== prevState.selectedTracks.length) return true
-  //   if (this.props.playTracks !== prevProps.playTracks) return true
-  //   if (!_.isEqual(this.props.currentSong, prevProps.currentSong)) return true
-  //   if (!_.isEqual(this.props.tracks, prevProps.tracks)) return true
-  //
-  //   return false
-  // }
 
   toggleTrack (track) {
     const prevSelectedTracks = this.state.selectedTracks.slice(0)

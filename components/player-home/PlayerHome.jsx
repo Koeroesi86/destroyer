@@ -13,10 +13,7 @@ import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
 import ShoutCastPanel from '../shoutcast-panel'
 import Navigation from '../navigation'
-
-export function formatTime (seconds) {
-  return moment(Math.floor(parseFloat(seconds) * 1000), 'x', true).format('HH:mm:ss')
-}
+import AudioSpectrum from '../audio-spectrum/AudioSpectrum'
 
 export default class PlayerHome extends PureComponent {
   constructor (props) {
@@ -27,7 +24,7 @@ export default class PlayerHome extends PureComponent {
       confirmMessage: null
     }
 
-    this.audioContext = new AudioContext() // eslint-disable-line no-undef
+    this.audioContext = new window.AudioContext()
 
     this.confirm = this.confirm.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
@@ -118,6 +115,19 @@ export default class PlayerHome extends PureComponent {
                 <div className={style.manageLibraryPanel}>
                   <TitleBar />
                   <div className={style.navigationContainer}>
+                    <AudioSpectrum
+                      audio={this.audio}
+                      audioContext={this.audioContext}
+                      audioSource={this.state.audioSource}
+                      width={160}
+                      height={80}
+                      meterColor={'rgba(255, 255, 255, 0.4)'}
+                      capColor={'rgba(255, 255, 255, 0.8)'}
+                      capHeight={1}
+                      meterCount={40}
+                      meterWidth={2}
+                      gap={2}
+                    />
                     <Navigation />
                   </div>
                 </div>

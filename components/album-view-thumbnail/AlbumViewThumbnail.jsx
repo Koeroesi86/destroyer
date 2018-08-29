@@ -3,19 +3,11 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay } from '@fortawesome/free-solid-svg-icons'
-import _ from 'lodash'
-import { formatTime, trackType } from '../player-home/PlayerHome'
+import { trackType } from '../player-home/PlayerHome'
 import style from './AlbumViewThumbnail.scss'
+import Time from '../time'
 
 class AlbumViewThumbnail extends PureComponent {
-  shouldComponentUpdate (prevProps) {
-    if (this.props.playTracks !== prevProps.playTracks) return true
-    if (this.props.selectAlbum !== prevProps.selectAlbum) return true
-    if (!_.isEqual(this.props.album, prevProps.album)) return true
-
-    return false
-  }
-
   componentDidMount () {
     this.updateCover()
   }
@@ -68,8 +60,8 @@ class AlbumViewThumbnail extends PureComponent {
         <div className={style.meta}>
           <div className={classNames(style.title)} title={album.title}>{album.title}</div>
           <div className={classNames(style.artist)} title={album.artist}>{album.artist}</div>
-          <div className={classNames(style.duration)} title={formatTime(album.duration)}>
-            {formatTime(album.duration)}
+          <div className={classNames(style.duration)}>
+            <Time seconds={album.duration} />
           </div>
         </div>
       </div>

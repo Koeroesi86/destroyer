@@ -4,9 +4,10 @@ import classNames from 'classnames'
 import { FiBarChart2 as EQIcon, FiVolumeX as VolumeOffIcon, FiVolume2 as VolumeFullIcon } from 'react-icons/fi'
 import { MdPlayCircleOutline as PlayIcon, MdPauseCircleOutline as PauseIcon } from 'react-icons/md'
 import Slider from '../slider/Slider'
-import { formatTime, trackType } from '../player-home/PlayerHome'
+import { trackType } from '../player-home/PlayerHome'
 import style from './PlayerControls.scss'
 import ScanProgress from '../scan-progress'
+import Time from '../time'
 
 class PlayerControls extends PureComponent {
   constructor (props) {
@@ -54,26 +55,22 @@ class PlayerControls extends PureComponent {
     return (
       <div className={style.controls}>
         <div className={style.controlsPanel}>
-          {currentSong && (
-            <div className={style.meta}>
-              <div className={style.contents}>
-                {currentSong.picture && (
-                  <div
-                    className={style.picture}
-                    style={{ backgroundImage: `url("${currentSong.picture}")` }}
-                  />
-                )}
-                <div className={style.details}>
-                  <div className={style.title}>{currentSong.title}</div>
-                  <div className={style.album}>{currentSong.album}</div>
-                  <div className={style.artist}>{currentSong.artist}</div>
-                  <div className={style.time}>
-                    {formatTime(currentTime)} / {formatTime(currentSong.duration)}
-                  </div>
+          <div className={style.meta}>
+            <div className={style.contents}>
+              <div
+                className={style.picture}
+                style={{ backgroundImage: (currentSong && currentSong.picture) ? `url("${currentSong.picture}")` : '' }}
+              />
+              <div className={style.details}>
+                <div className={style.title}>{currentSong ? currentSong.title : 'None'}</div>
+                <div className={style.album}>{currentSong ? currentSong.album : 'None'}</div>
+                <div className={style.artist}>{currentSong ? currentSong.artist : 'None'}</div>
+                <div className={style.time}>
+                  <Time seconds={currentTime} /> / <Time seconds={currentSong ? currentSong.duration : 0} />
                 </div>
               </div>
             </div>
-          )}
+          </div>
           <div className={style.controlsContainer}>
             <div className={style.progress}>
               <Slider
@@ -164,7 +161,7 @@ PlayerControls.propTypes = {
   openEqualizer: PropTypes.func,
   setVolume: PropTypes.func,
   volume: PropTypes.number,
-  audio: PropTypes.instanceOf(HTMLElement) // eslint-disable-line no-undef
+  audio: PropTypes.instanceOf(window.HTMLElement)
 }
 
 export default PlayerControls

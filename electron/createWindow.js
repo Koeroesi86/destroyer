@@ -1,19 +1,19 @@
 const { BrowserWindow, TouchBar } = require('electron')
 const windowStateKeeper = require('electron-window-state')
 
-const { TouchBarLabel, TouchBarSpacer } = TouchBar
+// const { TouchBarLabel, TouchBarSpacer } = TouchBar
 
-const artist = new TouchBarLabel({ textColor: '#5c43e8' })
-const track = new TouchBarLabel({ textColor: '#555555' })
-const time = new TouchBarLabel({ textColor: '#5c43e8' })
+// const artist = new TouchBarLabel({ textColor: '#5c43e8' })
+// const track = new TouchBarLabel({ textColor: '#555555' })
+// const time = new TouchBarLabel({ textColor: '#5c43e8' })
 
-const touchBar = new TouchBar([
-  artist,
-  new TouchBarSpacer({ size: 'small' }),
-  track,
-  new TouchBarSpacer({ size: 'small' }),
-  time
-])
+// const touchBar = new TouchBar([
+//   artist,
+//   new TouchBarSpacer({ size: 'small' }),
+//   track,
+//   new TouchBarSpacer({ size: 'small' }),
+//   time
+// ])
 
 const createWindow = (app) => {
   let mainWindowState = windowStateKeeper({
@@ -37,7 +37,7 @@ const createWindow = (app) => {
     }
   })
   mainWindowState.manage(mainWindow)
-  mainWindow.setTouchBar(touchBar)
+  // mainWindow.setTouchBar(touchBar)
   mainWindow.setFullScreenable(false)
 
   app.updateTouchBar = metadata => {

@@ -32,15 +32,6 @@ class AlbumView extends PureComponent {
     }, 50)
   }
 
-  // shouldComponentUpdate (prevProps, prevState) {
-  //   if (this.state.scrolledTop !== prevState.scrolledTop) return true
-  //   if (this.props.playTracks !== prevProps.playTracks) return true
-  //   if (this.props.selectAlbum !== prevProps.selectAlbum) return true
-  //   if (!_.isEqual(this.props.albums, prevProps.albums)) return true
-  //
-  //   return false
-  // }
-
   componentDidUpdate (prevProps) {
     if (this.props.albums !== prevProps.albums) {
       this.updateAlbums()
@@ -49,13 +40,13 @@ class AlbumView extends PureComponent {
 
   componentDidMount () {
     if (this.listing) {
-      this.listing.addEventListener('scroll', this.onScroll)
+      this.listing.addEventListener('scroll', this.onScroll, { passive: true })
     }
   }
 
   componentWillUnmount () {
     if (this.listing) {
-      this.listing.removeEventListener('scroll', this.onScroll)
+      this.listing.removeEventListener('scroll', this.onScroll, { passive: true })
     }
   }
 

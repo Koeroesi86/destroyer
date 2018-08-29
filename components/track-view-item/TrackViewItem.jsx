@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import _ from 'lodash'
-import { formatTime, trackType } from '../player-home/PlayerHome'
+import { trackType } from '../player-home/PlayerHome'
 import style from './TrackViewItem.scss'
+import Time from '../time'
 
 
 const TrackViewItemField = ({ onClick = () => {}, className = '', children = null }) => (
@@ -22,17 +22,6 @@ TrackViewItemField.propTypes = {
 }
 
 class TrackViewItem extends PureComponent {
-  shouldComponentUpdate (prevProps) {
-    if (this.props.isCurrent !== prevProps.isCurrent) return true
-    if (this.props.isSelected !== prevProps.isSelected) return true
-    if (this.props.isHeader !== prevProps.isHeader) return true
-    if (this.props.clickTrack !== prevProps.clickTrack) return true
-    if (this.props.doubleClickTrack !== prevProps.doubleClickTrack) return true
-    if (!_.isEqual(this.props.track, prevProps.track)) return true
-
-    return false
-  }
-
   render () {
     let { track, isSelected, isCurrent, isHeader, clickTrack, doubleClickTrack } = this.props
     return (
@@ -46,7 +35,10 @@ class TrackViewItem extends PureComponent {
         onDoubleClick={() => doubleClickTrack(track)}
       >
         <TrackViewItemField
-          className={style.duration}>{isNaN(track.duration) ? track.duration : formatTime(track.duration)}</TrackViewItemField>
+          className={style.duration}
+        >
+          <Time seconds={track.duration} />
+        </TrackViewItemField>
         <TrackViewItemField className={style.artist}>{track.artist || '-'}</TrackViewItemField>
         <TrackViewItemField className={style.year}>{track.year || '-'}</TrackViewItemField>
         <TrackViewItemField className={style.album}>{track.album || '-'}</TrackViewItemField>

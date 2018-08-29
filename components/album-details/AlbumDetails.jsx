@@ -4,7 +4,8 @@ import classNames from 'classnames'
 import { faPlay, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import style from './AlbumDetails.scss'
-import { formatTime, trackType } from '../player-home/PlayerHome'
+import { trackType } from '../player-home/PlayerHome'
+import Time from '../time'
 
 class AlbumDetails extends PureComponent {
   constructor (props) {
@@ -58,7 +59,7 @@ class AlbumDetails extends PureComponent {
         <div className={style.title}>{displayed.title}</div>
         <div className={style.meta}>
           <div className={style.year}>{displayed.year}</div>
-          <div className={style.duration}>{formatTime(displayed.duration)}</div>
+          <div className={style.duration}><Time seconds={displayed.duration} /></div>
         </div>
         <div className={style.tracks}>
           {displayed.tracks && displayed.tracks.map(track => (
