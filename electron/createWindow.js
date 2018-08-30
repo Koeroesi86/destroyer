@@ -40,14 +40,14 @@ const createWindow = (app) => {
   // mainWindow.setTouchBar(touchBar)
   mainWindow.setFullScreenable(false)
 
-  app.updateTouchBar = metadata => {
-    artist.label = metadata.artist
-    track.label = metadata.track
-  }
-
-  app.updateTouchBarTime = duration => {
-    time.label = duration
-  }
+  // app.updateTouchBar = metadata => {
+  //   artist.label = metadata.artist
+  //   track.label = metadata.track
+  // }
+  //
+  // app.updateTouchBarTime = duration => {
+  //   time.label = duration
+  // }
 
   return mainWindow
 }

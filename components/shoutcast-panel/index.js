@@ -1,3 +1,3 @@
-import ShoutCastPanel from './ShoutCastPanel'
+import OnlineSourcePanel from './OnlineSourcePanel'
 
-export default ShoutCastPanel
+export default OnlineSourcePanel

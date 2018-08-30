@@ -15,13 +15,15 @@ class AlbumView extends PureComponent {
     }
     this.onScroll = _.debounce((e) => {
       const { scrollTop } = e.target
+      const { classList } = this.separator
+
       if (scrollTop > 0) {
-        if (this.state.scrolledTop) {
-          this.setState({ scrolledTop: false })
+        if (!classList.contains(style.scrolled)) {
+          classList.add(style.scrolled)
         }
       } else {
-        if (!this.state.scrolledTop) {
-          this.setState({ scrolledTop: true })
+        if (classList.contains(style.scrolled)) {
+          classList.remove(style.scrolled)
         }
       }
     }, 200)
@@ -52,13 +54,12 @@ class AlbumView extends PureComponent {
 
   render () {
     const { playTracks, selectAlbum } = this.props
-    const { scrolledTop, albums } = this.state
+    const { albums } = this.state
     return (
       <div className={style.albums}>
         <div
-          className={classNames(style.separator, {
-            [style.scrolled]: !scrolledTop
-          })}
+          ref={s => { this.separator = s }}
+          className={style.separator}
         />
         <div
           className={style.listing}

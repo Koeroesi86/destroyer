@@ -19,13 +19,15 @@ class TrackView extends PureComponent {
     this.doubleClickTrack = this.doubleClickTrack.bind(this)
     this.onScroll = _.debounce((e) => {
       const { scrollTop } = e.target
+      const { classList } = this.separator
+
       if (scrollTop > 0) {
-        if (this.state.scrolledTop) {
-          this.setState({ scrolledTop: false })
+        if (!classList.contains(style.scrolled)) {
+          classList.add(style.scrolled)
         }
       } else {
-        if (!this.state.scrolledTop) {
-          this.setState({ scrolledTop: true })
+        if (classList.contains(style.scrolled)) {
+          classList.remove(style.scrolled)
         }
       }
     }, 100)
@@ -80,7 +82,7 @@ class TrackView extends PureComponent {
 
   render () {
     const { currentSong, playTracks } = this.props
-    const { selectedTracks, scrolledTop, tracks } = this.state
+    const { selectedTracks, tracks } = this.state
     const headerLabels = {
       duration: 'Duration',
       artist: 'Artist',
@@ -96,9 +98,8 @@ class TrackView extends PureComponent {
           isHeader
         />
         <div
-          className={classNames(style.separator, {
-            [style.scrolled]: !scrolledTop
-          })}
+          ref={s => { this.separator = s }}
+          className={style.separator}
         />
         <div className={style.listing} ref={l => { this.listing = l }}>
           {tracks.map(track => (

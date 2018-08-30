@@ -88,7 +88,7 @@ AudioComponent.defaultProps = {
   trackEnded: () => {},
   createSource: () => {},
   currentTime: 0,
-  currentTimeFPS: 30,
+  currentTimeFPS: 5,
   setCurrentTime: () => {},
   currentSong: null,
   volume: 0.5

@@ -14,11 +14,11 @@
     flex: 0 0;
     position: relative;
     display: block;
-    height: 1px;
-    min-height: 1px;
-    margin-top: -1px;
+    height: 2px;
+    min-height: 2px;
+    margin-top: -2px;
     width: 100%;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
     transition: opacity .2s ease-in-out;
     opacity: 0;
 

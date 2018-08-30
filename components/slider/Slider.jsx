@@ -40,7 +40,7 @@ class Slider extends PureComponent {
           min={min}
           max={max}
           step={step}
-          value={value}
+          // value={value}
           className={classNames(style.range)}
           onInput={onInput}
           onChange={onChange}

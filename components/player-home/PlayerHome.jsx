@@ -11,7 +11,7 @@ import PlayerControls from '../player-controls'
 import AudioComponent from '../audio-component'
 import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
-import ShoutCastPanel from '../shoutcast-panel'
+import OnlineSourcePanel from '../shoutcast-panel'
 import Navigation from '../navigation'
 import AudioSpectrum from '../audio-spectrum/AudioSpectrum'
 
@@ -146,7 +146,9 @@ export default class PlayerHome extends PureComponent {
                 <div className={classNames(style.tab, {
                   [style.active]: tab === 'shoutcast'
                 })}>
-                  <ShoutCastPanel />
+                  <OnlineSourcePanel
+                    src={'http://www.shoutcast.com/scradioinwinamp/'}
+                  />
                 </div>
               </div>
             </div>
