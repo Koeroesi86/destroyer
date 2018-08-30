@@ -157,13 +157,13 @@ function scanFolder (database, currentPath, sender, appDataPath) {
 
         const nextFile = () => {
           counter += 1
+          progress += 1
           let delay = fileDelay
           if (counter >= breakLimit) {
             delay = fileDelay * breakMultiplier
             console.log(`Taking a ${delay / 1000} second break...`)
           }
           setTimeout(() => {
-            progress += 1
             if (counter >= breakLimit) {
               console.log('I am back!')
               counter = 0
@@ -174,7 +174,7 @@ function scanFolder (database, currentPath, sender, appDataPath) {
         if (supportedFormats.includes(extension)) {
           sender.send('SCANNING_FILE', { fileName, progress, totalCount })
           writeMeta(fileName, fileStats, database, appDataPath)
-            .then(() => nextFile())
+            .then(nextFile)
             .catch(e => {
               console.error(fileName, e)
               nextFile()
