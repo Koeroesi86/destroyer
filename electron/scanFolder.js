@@ -173,6 +173,12 @@ function scanFolder (database, currentPath, sender, appDataPath) {
         }
         if (supportedFormats.includes(extension)) {
           sender.send('SCANNING_FILE', { fileName, progress, totalCount })
+          if (progress === totalCount) {
+            setTimeout(() => {
+              progress = 0
+              totalCount = 0
+            }, 1)
+          }
           writeMeta(fileName, fileStats, database, appDataPath)
             .then(nextFile)
             .catch(e => {

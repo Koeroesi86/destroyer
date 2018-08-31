@@ -119,12 +119,12 @@ export default class PlayerHome extends PureComponent {
                       audio={this.audio}
                       audioContext={this.audioContext}
                       audioSource={this.state.audioSource}
-                      width={160}
+                      width={180}
                       height={80}
                       meterColor={'rgba(255, 255, 255, 0.4)'}
                       capColor={'rgba(255, 255, 255, 0.8)'}
                       capHeight={1}
-                      meterCount={40}
+                      meterCount={45}
                       meterWidth={2}
                       gap={2}
                     />

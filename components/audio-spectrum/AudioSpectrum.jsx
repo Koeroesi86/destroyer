@@ -116,7 +116,10 @@ class AudioSpectrum extends PureComponent {
         let y = getY(value) + capHeight
         drawMeterBar(i, y) // the meter
       }
-      this.animationId = window.requestAnimationFrame(drawMeter)
+      // this.animationId = window.requestAnimationFrame(drawMeter)
+      setTimeout(() => {
+        this.animationId = window.requestAnimationFrame(drawMeter)
+      }, 1000 / fps)
     }
 
     this.animationId = window.requestAnimationFrame(drawMeter)
