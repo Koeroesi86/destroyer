@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import _ from 'lodash'
 import { trackType } from '../player-home/PlayerHome'
 import style from './TrackView.scss'
@@ -11,9 +10,7 @@ class TrackView extends PureComponent {
     super(props)
 
     this.state = {
-      tracks: [],
-      selectedTracks: [],
-      scrolledTop: true
+      selectedTracks: []
     }
     this.toggleTrack = this.toggleTrack.bind(this)
     this.doubleClickTrack = this.doubleClickTrack.bind(this)
@@ -30,11 +27,6 @@ class TrackView extends PureComponent {
           classList.remove(style.scrolled)
         }
       }
-    }, 100)
-    this.updateTracks = _.debounce(() => {
-      this.setState({
-        tracks: this.props.tracks
-      })
     }, 50)
   }
 
@@ -47,12 +39,6 @@ class TrackView extends PureComponent {
   componentWillUnmount () {
     if (this.listing) {
       this.listing.removeEventListener('scroll', this.onScroll, { passive: true })
-    }
-  }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.tracks !== prevProps.tracks) {
-      this.updateTracks()
     }
   }
 
@@ -81,8 +67,8 @@ class TrackView extends PureComponent {
   }
 
   render () {
-    const { currentSong, playTracks } = this.props
-    const { selectedTracks, tracks } = this.state
+    const { currentSong, playTracks, tracks, loaded } = this.props
+    const { selectedTracks } = this.state
     const headerLabels = {
       duration: 'Duration',
       artist: 'Artist',
@@ -102,7 +88,7 @@ class TrackView extends PureComponent {
           className={style.separator}
         />
         <div className={style.listing} ref={l => { this.listing = l }}>
-          {tracks.map(track => (
+          {loaded && tracks.map(track => (
             <TrackViewItem
               key={track.path}
               track={track}
@@ -137,12 +123,14 @@ class TrackView extends PureComponent {
 
 TrackView.defaultProps = {
   tracks: [],
-  playTracks: () => {}
+  playTracks: () => {},
+  loaded: true
 }
 
 TrackView.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.shape(trackType)),
   currentSong: PropTypes.shape(trackType),
+  loaded: PropTypes.bool,
   playTracks: PropTypes.func
 }
 

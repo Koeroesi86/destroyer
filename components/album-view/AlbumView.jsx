@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 import style from './AlbumView.scss'
 import AlbumViewThumbnail from '../album-view-thumbnail'
 import _ from 'lodash'
@@ -9,10 +8,6 @@ class AlbumView extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.state = {
-      scrolledTop: true,
-      albums: []
-    }
     this.onScroll = _.debounce((e) => {
       const { scrollTop } = e.target
       const { classList } = this.separator
@@ -26,18 +21,7 @@ class AlbumView extends PureComponent {
           classList.remove(style.scrolled)
         }
       }
-    }, 200)
-    this.updateAlbums = _.debounce(() => {
-      this.setState({
-        albums: this.props.albums
-      })
     }, 50)
-  }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.albums !== prevProps.albums) {
-      this.updateAlbums()
-    }
   }
 
   componentDidMount () {
@@ -53,8 +37,7 @@ class AlbumView extends PureComponent {
   }
 
   render () {
-    const { playTracks, selectAlbum } = this.props
-    const { albums } = this.state
+    const { playTracks, selectAlbum, loaded, albums } = this.props
     return (
       <div className={style.albums}>
         <div
@@ -65,7 +48,7 @@ class AlbumView extends PureComponent {
           className={style.listing}
           ref={l => { this.listing = l }}
         >
-          {albums.map(album => (
+          {loaded && albums.map(album => (
             <AlbumViewThumbnail
               key={album.id}
               album={album}
@@ -82,10 +65,12 @@ class AlbumView extends PureComponent {
 AlbumView.defaultProps = {
   playTracks: () => {},
   selectAlbum: () => {},
-  albums: []
+  albums: [],
+  loaded: true
 }
 
 AlbumView.propTypes = {
+  loaded: PropTypes.bool,
   playTracks: PropTypes.func,
   selectAlbum: PropTypes.func,
   albums: PropTypes.arrayOf(PropTypes.shape())

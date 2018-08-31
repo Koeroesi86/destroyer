@@ -2,6 +2,7 @@ import TrackView from './TrackView'
 import connect from 'react-redux/es/connect/connect'
 
 const mapState = state => ({
+  loaded: state.library.loaded,
   tracks: state.library.tracks,
   currentSong: state.uiState.currentSong
 })

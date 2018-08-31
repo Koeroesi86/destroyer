@@ -2,6 +2,7 @@ import AlbumView from './AlbumView.jsx'
 import connect from 'react-redux/es/connect/connect'
 
 const mapState = state => ({
+  loaded: state.library.loaded,
   albums: state.library.albums,
   album: state.uiState.selectedAlbum
 })
