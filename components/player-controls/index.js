@@ -2,6 +2,7 @@ import connect from 'react-redux/es/connect/connect'
 import PlayerControls from './PlayerControls'
 
 const mapState = (state) => ({
+  port: state.uiState.port,
   volume: state.uiState.volume,
   currentTime: state.uiState.currentTime,
   currentSong: state.uiState.currentSong

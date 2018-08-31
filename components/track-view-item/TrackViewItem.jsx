@@ -37,7 +37,7 @@ class TrackViewItem extends PureComponent {
         <TrackViewItemField
           className={style.duration}
         >
-          <Time seconds={track.duration} />
+          {isNaN(track.duration) ? track.duration : <Time seconds={track.duration} />}
         </TrackViewItemField>
         <TrackViewItemField className={style.artist}>{track.artist || '-'}</TrackViewItemField>
         <TrackViewItemField className={style.year}>{track.year || '-'}</TrackViewItemField>

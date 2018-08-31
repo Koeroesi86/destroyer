@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import moment from 'moment'
 import classNames from 'classnames'
 import style from './PlayerHome.scss'
 import AlbumDetails from '../album-details'
@@ -11,7 +10,7 @@ import PlayerControls from '../player-controls'
 import AudioComponent from '../audio-component'
 import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
-import OnlineSourcePanel from '../shoutcast-panel'
+import OnlineSources from '../online-sources'
 import Navigation from '../navigation'
 import AudioSpectrum from '../audio-spectrum/AudioSpectrum'
 
@@ -144,11 +143,9 @@ export default class PlayerHome extends PureComponent {
                   <NowPlaying />
                 </div>
                 <div className={classNames(style.tab, {
-                  [style.active]: tab === 'shoutcast'
+                  [style.active]: tab === 'online-sources'
                 })}>
-                  <OnlineSourcePanel
-                    src={'http://www.shoutcast.com/scradioinwinamp/'}
-                  />
+                  <OnlineSources />
                 </div>
               </div>
             </div>

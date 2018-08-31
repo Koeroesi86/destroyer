@@ -23,12 +23,7 @@ function ScanProgress ({
           className={style.link}
         >{scanningFolder}</span>
         <span className={style.progress}>
-          <span>file&nbsp;#</span>
-          <span>{current}</span>
-          <span>&nbsp;of&nbsp;#</span>
-          <span>{total}</span>
-          <span>&nbsp;</span>
-          <span>({total > 0 ? Math.floor(current / total) * 100 : 0}%)</span>
+          file&nbsp;#{current}&nbsp;of&nbsp;#{total}&nbsp;({(total > 0 ? (Math.floor(current / total) * 100) : 0)}%)
         </span>
       </div>
     </div>

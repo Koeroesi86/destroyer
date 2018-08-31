@@ -83,17 +83,17 @@ class LocalCollection extends PureComponent {
           {tracks.length === 0 && false && (
             <div>Library placeholder</div>
           )}
-          <div className={classNames(style.albums, {
+          <div className={classNames(style.viewPanel, {
             [style.active]: view === 'albums'
           })}>
             <AlbumView />
           </div>
-          <div className={classNames(style.albums, {
+          <div className={classNames(style.viewPanel, {
             [style.active]: view === 'tracks'
           })}>
             <TrackView />
           </div>
-          <div className={classNames(style.folders, {
+          <div className={classNames(style.viewPanel, {
             [style.active]: view === 'folders'
           })}>
             <FolderManagement handleFileChange={addFiles} />

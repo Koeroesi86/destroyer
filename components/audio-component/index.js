@@ -4,7 +4,8 @@ import connect from 'react-redux/es/connect/connect'
 const mapState = state => ({
   currentSong: state.uiState.currentSong,
   currentTime: state.uiState.currentTime,
-  volume: state.uiState.volume
+  volume: state.uiState.volume,
+  port: state.uiState.port
 })
 
 const mapDispatch = dispatch => ({

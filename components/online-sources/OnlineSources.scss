@@ -1,4 +1,4 @@
-.localCollection {
+.onlineSources {
   height: 100%;
   overflow: hidden;
 
@@ -71,7 +71,9 @@
     overflow: hidden;
     position: relative;
 
-    .viewPanel {
+    .albums,
+    .tracks,
+    .folders {
       position: absolute;
       top: 0;
       left: 0;

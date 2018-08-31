@@ -35,7 +35,8 @@ class AlbumDetails extends PureComponent {
   render () {
     let {
       playTracks,
-      close
+      close,
+      port
     } = this.props
     const { album } = this.state
     const displayed = Object.assign({}, album)
@@ -49,12 +50,10 @@ class AlbumDetails extends PureComponent {
         >
           <FontAwesomeIcon icon={faTimes} size='lg' />
         </div>
-        {displayed.cover && (
-          <div
-            className={style.cover}
-            style={{ backgroundImage: `url("${displayed.cover}")` }}
-          />
-        )}
+        <div
+          className={style.cover}
+          style={{ backgroundImage: displayed.cover ? `url("http://localhost:${port}/local?path=${encodeURIComponent(displayed.cover)}")` : '' }}
+        />
         <div className={style.artist}>{displayed.artist}</div>
         <div className={style.title}>{displayed.title}</div>
         <div className={style.meta}>
@@ -86,7 +85,8 @@ class AlbumDetails extends PureComponent {
 
 AlbumDetails.defaultProps = {
   playTracks: () => {},
-  close: () => {}
+  close: () => {},
+  port: '3000'
 }
 
 AlbumDetails.propTypes = {
@@ -100,6 +100,7 @@ AlbumDetails.propTypes = {
     year: PropTypes.string
   }),
   playTracks: PropTypes.func,
+  port: PropTypes.string,
   close: PropTypes.func
 }
 

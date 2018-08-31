@@ -2,6 +2,7 @@ import AlbumDetails from './AlbumDetails'
 import connect from 'react-redux/es/connect/connect'
 
 const mapState = state => ({
+  port: state.uiState.port,
   album: state.uiState.selectedAlbum
 })
 

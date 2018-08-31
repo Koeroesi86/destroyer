@@ -32,8 +32,8 @@ const createWindow = (app) => {
     show: false,
     vibrancy: 'dark',
     webPreferences: {
-      backgroundThrottling: false,
-      webSecurity: false
+      // webSecurity: false,
+      backgroundThrottling: false
     }
   })
   mainWindowState.manage(mainWindow)

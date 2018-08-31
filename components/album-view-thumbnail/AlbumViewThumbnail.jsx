@@ -19,10 +19,10 @@ class AlbumViewThumbnail extends PureComponent {
   }
 
   updateCover () {
-    const { album: { cover } } = this.props
+    const { album: { cover }, port } = this.props
 
     if (cover) {
-      this.cover.style.backgroundImage = `url("${cover}")`
+      this.cover.style.backgroundImage = `url("http://localhost:${port}/local?path=${encodeURIComponent(cover)}")`
     }
   }
 
@@ -72,7 +72,8 @@ class AlbumViewThumbnail extends PureComponent {
 AlbumViewThumbnail.defaultProps = {
   album: {},
   selectAlbum: () => {},
-  playTracks: () => {}
+  playTracks: () => {},
+  port: '3000'
 }
 
 AlbumViewThumbnail.propTypes = {
@@ -85,6 +86,7 @@ AlbumViewThumbnail.propTypes = {
     tracks: PropTypes.arrayOf(PropTypes.shape(trackType))
   }),
   selectAlbum: PropTypes.func,
+  port: PropTypes.string,
   playTracks: PropTypes.func
 }
 

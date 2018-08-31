@@ -59,7 +59,7 @@ class PlayerControls extends PureComponent {
             <div className={style.contents}>
               <div
                 className={style.picture}
-                style={{ backgroundImage: (currentSong && currentSong.picture) ? `url("${currentSong.picture}")` : '' }}
+                style={{ backgroundImage: (currentSong && currentSong.picture) ? `url("http://localhost:${this.props.port}/local?path=${encodeURIComponent(currentSong.picture)}")` : '' }}
               />
               <div className={style.details}>
                 <div className={style.title}>{currentSong ? currentSong.title : 'None'}</div>
@@ -148,6 +148,7 @@ PlayerControls.defaultProps = {
   currentSong: null,
   currentTime: 0,
   audio: null,
+  port: '3000',
   setCurrentTime: () => {},
   openEqualizer: () => {},
   setVolume: () => {},
@@ -157,6 +158,7 @@ PlayerControls.defaultProps = {
 PlayerControls.propTypes = {
   currentSong: PropTypes.shape(trackType),
   currentTime: PropTypes.number,
+  port: PropTypes.string,
   setCurrentTime: PropTypes.func,
   openEqualizer: PropTypes.func,
   setVolume: PropTypes.func,

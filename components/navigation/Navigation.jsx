@@ -32,13 +32,13 @@ function Navigation ({ setTab, tab }) {
         <span className={style.label}>Local collection</span>
       </div>
       <div
-        onClick={() => setTab('shoutcast')}
+        onClick={() => setTab('online-sources')}
         className={classNames(style.item, {
-          [style.active]: tab === 'shoutcast'
+          [style.active]: tab === 'online-sources'
         })}
       >
         <ShoutCastIcon size={'12px'} />
-        <span className={style.label}>Shoutcast</span>
+        <span className={style.label}>Online</span>
       </div>
       <div
         onClick={() => {}}

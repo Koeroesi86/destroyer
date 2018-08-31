@@ -15,6 +15,9 @@ const reducer = (state = initialState, action) => {
     })
     tracks.forEach(track => {
       const albumKey = `${path.dirname(track.path)} - ${track.album}`
+      if (track.picture) {
+        track.picture = track.picture.replace(/^file:\/\//, '')
+      }
       if (!albumsObject[albumKey]) {
         albumsObject[albumKey] = {
           title: track.album,

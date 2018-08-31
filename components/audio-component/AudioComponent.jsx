@@ -43,15 +43,28 @@ class AudioComponent extends PureComponent {
   playTrack (track) {
     let src = track.path
     console.log('src', src)
-    this.audio.src = /^http/.test(src) ? src : `file://${track.path}`
+    this.audio.src = /^http/.test(src) ?
+      src :
+      `http://localhost:${this.props.port}/local?path=${encodeURIComponent(track.path)}`
     this.audio.onerror = () => {
       console.log('error playing', track.title, src)
     }
+    // this.audio.load()
     this.play()
   }
 
   play () {
-    this.audio.play()
+    const playPromise = this.audio.play()
+
+    if (playPromise) {
+      playPromise
+        .then(() => {
+          console.log('playing', this.audio.src)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    }
   }
 
   pause () {
@@ -78,6 +91,7 @@ class AudioComponent extends PureComponent {
         ref={a => {
           this.audio = a
         }}
+        crossOrigin='anonymous'
         onEnded={trackEnded}
       />
     )
@@ -91,12 +105,14 @@ AudioComponent.defaultProps = {
   currentTimeFPS: 5,
   setCurrentTime: () => {},
   currentSong: null,
+  port: '3000',
   volume: 0.5
 }
 
 AudioComponent.propTypes = {
   trackEnded: PropTypes.func,
   createSource: PropTypes.func,
+  port: PropTypes.string,
   currentTime: PropTypes.number,
   currentTimeFPS: PropTypes.number,
   setCurrentTime: PropTypes.func,

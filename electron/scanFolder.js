@@ -86,7 +86,7 @@ const parsePicture = (picture, album, appDataPath) => {
     fs.writeFileSync(filePath, picture.data)
   }
 
-  return `file://${normalizePath(filePath)}`
+  return normalizePath(filePath)
 }
 
 const writeMeta = (fileName, fileStats, database, appDataPath) => {

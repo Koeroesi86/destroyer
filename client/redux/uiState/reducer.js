@@ -1,5 +1,7 @@
 const initialState = {
   view: 'albums',
+  port: window.location.search.match(/^\?port=([0-9]+)/)[1],
+  onlineView: 'shoutcast',
   tab: 'local',
   nowPlaying: [],
   currentSong: null,
@@ -16,6 +18,10 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   if (action.type === 'SET_VIEW') {
     return Object.assign({}, state, { view: action.payload.view })
+  }
+
+  if (action.type === 'SET_ONLINE_VIEW') {
+    return Object.assign({}, state, { onlineView: action.payload.view })
   }
 
   if (action.type === 'PLAY_TRACKS') {
