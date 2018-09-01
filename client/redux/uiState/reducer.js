@@ -27,8 +27,7 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'PLAY_TRACKS') {
     const { tracks } = action.payload
     return Object.assign({}, state, {
-      nowPlaying: tracks,
-      currentSong: tracks[0] || null
+      nowPlaying: tracks
     })
   }
 
@@ -50,21 +49,6 @@ const reducer = (state = initialState, action) => {
 
     return Object.assign({}, state, {
       currentTime
-    })
-  }
-
-  if (action.type === 'TRACK_ENDED') {
-    const { nowPlaying, currentSong } = state
-    const currentIndex = nowPlaying.indexOf(currentSong)
-    let nextSong = null
-    // TODO: repeat / shuffle
-    if (currentIndex < nowPlaying.length - 1) {
-      nextSong = Object.assign({}, nowPlaying[currentIndex + 1])
-    }
-
-    return Object.assign({}, state, {
-      currentSong: nextSong,
-      currentTime: 0
     })
   }
 

@@ -1,19 +1,15 @@
-const { app, protocol } = require('electron')
-// const electronAcrylic = require('electron-acrylic')
+const { app } = require('electron')
 const electronVibrancy = require('electron-vibrancy')
-const { resolve, normalize, parse } = require('path')
+const { resolve } = require('path')
 const fs = require('fs')
-const mmmagic = require('mmmagic')
 const fp = require('find-free-port')
-const express = require('express')
-const url = require('url')
+const ws = require('windows-shortcuts-appid')
 const package = require('./package')
 const createWindow = require('./electron/createWindow')
 const getLoadingWindow = require('./electron/getLoadingWindow')
 const createDatabase = require('./electron/createDatabase')
 const setupListeners = require('./electron/setupListeners')
-
-const server = express()
+const setupServer = require('./electron/setupServer')
 
 process.env.ELECTRON_ENABLE_LOGGING = '1'
 
@@ -37,7 +33,32 @@ if (argv.webpackPort) {
   loadingLocation = `http://localhost:${argv.webpackPort}/loading.html`
 }
 
+function setAppId() {
+  global.appId = package.build.appId
+
+  if (isWin) {
+    app.setAppUserModelId(global.appId)
+    console.log('Registered app ID', global.appId)
+
+    const shortcutPath = process.env.APPDATA + '\\Microsoft\\Windows\\Start Menu\\Programs\\' + app.getName() + '.lnk'
+    if (!fs.existsSync(shortcutPath)) {
+      // Create the shortcut
+      ws.create(shortcutPath, process.execPath, err => {
+        if(err) throw err
+
+        // Add the app ID to the shortcut
+        ws.addAppId(shortcutPath, appId, err => {
+          if(err) throw err
+          // Ready!
+        })
+      })
+    }
+  }
+}
+
+
 const initWindow = () => {
+  setAppId()
   windows.main = createWindow(app, windowLocation)
   windows.main.loadURL(windowLocation)
 
@@ -47,51 +68,27 @@ const initWindow = () => {
   })
 }
 
-const appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
+global.appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
 
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
 }
 
 const libraryLocation = resolve(appDataPath, './library.sqlite')
-const magic = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
-
-server.get('/local', (request, response) => {
-  const url_parts = url.parse(request.url, true)
-  const query = url_parts.query
-
-  if(query.path) {
-    magic.detectFile(query.path, function(err, result) {
-      if (err) {
-        response.status(500).send(err)
-        return
-      }
-      response.setHeader("Access-Control-Allow-Origin", "*");
-      response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      response.setHeader("content-type", result);
-      fs.createReadStream(query.path).pipe(response);
-    })
-  } else {
-    response.status(404)
-  }
-})
 
 const getPort = () => {
     return fp(3000, '127.0.0.1')
       .then(freePorts => {
-        port = freePorts[0]
+        global.port = freePorts[0]
         if (!windowLocation || !loadingLocation) {
-          windowLocation = `http://localhost:${port}/app/index.html?port=${port}`
-          loadingLocation = `http://localhost:${port}/app/loading.html`
-
-          server.use('/app', express.static('public'))
+          windowLocation = `http://localhost:${global.port}/app/index.html?port=${global.port}`
+          loadingLocation = `http://localhost:${global.port}/app/loading.html`
         } else {
-          windowLocation += `?port=${port}`
+          windowLocation += `?port=${global.port}`
         }
-        server.listen(port, () => {
-          console.log(`Example app listening on port ${port}!`)
-          console.log(`App starts on ${windowLocation}`)
-        })
+
+        setupServer()
+
         return Promise.resolve()
       })
 }

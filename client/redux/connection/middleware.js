@@ -91,8 +91,26 @@ const middleware = store => {
         title: item.title,
         duration: 0
       }))
-      console.log('tracks', tracks)
       store.dispatch({ type: 'PLAY_TRACKS', payload: { tracks } })
+    }
+
+    if (action.type === 'PLAY_TRACK') {
+      const { track } = action.payload
+      const notification = {
+        title: track.title,
+        body: `${track.artist}\n${track.album}`,
+        requireInteraction: true,
+        sticky: true
+      }
+      if (track.picture) {
+        notification.icon = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
+        notification.image = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
+      }
+      const myNotification = new window.Notification(notification.title, notification)
+      myNotification.onclick = () => {
+        store.dispatch({ type: 'CLICK_NOTIFICATION', payload: {} })
+        ipcRenderer.send('NOTIFICATION_CLICKED', { track: action.payload.track })
+      }
     }
 
     next(action)

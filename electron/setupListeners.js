@@ -1,4 +1,4 @@
-const { app, ipcMain, session } = require('electron')
+const { ipcMain, session } = require('electron')
 const fs = require('fs')
 const electronVibrancy = require('electron-vibrancy')
 const playlistParser = require('playlist-parser')
@@ -165,6 +165,13 @@ function setupListeners (database, windows, appDataPath) {
       const playlist = playlistParser.PLS.parse(body)
       windows.main.webContents.send('CLICKED_URL', { playlist, url })
     })
+  })
+
+  ipcMain.on('NOTIFICATION_CLICKED', (event) => {
+    windows.main.setAlwaysOnTop(true)
+    windows.main.show()
+    windows.main.focus()
+    windows.main.setAlwaysOnTop(false)
   })
 }
 
