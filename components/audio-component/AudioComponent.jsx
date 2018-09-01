@@ -72,7 +72,7 @@ class AudioComponent extends PureComponent {
   }
 
   seekTo (currentTime) {
-    if (!this.audio.paused && this.audio.currentTime !== currentTime) {
+    if (this.audio.currentTime !== currentTime) {
       this.audio.currentTime = currentTime
     }
   }
