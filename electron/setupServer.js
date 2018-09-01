@@ -1,6 +1,6 @@
 
 const express = require('express')
-const { resolve, extname, basename } = require('path')
+const path = require('path')
 const fs = require('fs')
 const url = require('url')
 const mmmagic = require('mmmagic')
@@ -10,14 +10,14 @@ const server = express()
 const mimeType = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
 
 function setupServer () {
-  server.use('/app', express.static(resolve(__dirname, '../build')))
+  server.use('/app', express.static(path.resolve(__dirname, '../build')))
   server.get('/local', (request, response) => {
     const urlParts = url.parse(request.url, true)
     const query = urlParts.query
 
     if (query.path) {
       const sendFile = (path) => {
-        mimeType.detectFile(path, function (err, result) {
+        mimeType.detectFile(path, (err, result) => {
           if (err) {
             response.status(500).send(err)
             return
@@ -30,12 +30,12 @@ function setupServer () {
       }
 
       if (query.optimized) {
-        const basename = basename(query.path, extname(query.path))
-        const notificationImage = resolve(global.appDataPath, `./albumart/${basename}-optimized.png`)
+        const basename = path.basename(query.path, path.extname(query.path))
+        const notificationImage = path.resolve(global.appDataPath, `./albumart/${basename}-optimized.png`)
         if (fs.existsSync(notificationImage)) {
           sendFile(notificationImage)
         } else {
-          sharp(resolve(query.path))
+          sharp(path.resolve(query.path))
             .resize(250, 250)
             .max()
             .png({ compressionLevel: 9, force: true })

@@ -82,9 +82,7 @@ class Equalizer extends PureComponent {
 
   render () {
     return (
-      <div className={classNames(style.equalizer, {
-        [style.show]: this.props.show
-      })}>
+      <div className={style.equalizer}>
         <div className={style.header}>
           <div>Equalizer</div>
           <div
@@ -114,7 +112,7 @@ class Equalizer extends PureComponent {
   }
 }
 
-Equalizer.defaultProps = {
+Equalizer.defaultProps = {// 70, 180, 320, 600, 1000, 3000, 6000, 12000, 14000, 16000
   show: true,
   source: null,
   gainDb: -40.0,
@@ -122,16 +120,45 @@ Equalizer.defaultProps = {
   bands: [
     {
       type: 'lowshelf',
-      label: 'Bass',
-      frequency: 80
+      label: '70',
+      frequency: 70
     },
     {
-      label: 'Mid'
+      label: '180',
+      frequency: 180
+    },
+    {
+      label: '320',
+      frequency: 320
+    },
+    {
+      label: '600',
+      frequency: 600
+    },
+    {
+      label: '1k',
+      frequency: 1000
+    },
+    {
+      label: '3k',
+      frequency: 3000
+    },
+    {
+      label: '6k',
+      frequency: 6000
+    },
+    {
+      label: '12k',
+      frequency: 12000
+    },
+    {
+      label: '14k',
+      frequency: 14000
     },
     {
       type: 'highpass',
-      label: 'Treble',
-      frequency: 3600
+      label: '16k',
+      frequency: 16000
     }
   ]
 }

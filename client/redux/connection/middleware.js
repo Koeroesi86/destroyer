@@ -98,13 +98,13 @@ const middleware = store => {
       const { track } = action.payload
       const notification = {
         title: track.title,
-        body: `${track.artist}\n${track.album}`,
-        requireInteraction: true,
-        sticky: true
+        body: `${track.artist}\n${track.album}`
       }
       if (track.picture) {
         notification.icon = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
+        notification.iconUrl = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
         notification.image = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
+        notification.imageUrl = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
       }
       const myNotification = new window.Notification(notification.title, notification)
       myNotification.onclick = () => {

@@ -41,7 +41,7 @@ function Navigation ({ setTab, tab }) {
         <span className={style.label}>Online</span>
       </div>
       <div
-        onClick={() => {}}
+        onClick={() => setTab('equalizer')}
         className={classNames(style.item, {
           [style.active]: tab === 'equalizer'
         })}

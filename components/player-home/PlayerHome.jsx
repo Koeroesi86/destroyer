@@ -147,16 +147,20 @@ export default class PlayerHome extends PureComponent {
                 })}>
                   <OnlineSources />
                 </div>
+                <div className={classNames(style.tab, {
+                  [style.active]: tab === 'equalizer'
+                })}>
+                  <Equalizer
+                    source={audioSource}
+                    context={this.audioContext}
+                  />
+                </div>
               </div>
             </div>
           </div>
           <PlayerControls audio={this.audio} />
         </div>
         <AlbumDetails />
-        <Equalizer
-          source={audioSource}
-          context={this.audioContext}
-        />
         <Confirm
           message={confirmMessage}
           confirm={this.handleConfirm}
