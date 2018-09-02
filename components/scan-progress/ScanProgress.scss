@@ -10,7 +10,7 @@
   font-size: 12px;
   padding: 0 12px;
   min-width: 0;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
   overflow: hidden;
   opacity: 0;
@@ -63,5 +63,20 @@
   .progress {
     flex: 0 0;
     margin-left: 6px;
+  }
+
+  .progressBar {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    margin: 0 6px;
+    background-color: rgba(255, 255, 255, 0.2);
+
+    .current {
+      height: 2px;
+      background-color: rgba(255, 134, 134, 0.6);
+      transition: width .1s ease-in-out;
+    }
   }
 }

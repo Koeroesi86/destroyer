@@ -84,13 +84,7 @@ class Equalizer extends PureComponent {
     return (
       <div className={style.equalizer}>
         <div className={style.header}>
-          <div>Equalizer</div>
-          <div
-            className={style.close}
-            onClick={this.props.close}
-          >
-            <FontAwesomeIcon icon={faTimes} size='sm' />
-          </div>
+          Equalizer
         </div>
         <div className={style.sliders}>
           {this.props.bands.map((band, index) => (

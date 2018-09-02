@@ -18,13 +18,28 @@ class OnlineSources extends PureComponent {
           >
             Shoutcast
           </div>
+          <div
+            className={classNames(style.view, {
+              [style.current]: view === 'spotify'
+            })}
+            onClick={() => setView('spotify')}
+          >
+            Spotify
+          </div>
         </div>
         <div className={style.viewPanels}>
-          <div className={classNames(style.albums, {
+          <div className={classNames(style.viewPanel, {
             [style.active]: view === 'shoutcast'
           })}>
             <OnlineSourcePanel
               src={'http://www.shoutcast.com/scradioinwinamp/'}
+            />
+          </div>
+          <div className={classNames(style.viewPanel, {
+            [style.active]: view === 'spotify'
+          })}>
+            <OnlineSourcePanel
+              src={'https://open.spotify.com/browse'}
             />
           </div>
         </div>

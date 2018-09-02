@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { basename, extname } from 'path'
 import { FiBarChart2 as EQIcon, FiVolumeX as VolumeOffIcon, FiVolume2 as VolumeFullIcon } from 'react-icons/fi'
 import { MdPlayCircleOutline as PlayIcon, MdPauseCircleOutline as PauseIcon } from 'react-icons/md'
 import Slider from '../slider/Slider'
@@ -43,8 +44,23 @@ class PlayerControls extends PureComponent {
     }
   }
 
-  render () {
+  get coverStyle () {
     let {
+      currentSong,
+      port
+    } = this.props
+    const coverStyle = {}
+
+    if (currentSong && currentSong.picture) {
+      const cover = `${basename(currentSong.picture, extname(currentSong.picture))}-optimized.png`
+      coverStyle.backgroundImage = `url("http://localhost:${port}/albumart/${cover}")`
+    }
+
+    return coverStyle
+  }
+
+  render () {
+    const {
       currentSong,
       currentTime,
       setCurrentTime,
@@ -59,7 +75,7 @@ class PlayerControls extends PureComponent {
             <div className={style.contents}>
               <div
                 className={style.picture}
-                style={{ backgroundImage: (currentSong && currentSong.picture) ? `url("http://localhost:${this.props.port}/local?path=${encodeURIComponent(currentSong.picture)}")` : '' }}
+                style={this.coverStyle}
               />
               <div className={style.details}>
                 <div className={style.title}>{currentSong ? currentSong.title : 'None'}</div>

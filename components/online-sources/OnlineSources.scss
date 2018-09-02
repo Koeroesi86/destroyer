@@ -1,6 +1,8 @@
 .onlineSources {
   height: 100%;
+  width: 100%;
   overflow: hidden;
+  position: absolute;
 
   .viewControls {
     -webkit-app-region: drag;
@@ -8,46 +10,6 @@
     flex-direction: row;
     align-items: center;
     padding: 12px;
-
-    .libraryControls {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-
-      button {
-        -webkit-app-region: no-drag;
-        padding: 0 10px;
-        line-height: 30px;
-        font-size: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 0;
-        color: #efefef;
-        cursor: pointer;
-        transition: color .2s ease-in-out, background-color .2s ease-in-out;
-        border-radius: 3px;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.2);
-          color: #ffffff;
-        }
-
-        &.spinning {
-          > svg {
-            animation-name: spin;
-            animation-duration: 1s;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
-            animation-play-state: running;
-          }
-        }
-
-        > svg {
-          margin-left: 2px;
-          margin-right: 4px;
-        }
-      }
-    }
 
     .view {
       -webkit-app-region: no-drag;
@@ -71,9 +33,7 @@
     overflow: hidden;
     position: relative;
 
-    .albums,
-    .tracks,
-    .folders {
+    .viewPanel {
       position: absolute;
       top: 0;
       left: 0;

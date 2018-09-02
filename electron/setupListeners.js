@@ -48,14 +48,19 @@ function memorySizeOf (obj) {
 }
 
 const isWin = process.platform === 'win32'
+const enableTransparency = true
 
-function setupListeners (database, windows, appDataPath) {
+function setupListeners (database, windows) {
+  const appDataPath = global._appDataPath
   // loading.openDevTools()
 
   ipcMain.once('APP_LOADED', () => {
     setTimeout(() => {
       windows.main.show()
-      if (isWin) electronVibrancy.SetVibrancy(windows.main, 0)
+      if (enableTransparency) {
+        if (isWin) electronVibrancy.SetVibrancy(windows.main, 0)
+        else windows.main.setVibrancy('dark')
+      }
       windows.loading.close()
       windows.loading = null
     }, 200)
@@ -77,8 +82,16 @@ function setupListeners (database, windows, appDataPath) {
     } else {
       windows.main.maximize()
     }
-    isMaximized = !isMaximized
-    event.sender.send('MAXIMIZED_APP', { maximized: isMaximized })
+  })
+
+  windows.main.on('maximize', () => {
+    isMaximized = true
+    windows.main.webContents.send('MAXIMIZED_APP', { maximized: isMaximized })
+  })
+
+  windows.main.on('unmaximize', () => {
+    isMaximized = false
+    windows.main.webContents.send('MAXIMIZED_APP', { maximized: isMaximized })
   })
 
   ipcMain.on('APP_READY', (event) => {
@@ -152,7 +165,7 @@ function setupListeners (database, windows, appDataPath) {
   })
 
   ipcMain.on('RESCAN_LIBRARY', (event, { forced }) => {
-    rescanLibrary(database, event.sender, forced, appDataPath)
+    rescanLibrary(event.sender, forced)
   })
 
   session.defaultSession.on('will-download', (event, item, webContents) => {

@@ -1,5 +1,6 @@
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, nativeImage } from 'electron'
 import _ from 'lodash'
+import { basename, extname, resolve } from 'path'
 
 function addListeners (eventNames, store) {
   eventNames.forEach(eventName => {
@@ -41,7 +42,7 @@ const middleware = store => {
       rescanLibrary(false)
     }, 1000 * 60 * 60)
 
-    // rescanLibrary(false)
+    rescanLibrary(false)
   }
 
   return next => action => {
@@ -98,13 +99,16 @@ const middleware = store => {
       const { track } = action.payload
       const notification = {
         title: track.title,
-        body: `${track.artist}\n${track.album}`
+        body: `${track.artist}\n${track.album}`,
+        silent: false,
+        sound: false
       }
       if (track.picture) {
-        notification.icon = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
-        notification.iconUrl = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
-        notification.image = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
-        notification.imageUrl = `http://localhost:${store.getState().uiState.port}/local?path=${encodeURIComponent(track.picture)}&optimized=true`
+        const { port } = store.getState().uiState
+        const cover = `${basename(track.picture, extname(track.picture))}-optimized.png`
+        const url = `http://localhost:${port}/albumart/${cover}`
+        notification.icon = url
+        notification.image = url
       }
       const myNotification = new window.Notification(notification.title, notification)
       myNotification.onclick = () => {

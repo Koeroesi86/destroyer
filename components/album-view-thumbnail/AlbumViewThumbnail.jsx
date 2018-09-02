@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { basename, extname } from 'path'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay } from '@fortawesome/free-solid-svg-icons'
 import { trackType } from '../player-home/PlayerHome'
@@ -19,10 +20,11 @@ class AlbumViewThumbnail extends PureComponent {
   }
 
   updateCover () {
-    const { album: { cover }, port } = this.props
+    const { album, port } = this.props
 
-    if (cover) {
-      this.cover.style.backgroundImage = `url("http://localhost:${port}/local?path=${encodeURIComponent(cover)}")`
+    if (album.cover) {
+      const cover = `${basename(album.cover, extname(album.cover))}-optimized.png`
+      this.cover.style.backgroundImage = `url("http://localhost:${port}/albumart/${cover}")`
     }
   }
 

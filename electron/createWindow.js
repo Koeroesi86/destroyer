@@ -30,7 +30,6 @@ const createWindow = (app) => {
     transparent: true,
     darkTheme: true,
     show: false,
-    vibrancy: 'dark',
     webPreferences: {
       // webSecurity: false,
       backgroundThrottling: false

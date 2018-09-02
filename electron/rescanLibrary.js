@@ -1,9 +1,9 @@
 const fs = require('fs')
 const executeQuery = require('./executeQuery')
 const scanFolders = require('./scanFolders')
-const addTrack = require('./addTrack')
 
-function rescanLibrary (database, sender, forced = false, appDataPath) {
+function rescanLibrary (sender, forced = false) {
+  const database = global._database
   console.log(`Scanning library ${forced ? 'completely' : 'wisely'}...`)
   executeQuery(database, {
     query: `SELECT * FROM folders ORDER BY path ASC`,
@@ -23,17 +23,7 @@ function rescanLibrary (database, sender, forced = false, appDataPath) {
         )
       )
     })
-    .then(folders => scanFolders(database, folders, sender, appDataPath))
-    .then(() => executeQuery(database, {
-      query: `SELECT * FROM library ORDER BY path ASC`,
-      variables: []
-    }))
-    .then(tracks => {
-      console.log(`Updating ${tracks.length} track metadata`)
-      return Promise.all(
-        tracks.map(track => addTrack(database, track))
-      )
-    })
+    .then(folders => scanFolders(folders, sender))
     .then(() => executeQuery(database, {
       query: `SELECT * FROM library ORDER BY path ASC`,
       variables: []

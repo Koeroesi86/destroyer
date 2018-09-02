@@ -1,6 +1,6 @@
 const { app } = require('electron')
 const electronVibrancy = require('electron-vibrancy')
-const { resolve } = require('path')
+const { resolve, basename } = require('path')
 const fs = require('fs')
 const fp = require('find-free-port')
 const ws = require('windows-shortcuts-appid')
@@ -18,7 +18,6 @@ const isWin = process.platform === 'win32'
 const argv = require('minimist')(process.argv.slice(2))
 
 let mainWindow
-let library
 const windows = {
   main: null,
   loading: null
@@ -34,22 +33,26 @@ if (argv.webpackPort) {
 }
 
 function setAppId() {
-  global.appId = package.build.appId
+  const exeName = basename(process.execPath).replace(/\.exe$/i, '')
+
+  global._appId = `com.squirrel.${exeName}`;
 
   if (isWin) {
-    app.setAppUserModelId(global.appId)
-    console.log('Registered app ID', global.appId)
+    app.setAppUserModelId(_appId)
+    console.log('Registered app ID', _appId)
 
-    const shortcutPath = process.env.APPDATA + '\\Microsoft\\Windows\\Start Menu\\Programs\\' + app.getName() + '.lnk'
+    const shortcutPath = `${process.env.APPDATA}\\Microsoft\\Windows\\Start Menu\\Programs\\eMusic.lnk`
     if (!fs.existsSync(shortcutPath)) {
-      // Create the shortcut
-      ws.create(shortcutPath, process.execPath, err => {
+      ws.create(shortcutPath, {
+        target: process.execPath,
+        desc: package.description,
+        workingDir: resolve(__dirname),
+        icon: resolve(__dirname, 'icons.ico')
+      }, err => {
         if(err) throw err
 
-        // Add the app ID to the shortcut
-        ws.addAppId(shortcutPath, appId, err => {
+        ws.addAppId(shortcutPath, _appId, err => {
           if(err) throw err
-          // Ready!
         })
       })
     }
@@ -68,7 +71,8 @@ const initWindow = () => {
   })
 }
 
-global.appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
+global._appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
+const appDataPath = _appDataPath
 
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
@@ -79,12 +83,12 @@ const libraryLocation = resolve(appDataPath, './library.sqlite')
 const getPort = () => {
     return fp(3000, '127.0.0.1')
       .then(freePorts => {
-        global.port = freePorts[0]
+        global._port = freePorts[0]
         if (!windowLocation || !loadingLocation) {
-          windowLocation = `http://localhost:${global.port}/app/index.html?port=${global.port}`
-          loadingLocation = `http://localhost:${global.port}/app/loading.html`
+          windowLocation = `http://localhost:${_port}/app/index.html?port=${_port}`
+          loadingLocation = `http://localhost:${_port}/app/loading.html`
         } else {
-          windowLocation += `?port=${global.port}`
+          windowLocation += `?port=${_port}`
         }
 
         setupServer()
@@ -95,20 +99,19 @@ const getPort = () => {
 
 getPort()
   .then(() => createDatabase(libraryLocation))
-  .then((database) => {
+  .then((d) => {
     console.log(`Connected to library ${libraryLocation}`)
-    library = database
+    global._database = d
 
     windows.loading = getLoadingWindow()
     windows.loading.loadURL(loadingLocation)
     windows.loading.once('ready-to-show', () => {
       windows.loading.show()
-      // electronAcrylic.setAcrylic(windows.loading, 0xFFFFFF)
       if (isWin) electronVibrancy.SetVibrancy(windows.loading, 0)
     })
 
     initWindow()
-    setupListeners(library, windows, appDataPath)
+    setupListeners(_database, windows, appDataPath)
 
     app.on('ready', initWindow)
 

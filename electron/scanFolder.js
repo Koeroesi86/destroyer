@@ -28,13 +28,18 @@ const breakMultiplier = 100 // multiply the default file delay on a break
 /** @var {Array} existingTracks */
 let existingTracks
 const scannedFolders = []
+const scannedFiles = []
+const foundFiles = []
 let counter = 0
 let progress = 0
 let totalCount = 0
+let appDataPath
+let database
+let prevFolder
 
 const normalizePath = path => (path || '').replace(/\\/g, '/')
 
-const transformMeta = ({ common: metadata, format }, fileName, appDataPath) => Promise.resolve(
+const transformMeta = ({ common: metadata, format }, fileName) => Promise.resolve(
   Object.assign({}, {
     path: normalizePath(fileName),
     artist: metadata.artist || '',
@@ -49,9 +54,10 @@ const transformMeta = ({ common: metadata, format }, fileName, appDataPath) => P
   })
 )
 
-// const stringify = obj => JSON.stringify(obj, obj ? Object.keys(obj).sort() : () => {})
-// const isEqual = (a, b) => stringify(a) === stringify(b)
-const isEqual = (a, b) => _.isEqualWith(a, b, (one, two) => `${one}` === `${two}`)
+const isEqual = (a, b) =>
+  Object.getOwnPropertyNames(a)
+    .map(key => `${a[key]}` === `${b[key]}`)
+    .reduce((prev, current) => prev && current, true)
 
 /**
  * @param {String} album
@@ -86,40 +92,41 @@ const parsePicture = (picture, album, appDataPath) => {
     fs.writeFileSync(filePath, picture.data)
   }
 
-  return normalizePath(filePath)
+  return path.basename(filePath)
 }
 
-const writeMeta = (fileName, fileStats, database, appDataPath) => {
+const writeMeta = (fileName) => {
   return new Promise((resolve, reject) => {
-    try {
-      const timer = setTimeout(() => {
-        const err = new Error(`File access timeout ${fileName}`)
-        reject(err)
-        throw err
-      }, fileReadTimeout)
-      musicMeta.parseFile(fileName)
-        .then(m => m)
-        .then(metadata => transformMeta(metadata, fileName, appDataPath))
-        .then(meta => {
+    let cancelled = false
+    const timer = setTimeout(() => {
+      const err = new Error(`File access timeout ${fileName}`)
+      reject(err)
+      cancelled = err
+    }, fileReadTimeout)
+    musicMeta.parseFile(fileName)
+      .then(m => m)
+      .then(metadata => transformMeta(metadata, fileName))
+      .then(meta => {
+        if (cancelled) {
+          return Promise.reject(cancelled)
+        } else {
           const existingTrack = existingTracks.find(track => track.path === meta.path)
           if (isEqual(existingTrack, meta)) {
             return Promise.resolve()
           } else {
             return addTrack(database, meta)
           }
-        })
-        .then(() => {
-          clearTimeout(timer)
-          resolve()
-        })
-        .catch(err => {
-          console.error(err.message)
-          clearTimeout(timer)
-          reject(err)
-        })
-    } catch (e) {
-      reject(e)
-    }
+        }
+      })
+      .then(() => {
+        clearTimeout(timer)
+        resolve()
+      })
+      .catch(err => {
+        console.error(err.message)
+        clearTimeout(timer)
+        reject(err)
+      })
   })
 }
 
@@ -129,103 +136,117 @@ const countFilesSync = (directory, fileCount = 0) => {
     const stats = fs.statSync(filePath)
     if (stats.isSymbolicLink()) return prev
 
-    return prev + (stats.isDirectory() ? countFilesSync(filePath) : 1)
+    if (stats.isDirectory()) {
+      return prev + countFilesSync(filePath)
+    } else {
+      foundFiles.push(filePath)
+      return prev + 1
+    }
   }, fileCount)
 }
 
+const init = (currentPath) => {
+  if (existingTracks) {
+    return Promise.resolve()
+  } else {
+    appDataPath = global._appDataPath
+    database = global._database
+    prevFolder = currentPath
+    totalCount = countFilesSync(currentPath)
+    foundFiles.sort()
+    return executeQuery(database, {
+      query: `SELECT * FROM library ORDER BY path ASC`,
+      variables: []
+    }).then(t => {
+      existingTracks = t
+      return Promise.resolve()
+    })
+  }
+}
+
+const end = () => {
+  progress = 0
+  totalCount = 0
+  existingTracks = null
+  scannedFolders.splice(0)
+  scannedFiles.splice(0)
+  foundFiles.splice(0)
+  return Promise.resolve()
+}
+
+const nextFile = (next) => {
+  counter += 1
+  progress += 1
+  let delay = fileDelay
+  if (counter >= breakLimit) {
+    delay = fileDelay * breakMultiplier
+    console.log(`Taking a ${delay / 1000} second break...`)
+  }
+  setTimeout(() => {
+    if (counter >= breakLimit) {
+      console.log('I am back!')
+      counter = 0
+    }
+    next()
+  }, delay)
+}
+
+const stepFile = (fileName, sender) => new Promise(resolve => {
+  const extension = path.extname(fileName).replace('.', '')
+  const scanned = scannedFiles.includes(fileName)
+  const fileStats = fs.statSync(fileName)
+  const folder = path.dirname(fileName)
+
+  if (folder !== prevFolder) {
+    sender.send('SCANNING_FOLDER', { folder })
+    prevFolder = folder
+  }
+
+  if (supportedFormats.includes(extension) && !scanned && fileStats.isFile()) {
+    scannedFiles.push(fileName)
+    sender.send('SCANNING_FILE', { fileName, progress, totalCount })
+    writeMeta(fileName)
+      .then(() => nextFile(resolve))
+      .catch(e => {
+        console.error(fileName, e)
+        nextFile(resolve)
+      })
+  } else if (scanned || !fileStats.isFile()) {
+    // don't count the risky ones
+    if (!fileStats.isFile()) console.log('meh?', fileName, fileStats)
+    if (scanned) console.log('double scanned', fileName)
+    resolve()
+  } else {
+    nextFile(resolve)
+  }
+})
+
+const scan = (sender) => new Promise(resolve => {
+  foundFiles.reduce((p, filePath) => {
+    return p.then(() => stepFile(filePath, sender))
+  }, Promise.resolve()).then(resolve)
+})
+
 /** Scan a defined folder for tracks
- * @param {Object} database
- * @param {String} currentPath
+ * @param {String} path
  * @param {Object} sender
- * @param {String} appDataPath
  * @returns {Promise}
  * */
-function scanFolder (database, currentPath, sender, appDataPath) {
-  return new Promise((resolve, reject) => {
-    sender.send('SCANNING_FOLDER', { folder: currentPath })
-    scannedFolders.push(currentPath)
-
-    if (!totalCount) {
-      totalCount = countFilesSync(currentPath)
-    }
-
-    function scan () {
-      const directory = walk(currentPath, { followLinks: false })
-      directory.on('file', (fileRoot, fileStats, next) => {
-        const fileName = path.join(fileRoot, '/' + fileStats.name)
-        const extension = path.extname(fileName).replace('.', '')
-
-        const nextFile = () => {
-          counter += 1
-          progress += 1
-          let delay = fileDelay
-          if (counter >= breakLimit) {
-            delay = fileDelay * breakMultiplier
-            console.log(`Taking a ${delay / 1000} second break...`)
-          }
-          setTimeout(() => {
-            if (counter >= breakLimit) {
-              console.log('I am back!')
-              counter = 0
-            }
-            next()
-          }, delay)
-        }
-        if (supportedFormats.includes(extension)) {
-          sender.send('SCANNING_FILE', { fileName, progress, totalCount })
-          if (progress === totalCount) {
-            setTimeout(() => {
-              progress = 0
-              totalCount = 0
-            }, 1)
-          }
-          writeMeta(fileName, fileStats, database, appDataPath)
-            .then(nextFile)
-            .catch(e => {
-              console.error(fileName, e)
-              nextFile()
-            })
-        } else {
-          nextFile()
-        }
-      })
-      directory.on('directory', (dirRoot, dirStats, next) => {
-        const folderName = path.join(dirRoot, `/${dirStats.name}`)
-        if (scannedFolders.includes(folderName)) {
-          next()
-        } else {
-          scanFolder(database, folderName, sender, appDataPath)
-            .then(() => {
-              setTimeout(() => next(), folderDelay)
-            })
-            .catch(e => {
-              console.error('error at folder', folderName)
-              reject(e)
-              throw new Error(`error at folder${folderName}`)
-            })
-        }
-      })
-      directory.on('errors', (root, nodeStatsArray, next) => {
-        console.error('errors detected', nodeStatsArray)
-        next()
-      })
-      directory.on('end', () => {
+const scanFolder = (path, sender) =>
+  new Promise((resolve, reject) => {
+    init(path)
+      .then(() => scan(sender))
+      .then(() => {
+        end()
+        console.log(foundFiles.length)
+        console.log(totalCount)
+        console.log(database)
         resolve()
       })
-    }
-
-    if (existingTracks) {
-      scan()
-    } else {
-      executeQuery(database, {
-        query: `SELECT * FROM library ORDER BY path ASC`,
-        variables: []
-      }).then(t => {
-        existingTracks = t
-        scan()
+      .catch(err => {
+        end()
+        reject(err)
       })
-    }
   })
-}
 
 module.exports = scanFolder

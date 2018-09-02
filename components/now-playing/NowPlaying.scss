@@ -4,12 +4,12 @@
   flex-direction: column;
 
   .header {
+    -webkit-app-region: drag;
     flex-grow: 0;
     flex-shrink: 0;
     font-weight: 100;
     line-height: 56px;
     padding: 0 12px;
-    background-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
   }
 

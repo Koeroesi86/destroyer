@@ -38,7 +38,7 @@ function TitleBar (props) {
 
 TitleBar.defaultProps = {
   iconSize: '16px',
-  title: 'Emusic',
+  title: 'eMusic',
   close: () => {},
   minimize: () => {},
   maximize: () => {}
