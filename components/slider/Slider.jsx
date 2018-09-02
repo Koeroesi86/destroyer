@@ -17,10 +17,14 @@ class Slider extends PureComponent {
   }
 
   update () {
-    const { max, value } = this.props
+    const { max, value, orientation } = this.props
     if (this.slider.value !== value) {
       this.slider.value = value
-      this.lowerFill.style.width = `${max > 0 ? (value / max) * 100 : 0}%`
+      if (orientation !== 'vertical') {
+        this.lowerFill.style.width = `${max > 0 ? (value / max) * 100 : 0}%`
+      } else {
+        this.lowerFill.style.height = `${max > 0 ? (value / max) * 100 : 0}%`
+      }
     }
   }
 
@@ -29,12 +33,14 @@ class Slider extends PureComponent {
       min,
       max,
       step,
-      value,
+      orientation,
       onInput,
       onChange
     } = this.props
     return (
-      <div className={classNames(style.slider)}>
+      <div className={classNames(style.slider, {
+        [style.vertical]: orientation === 'vertical'
+      })}>
         <input
           type='range'
           min={min}
@@ -59,6 +65,7 @@ Slider.defaultProps = {
   min: 0,
   max: 1,
   step: 0.01,
+  orientation: 'horizontal',
   onChange: () => {}
 }
 
@@ -66,6 +73,7 @@ Slider.propTypes = {
   min: PropTypes.number,
   max: PropTypes.number,
   step: PropTypes.number,
+  orientation: PropTypes.string,
   value: PropTypes.number.isRequired,
   onInput: PropTypes.func.isRequired,
   onChange: PropTypes.func

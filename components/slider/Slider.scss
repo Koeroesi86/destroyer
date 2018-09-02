@@ -9,6 +9,32 @@
     opacity: 1;
   }
 
+  &.vertical {
+    height: 100%;
+    width: 25px;
+
+    .lowerFill {
+      top: auto;
+      bottom: 0;
+      left: 9px;
+      width: 6px;
+      line-height: 0;
+      border-top-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    .range {
+      -webkit-appearance: none;
+      transform: translate(-25px, 25px) rotate(-90deg);
+      transform-origin: bottom;
+      width: 100px;
+
+      &::-webkit-slider-runnable-track {
+        box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+
   .range {
     position: absolute;
     top: 0;

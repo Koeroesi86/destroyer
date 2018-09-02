@@ -36,7 +36,8 @@
       align-items: center;
 
       .input {
-        -webkit-appearance: slider-vertical;
+        height: 100px;
+        //width: 100%;
       }
 
       .band {

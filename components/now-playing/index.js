@@ -2,6 +2,7 @@ import connect from 'react-redux/es/connect/connect'
 import NowPlaying from './NowPlaying'
 
 const mapState = state => ({
+  port: state.uiState.port,
   currentSong: state.uiState.currentSong,
   nowPlaying: state.uiState.nowPlaying
 })

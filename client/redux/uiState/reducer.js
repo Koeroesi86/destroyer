@@ -12,7 +12,61 @@ const initialState = {
   scanningFolder: null,
   progress: 0,
   totalCount: 0,
-  maximized: false
+  maximized: false,
+  equalizer: [
+    {
+      type: 'lowshelf',
+      label: '70',
+      value: -40,
+      frequency: 70
+    },
+    {
+      label: '180',
+      value: -40,
+      frequency: 180
+    },
+    {
+      label: '320',
+      value: -40,
+      frequency: 320
+    },
+    {
+      label: '600',
+      value: -40,
+      frequency: 600
+    },
+    {
+      label: '1k',
+      value: -40,
+      frequency: 1000
+    },
+    {
+      label: '3k',
+      value: -40,
+      frequency: 3000
+    },
+    {
+      label: '6k',
+      value: -40,
+      frequency: 6000
+    },
+    {
+      label: '12k',
+      value: -40,
+      frequency: 12000
+    },
+    {
+      label: '14k',
+      value: -40,
+      frequency: 14000
+    },
+    {
+      type: 'highpass',
+      label: '16k',
+      value: -40,
+      frequency: 16000
+    }
+  ]
 }
 
 const reducer = (state = initialState, action) => {
@@ -63,6 +117,15 @@ const reducer = (state = initialState, action) => {
     return Object.assign({}, state, {
       showEqualizer: true,
       selectedAlbum: null
+    })
+  }
+
+  if (action.type === 'SET_GAIN') {
+    const { value, index } = action.payload
+    const equalizer = state.equalizer.slice()
+    equalizer[index].value = parseFloat(value) / 100.0
+    return Object.assign({}, state, {
+      equalizer
     })
   }
 

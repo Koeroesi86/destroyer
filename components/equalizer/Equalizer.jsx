@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import style from './Equalizer.scss'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import Slider from '../slider/Slider'
 
 class Equalizer extends PureComponent {
   componentDidMount () {
@@ -37,11 +36,11 @@ class Equalizer extends PureComponent {
         this.props.source.connect(band)
 
         let invert
-        if (index === 0 || index === this.props.bands.length - 1) {
-          invert = this.props.context.createGain()
-          invert.gain.value = -1.0
-          band.connect(invert)
-        }
+        // if (index === 0 || index === this.props.bands.length - 1) {
+        //   invert = this.props.context.createGain()
+        //   invert.gain.value = -1.0
+        //   band.connect(invert)
+        // }
 
         const gainContext = this.props.context.createGain()
         band.connect(gainContext)
@@ -89,12 +88,16 @@ class Equalizer extends PureComponent {
         <div className={style.sliders}>
           {this.props.bands.map((band, index) => (
             <div className={style.slider} key={index}>
-              <input
-                type='range'
-                className={style.input}
-                aria-orientation='vertical'
-                onInput={e => { this.changeGain(e.target.value, index) }}
-              />
+              <div className={style.input}>
+                <Slider
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={50}
+                  orientation={'vertical'}
+                  onInput={e => { this.changeGain(e.target.value, index) }}
+                />
+              </div>
               <div className={style.band}>
                 {band.label}
               </div>
@@ -106,67 +109,78 @@ class Equalizer extends PureComponent {
   }
 }
 
-Equalizer.defaultProps = {// 70, 180, 320, 600, 1000, 3000, 6000, 12000, 14000, 16000
+Equalizer.defaultProps = {
   show: true,
   source: null,
   gainDb: -40.0,
+  setGain: () => {},
   close: () => {},
   bands: [
     {
-      type: 'lowshelf',
+      type: 'lowpass',
       label: '70',
+      value: 0,
       frequency: 70
     },
     {
       label: '180',
+      value: 0,
       frequency: 180
     },
     {
       label: '320',
+      value: 0,
       frequency: 320
     },
     {
       label: '600',
+      value: 0,
       frequency: 600
     },
     {
       label: '1k',
+      value: 0,
       frequency: 1000
     },
     {
       label: '3k',
+      value: 0,
       frequency: 3000
     },
     {
       label: '6k',
+      value: 0,
       frequency: 6000
     },
     {
       label: '12k',
+      value: 0,
       frequency: 12000
     },
     {
       label: '14k',
+      value: 0,
       frequency: 14000
     },
     {
       type: 'highpass',
       label: '16k',
+      value: 0,
       frequency: 16000
     }
   ]
 }
 
 Equalizer.propTypes = {
-  show: PropTypes.bool,
   source: PropTypes.object,
   context: PropTypes.object,
   gainDb: PropTypes.number,
-  close: PropTypes.func,
+  setGain: PropTypes.func,
   bands: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOf(['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass']),
       label: PropTypes.string,
+      // value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       frequency: PropTypes.number
     })
   )

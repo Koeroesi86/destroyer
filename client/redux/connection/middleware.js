@@ -42,7 +42,7 @@ const middleware = store => {
       rescanLibrary(false)
     }, 1000 * 60 * 60)
 
-    rescanLibrary(false)
+    // rescanLibrary(false)
   }
 
   return next => action => {
