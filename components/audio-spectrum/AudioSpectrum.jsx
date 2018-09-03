@@ -11,44 +11,28 @@ class AudioSpectrum extends PureComponent {
   }
 
   componentDidMount () {
-    if (this.props.audio) {
-      this.initAudioEvents()
-    }
-
-    if (this.props.audioContext && this.props.audioSource) {
+    if (this.canvas) {
+      this.canvasContext = this.canvas.getContext('2d')
       this.setupAudioNode()
     }
 
-    if (this.canvas) {
-      this.canvasContext = this.canvas.getContext('2d')
-    }
+    this.props.addPlayStatusListener(isPlaying => {
+      this.playStatus = isPlaying ? 'PLAYING' : 'PAUSED'
+
+      if (isPlaying) {
+        if (!this.analyser) this.setupAudioNode()
+        this.drawSpectrum()
+      } else {
+        window.cancelAnimationFrame(this.animationId)
+      }
+    })
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.audio !== prevProps.audio) {
-      this.initAudioEvents()
-    }
-
-    if (
-      this.props.audioContext !== prevProps.audioContext ||
-      this.props.audioSource !== prevProps.audioSource
-    ) {
-      this.setupAudioNode()
-    }
-
     if (this.canvas) {
       this.canvasContext = this.canvas.getContext('2d')
+      this.setupAudioNode()
     }
-  }
-
-  initAudioEvents () {
-    this.props.audio.addEventListener('pause', (e) => {
-      this.playStatus = 'PAUSED'
-    })
-    this.props.audio.addEventListener('play', (e) => {
-      this.playStatus = 'PLAYING'
-      this.drawSpectrum()
-    })
   }
 
   drawSpectrum () {
@@ -75,47 +59,49 @@ class AudioSpectrum extends PureComponent {
     const drawMeterBar = (i, y) => drawRect(i, y, canvasHeight - y + capHeight)
 
     const drawMeter = () => {
-      const dataArray = new Uint8Array(this.analyser.frequencyBinCount) // item value of array: 0 - 255
-      // this.analyser.getByteTimeDomainData(dataArray)
-      this.analyser.getByteFrequencyData(dataArray)
-      if (this.playStatus === 'PAUSED') {
-        for (let i = dataArray.length - 1; i >= 0; i--) {
-          dataArray[i] = 0
+      if (this.analyser) {
+        const dataArray = new Uint8Array(this.analyser.frequencyBinCount) // item value of array: 0 - 255
+        // this.analyser.getByteTimeDomainData(dataArray)
+        this.analyser.getByteFrequencyData(dataArray)
+        if (this.playStatus === 'PAUSED') {
+          for (let i = dataArray.length - 1; i >= 0; i--) {
+            dataArray[i] = 0
+          }
+          let allCapsReachBottom = !capYPositionArray.some(cap => cap > 0)
+          if (allCapsReachBottom) {
+            clearCanvas()
+            if (this.animationId) window.cancelAnimationFrame(this.animationId)
+            return
+          }
         }
-        let allCapsReachBottom = !capYPositionArray.some(cap => cap > 0)
-        if (allCapsReachBottom) {
-          clearCanvas()
-          if (this.animationId) window.cancelAnimationFrame(this.animationId)
-          return
+
+        let step = Math.round(dataArray.length / meterCount) // sample limited data from the total array
+        clearCanvas()
+        for (let i = 0; i < meterCount; i++) {
+          let value = dataArray[i * step]
+          if (capYPositionArray.length < Math.round(meterCount)) {
+            capYPositionArray.push(value)
+          }
+
+          this.canvasContext.fillStyle = capColor
+          // draw the cap, with transition effect
+          if (value < capYPositionArray[i]) {
+            let preValue = --capYPositionArray[i]
+            let y = getY(preValue)
+            drawCap(i, y)
+          } else {
+            let y = getY(value)
+            drawCap(i, y)
+            capYPositionArray[i] = value
+          }
+
+          this.canvasContext.fillStyle = gradient // set the filllStyle to gradient for a better look
+
+          let y = getY(value) + capHeight
+          drawMeterBar(i, y) // the meter
         }
       }
 
-      // console.log(dataArray.length, meterCount)
-      let step = Math.round(dataArray.length / meterCount) // sample limited data from the total array
-      clearCanvas()
-      for (let i = 0; i < meterCount; i++) {
-        let value = dataArray[i * step]
-        if (capYPositionArray.length < Math.round(meterCount)) {
-          capYPositionArray.push(value)
-        }
-
-        this.canvasContext.fillStyle = capColor
-        // draw the cap, with transition effect
-        if (value < capYPositionArray[i]) {
-          let preValue = --capYPositionArray[i]
-          let y = getY(preValue)
-          drawCap(i, y)
-        } else {
-          let y = getY(value)
-          drawCap(i, y)
-          capYPositionArray[i] = value
-        }
-
-        this.canvasContext.fillStyle = gradient // set the filllStyle to gradient for a better look
-
-        let y = getY(value) + capHeight
-        drawMeterBar(i, y) // the meter
-      }
       // this.animationId = window.requestAnimationFrame(drawMeter)
       setTimeout(() => {
         this.animationId = window.requestAnimationFrame(drawMeter)
@@ -126,13 +112,7 @@ class AudioSpectrum extends PureComponent {
   }
 
   setupAudioNode () {
-    const analyser = this.props.audioContext.createAnalyser()
-    analyser.smoothingTimeConstant = 0.8
-    analyser.fftSize = 2048
-
-    this.props.audioSource.connect(analyser)
-
-    this.analyser = analyser
+    this.analyser = this.props.createAnalyser()
   }
 
   render () {
@@ -152,10 +132,9 @@ class AudioSpectrum extends PureComponent {
 AudioSpectrum.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
-  audio: PropTypes.instanceOf(window.Element),
-  audioContext: PropTypes.instanceOf(window.AudioContext),
-  audioSource: PropTypes.object,
   capColor: PropTypes.string,
+  createAnalyser: PropTypes.func,
+  addPlayStatusListener: PropTypes.func,
   capHeight: PropTypes.number,
   meterWidth: PropTypes.number,
   meterCount: PropTypes.number,
@@ -173,6 +152,8 @@ AudioSpectrum.propTypes = {
 AudioSpectrum.defaultProps = {
   width: 200,
   height: 150,
+  createAnalyser: () => false,
+  addPlayStatusListener: () => {},
   capColor: '#FFF',
   capHeight: 2,
   meterWidth: 2,
@@ -185,4 +166,5 @@ AudioSpectrum.defaultProps = {
   gap: 10,
   fps: 30
 }
+
 export default AudioSpectrum

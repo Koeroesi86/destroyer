@@ -1,5 +1,7 @@
-import AudioComponent from './AudioComponent'
+import React from 'react'
 import connect from 'react-redux/es/connect/connect'
+import AudioComponent from './AudioComponent'
+import { Audio } from '../../client/audio/context'
 
 const mapState = state => ({
   currentSong: state.uiState.currentSong,
@@ -13,6 +15,18 @@ const mapDispatch = dispatch => ({
   setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } })
 })
 
+const ContextualAudioComponent = props => (
+  <Audio.Consumer>
+    {({ connectNode, play, pause }) =>
+      <AudioComponent
+        {...props}
+        play={play}
+        pause={pause}
+        connectNode={connectNode}
+    />}
+  </Audio.Consumer>
+)
+
 export default window
-  ? connect(mapState, mapDispatch)(AudioComponent)
+  ? connect(mapState, mapDispatch)(ContextualAudioComponent)
   : AudioComponent

@@ -8,7 +8,7 @@ class AudioComponent extends PureComponent {
       this.setVolume()
       this.seekTo(this.props.currentTime)
 
-      this.props.createSource(this.audio)
+      this.props.connectNode(this.audio)
     }
 
     this.timer = setInterval(() => {
@@ -27,7 +27,7 @@ class AudioComponent extends PureComponent {
       if (this.props.currentSong) {
         this.playTrack(this.props.currentSong)
       } else {
-        this.pause()
+        this.props.pause()
       }
     }
 
@@ -42,33 +42,13 @@ class AudioComponent extends PureComponent {
 
   playTrack (track) {
     let src = track.path
-    console.log('src', src)
-    this.audio.src = /^http/.test(src) ?
-      src :
-      `http://localhost:${this.props.port}/local?path=${encodeURIComponent(track.path)}`
-    this.audio.onerror = () => {
-      console.log('error playing', track.title, src)
+    if (/^http/.test(src)) {
+      this.audio.src = src
+    } else {
+      this.audio.src = `http://localhost:${this.props.port}/local?path=${encodeURIComponent(track.path)}`
     }
-    // this.audio.load()
-    this.play()
-  }
 
-  play () {
-    const playPromise = this.audio.play()
-
-    if (playPromise) {
-      playPromise
-        .then(() => {
-          console.log('playing', this.audio.src)
-        })
-        .catch(err => {
-          console.error(err)
-        })
-    }
-  }
-
-  pause () {
-    this.audio.pause()
+    this.props.play()
   }
 
   seekTo (currentTime) {
@@ -99,8 +79,10 @@ class AudioComponent extends PureComponent {
 }
 
 AudioComponent.defaultProps = {
+  play: () => {},
+  pause: () => {},
   trackEnded: () => {},
-  createSource: () => {},
+  connectNode: () => {},
   currentTime: 0,
   currentTimeFPS: 5,
   setCurrentTime: () => {},
@@ -110,8 +92,10 @@ AudioComponent.defaultProps = {
 }
 
 AudioComponent.propTypes = {
+  play: PropTypes.func,
+  pause: PropTypes.func,
   trackEnded: PropTypes.func,
-  createSource: PropTypes.func,
+  connectNode: PropTypes.func,
   port: PropTypes.string,
   currentTime: PropTypes.number,
   currentTimeFPS: PropTypes.number,

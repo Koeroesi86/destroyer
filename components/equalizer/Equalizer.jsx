@@ -5,27 +5,28 @@ import style from './Equalizer.scss'
 import Slider from '../slider/Slider'
 
 class Equalizer extends PureComponent {
-  componentDidMount () {
-    if (this.props.context && this.props.source) {
-      this.setup()
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      connectedBands: null
     }
   }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.context !== prevProps.context || this.props.source !== prevProps.source) {
+  componentDidMount () {
+    this.props.onAudioMounted(() => {
       this.setup()
-    }
+    })
   }
 
   setup () {
-    this.connectedBands = this.props.bands
+    let connectedBands = this.props.bands
       .map(band => {
-        const currentBand = this.props.context.createBiquadFilter()
+        const currentBand = this.props.createBiquadFilter()
 
         if (band.type) {
           currentBand.type = band.type
         } else {
-          currentBand.type = 'bandpass'
+          // currentBand.type = 'bandpass'
         }
         if (band.frequency) currentBand.frequency.value = band.frequency
         currentBand.gain.value = this.props.gainDb
@@ -33,16 +34,16 @@ class Equalizer extends PureComponent {
         return currentBand
       })
       .map((band, index) => {
-        this.props.source.connect(band)
+        this.props.connectToSource(band)
 
         let invert
         // if (index === 0 || index === this.props.bands.length - 1) {
-        //   invert = this.props.context.createGain()
+        //   invert = this.props.createGain()
         //   invert.gain.value = -1.0
         //   band.connect(invert)
         // }
 
-        const gainContext = this.props.context.createGain()
+        const gainContext = this.props.createGain()
         band.connect(gainContext)
 
         return {
@@ -52,31 +53,36 @@ class Equalizer extends PureComponent {
         }
       })
 
-    this.connectedBands = this.connectedBands
+    connectedBands = connectedBands
       .map((connectedBand, index) => {
         if (index === 0 && index < this.props.bands.length - 1) {
-          connectedBand.gainContext.connect(this.connectedBands[index + 1].band)
+          connectedBand.gainContext.connect(connectedBands[index + 1].band)
         }
 
         if (index > 1 && index === this.props.bands.length - 1) {
-          connectedBand.gainContext.connect(this.connectedBands[index - 1].band)
+          connectedBand.gainContext.connect(connectedBands[index - 1].band)
         }
 
         return connectedBand
       })
 
-    const sum = this.props.context.createGain()
-    this.connectedBands = this.connectedBands
+    const sum = this.props.createGain()
+    connectedBands = connectedBands
       .map(connectedBand => {
         connectedBand.gainContext.connect(sum)
         return connectedBand
       })
-    sum.connect(this.props.context.destination)
+    this.props.connectDestination(sum)
+    this.setState({ connectedBands })
   }
 
   changeGain (inputValue, index) {
-    const connectedBand = this.connectedBands[index]
-    connectedBand.gainContext.gain.value = parseFloat(inputValue) / 100.0
+    this.setState((prevState, props) => {
+      const connectedBands = this.state.connectedBands.slice()
+      const connectedBand = connectedBands[index]
+      connectedBand.gainContext.gain.value = parseFloat(inputValue) / 100.0
+      return { connectedBands }
+    })
   }
 
   render () {
@@ -86,14 +92,14 @@ class Equalizer extends PureComponent {
           Equalizer
         </div>
         <div className={style.sliders}>
-          {this.props.bands.map((band, index) => (
+          {this.state.connectedBands && this.props.bands.map((band, index) => (
             <div className={style.slider} key={index}>
               <div className={style.input}>
                 <Slider
                   min={0}
                   max={100}
                   step={1}
-                  value={50}
+                  value={this.state.connectedBands[index].gainContext.gain.value * 100} //50
                   orientation={'vertical'}
                   onInput={e => { this.changeGain(e.target.value, index) }}
                 />
@@ -110,10 +116,13 @@ class Equalizer extends PureComponent {
 }
 
 Equalizer.defaultProps = {
-  show: true,
-  source: null,
   gainDb: -40.0,
   setGain: () => {},
+  createBiquadFilter: () => {},
+  createGain: () => {},
+  connectDestination: () => {},
+  connectToSource: () => {},
+  onAudioMounted: () => {},
   close: () => {},
   bands: [
     {
@@ -172,10 +181,13 @@ Equalizer.defaultProps = {
 }
 
 Equalizer.propTypes = {
-  source: PropTypes.object,
-  context: PropTypes.object,
   gainDb: PropTypes.number,
   setGain: PropTypes.func,
+  createBiquadFilter: PropTypes.func,
+  createGain: PropTypes.func,
+  connectDestination: PropTypes.func,
+  connectToSource: PropTypes.func,
+  onAudioMounted: PropTypes.func,
   bands: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOf(['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass']),

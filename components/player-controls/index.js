@@ -1,5 +1,7 @@
+import React from 'react'
 import connect from 'react-redux/es/connect/connect'
 import PlayerControls from './PlayerControls'
+import { Audio } from '../../client/audio/context'
 
 const mapState = (state) => ({
   port: state.uiState.port,
@@ -14,6 +16,18 @@ const mapDispatch = (dispatch) => ({
   setVolume: (volume) => dispatch({ type: 'SET_VOLUME', payload: { volume } })
 })
 
+const ContextualPlayerControls = props => (
+  <Audio.Consumer>
+    {({ addPlayStatusListener, play, pause }) =>
+      <PlayerControls
+        {...props}
+        play={play}
+        pause={pause}
+        addPlayStatusListener={addPlayStatusListener}
+      />}
+  </Audio.Consumer>
+)
+
 export default window
-  ? connect(mapState, mapDispatch)(PlayerControls)
+  ? connect(mapState, mapDispatch)(ContextualPlayerControls)
   : PlayerControls

@@ -12,23 +12,19 @@ import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
 import OnlineSources from '../online-sources'
 import Navigation from '../navigation'
-import AudioSpectrum from '../audio-spectrum/AudioSpectrum'
+import AudioSpectrum from '../audio-spectrum'
 
 export default class PlayerHome extends PureComponent {
   constructor (props) {
     super(props)
 
     this.state = {
-      audioSource: null,
       confirmMessage: null
     }
-
-    this.audioContext = new window.AudioContext()
 
     this.confirm = this.confirm.bind(this)
     this.handleCancel = this.handleCancel.bind(this)
     this.handleConfirm = this.handleConfirm.bind(this)
-    this.createMediaElementSource = this.createMediaElementSource.bind(this)
     this.addFiles = this.addFiles.bind(this)
     this.confirmCallback = () => {}
   }
@@ -89,16 +85,9 @@ export default class PlayerHome extends PureComponent {
     this.setState({ confirmMessage: null })
   }
 
-  createMediaElementSource (node) {
-    this.audio = node
-    this.setState({
-      audioSource: this.audioContext.createMediaElementSource(node)
-    })
-  }
-
   render () {
     const { maximized, enableTransparency, loaded, tab } = this.props
-    const { audioSource, confirmMessage } = this.state
+    const { confirmMessage } = this.state
     return (
       <div
         className={classNames(style.playerHome, {
@@ -115,9 +104,6 @@ export default class PlayerHome extends PureComponent {
                   <TitleBar />
                   <div className={style.navigationContainer}>
                     <AudioSpectrum
-                      audio={this.audio}
-                      audioContext={this.audioContext}
-                      audioSource={this.state.audioSource}
                       width={180}
                       height={80}
                       meterColor={'rgba(255, 255, 255, 0.4)'}
@@ -150,15 +136,12 @@ export default class PlayerHome extends PureComponent {
                 <div className={classNames(style.tab, {
                   [style.active]: tab === 'equalizer'
                 })}>
-                  <Equalizer
-                    source={audioSource}
-                    context={this.audioContext}
-                  />
+                  <Equalizer />
                 </div>
               </div>
             </div>
           </div>
-          <PlayerControls audio={this.audio} />
+          <PlayerControls />
         </div>
         <AlbumDetails />
         <Confirm
@@ -166,9 +149,7 @@ export default class PlayerHome extends PureComponent {
           confirm={this.handleConfirm}
           cancel={this.handleCancel}
         />
-        <AudioComponent
-          createSource={this.createMediaElementSource}
-        />
+        <AudioComponent />
       </div>
     )
   }

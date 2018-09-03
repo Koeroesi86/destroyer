@@ -1,13 +1,29 @@
-import Equalizer from './Equalizer'
+import React from 'react'
 import connect from 'react-redux/es/connect/connect'
+import { Audio } from '../../client/audio/context'
+import Equalizer from './Equalizer'
 
 const mapState = state => ({
-  show: state.uiState.showEqualizer,
-  // bands: state.uiState.equalizer
+  // show: state.uiState.showEqualizer
 })
 
 const mapDispatch = dispatch => ({
   // changeGain: (value, index) => dispatch({ type: 'SET_GAIN', payload: { value, index } })
 })
 
-export default window ? connect(mapState, mapDispatch)(Equalizer) : Equalizer
+const ContextualEqualizer = props => (
+  <Audio.Consumer>
+    {({ connectToSource, createBiquadFilter, createGain, connectDestination, onAudioMounted }) =>
+      <Equalizer
+        {...props}
+        connectToSource={connectToSource}
+        createBiquadFilter={createBiquadFilter}
+        createGain={createGain}
+        connectDestination={connectDestination}
+        onAudioMounted={onAudioMounted}
+      />
+    }
+  </Audio.Consumer>
+)
+
+export default window ? connect(mapState, mapDispatch)(ContextualEqualizer) : Equalizer

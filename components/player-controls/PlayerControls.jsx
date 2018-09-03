@@ -13,34 +13,20 @@ import Time from '../time'
 class PlayerControls extends PureComponent {
   constructor (props) {
     super(props)
-    this.play = this.play.bind(this)
-    this.pause = this.pause.bind(this)
+    this.state = {
+      isPlaying: false
+    }
     this.toggle = this.toggle.bind(this)
-  }
-
-  get isPlaying () {
-    const { audio } = this.props
-
-    return audio && !audio.paused
-  }
-
-  play () {
-    const { audio, currentSong } = this.props
-
-    if (audio && currentSong) audio.play()
-  }
-
-  pause () {
-    const { audio, currentSong } = this.props
-
-    if (audio && currentSong) audio.pause()
+    this.props.addPlayStatusListener(isPlaying => {
+      this.setState({ isPlaying })
+    })
   }
 
   toggle () {
-    if (this.isPlaying) {
-      this.pause()
+    if (this.state.isPlaying) {
+      this.props.pause()
     } else {
-      this.play()
+      this.props.play()
     }
   }
 
@@ -107,7 +93,7 @@ class PlayerControls extends PureComponent {
                 <button
                   onClick={this.toggle}
                   className={classNames(style.mainControlButton, {
-                    [style.playing]: this.isPlaying
+                    [style.playing]: this.state.isPlaying
                   })}
                   disabled={!currentSong}
                 >
@@ -163,23 +149,27 @@ class PlayerControls extends PureComponent {
 PlayerControls.defaultProps = {
   currentSong: null,
   currentTime: 0,
-  audio: null,
   port: '3000',
   setCurrentTime: () => {},
   openEqualizer: () => {},
   setVolume: () => {},
-  volume: 0.5
+  volume: 0.5,
+  addPlayStatusListener: () => {},
+  play: () => {},
+  pause: () => {}
 }
 
 PlayerControls.propTypes = {
   currentSong: PropTypes.shape(trackType),
   currentTime: PropTypes.number,
+  addPlayStatusListener: PropTypes.func,
   port: PropTypes.string,
   setCurrentTime: PropTypes.func,
   openEqualizer: PropTypes.func,
+  play: PropTypes.func,
+  pause: PropTypes.func,
   setVolume: PropTypes.func,
-  volume: PropTypes.number,
-  audio: PropTypes.instanceOf(window.HTMLElement)
+  volume: PropTypes.number
 }
 
 export default PlayerControls
