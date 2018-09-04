@@ -4,6 +4,7 @@ import AudioComponent from './AudioComponent'
 import { Audio } from '../../client/audio/context'
 
 const mapState = state => ({
+  isPlaying: state.uiState.isPlaying,
   currentSong: state.uiState.currentSong,
   currentTime: state.uiState.currentTime,
   volume: state.uiState.volume,

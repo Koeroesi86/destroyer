@@ -77,7 +77,7 @@ class Equalizer extends PureComponent {
   }
 
   changeGain (inputValue, index) {
-    this.setState((prevState, props) => {
+    this.setState(() => {
       const connectedBands = this.state.connectedBands.slice()
       const connectedBand = connectedBands[index]
       connectedBand.gainContext.gain.value = parseFloat(inputValue) / 100.0
@@ -86,26 +86,27 @@ class Equalizer extends PureComponent {
   }
 
   render () {
+    const { connectedBands } = this.state
     return (
       <div className={style.equalizer}>
         <div className={style.header}>
           Equalizer
         </div>
         <div className={style.sliders}>
-          {this.state.connectedBands && this.props.bands.map((band, index) => (
+          {connectedBands && connectedBands.map((connectedBand, index) => (
             <div className={style.slider} key={index}>
               <div className={style.input}>
                 <Slider
                   min={0}
                   max={100}
                   step={1}
-                  value={this.state.connectedBands[index].gainContext.gain.value * 100} //50
+                  value={connectedBand.gainContext.gain.value * 100}
                   orientation={'vertical'}
                   onInput={e => { this.changeGain(e.target.value, index) }}
                 />
               </div>
               <div className={style.band}>
-                {band.label}
+                {this.props.bands[index].label}
               </div>
             </div>
           ))}

@@ -10,12 +10,18 @@ const getLoadingWindow = require('./electron/getLoadingWindow')
 const createDatabase = require('./electron/createDatabase')
 const setupListeners = require('./electron/setupListeners')
 const setupServer = require('./electron/setupServer')
+const generateIcons = require('./electron/generateIcons')
 
 process.env.ELECTRON_ENABLE_LOGGING = '1'
 
 const isWin = process.platform === 'win32'
+const isMac = process.platform === 'darwin'
+const isDev = process.env.NODE_ENV !== 'production'
 
 const argv = require('minimist')(process.argv.slice(2))
+
+global._appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
+const appDataPath = _appDataPath
 
 let mainWindow
 const windows = {
@@ -25,7 +31,6 @@ const windows = {
 
 let windowLocation
 let loadingLocation
-let port
 
 if (argv.webpackPort) {
   windowLocation = `http://localhost:${argv.webpackPort}/index.html`
@@ -35,19 +40,28 @@ if (argv.webpackPort) {
 function setAppId() {
   const exeName = basename(process.execPath).replace(/\.exe$/i, '')
 
-  global._appId = `com.squirrel.${exeName}`;
+  generateIcons()
+
+  if (isDev) {
+    global._appId = `com.squirrel.${exeName}-${process.env.NODE_ENV}`;
+  } else {
+    global._appId = `com.squirrel.${exeName}`;
+  }
 
   if (isWin) {
     app.setAppUserModelId(_appId)
     console.log('Registered app ID', _appId)
 
-    const shortcutPath = `${process.env.APPDATA}\\Microsoft\\Windows\\Start Menu\\Programs\\eMusic.lnk`
+    const shortcutPath = `${app.getPath('appData')}\\Microsoft\\Windows\\Start Menu\\Programs\\eMusic${
+      isDev ? '-' + process.env.NODE_ENV : ''
+    }.lnk`
+
     if (!fs.existsSync(shortcutPath)) {
       ws.create(shortcutPath, {
         target: process.execPath,
         desc: package.description,
         workingDir: resolve(__dirname),
-        icon: resolve(__dirname, 'icons.ico')
+        icon: resolve(__dirname, './icons/win/icon.ico')
       }, err => {
         if(err) throw err
 
@@ -70,9 +84,6 @@ const initWindow = () => {
     windows.loading = null
   })
 }
-
-global._appDataPath = resolve(app.getPath('appData'), `./${package.name}`)
-const appDataPath = _appDataPath
 
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
@@ -116,7 +127,7 @@ getPort()
     app.on('ready', initWindow)
 
     app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
+      if (!isMac) {
         app.quit()
       }
     })

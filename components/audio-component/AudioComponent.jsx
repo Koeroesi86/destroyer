@@ -38,6 +38,14 @@ class AudioComponent extends PureComponent {
     if (prevProps.currentTime !== this.props.currentTime) {
       this.seekTo(this.props.currentTime)
     }
+
+    if (this.props.isPlaying !== prevProps.isPlaying) {
+      if (this.props.isPlaying) {
+        this.props.play()
+      } else {
+        this.props.pause()
+      }
+    }
   }
 
   playTrack (track) {
@@ -83,6 +91,8 @@ AudioComponent.defaultProps = {
   pause: () => {},
   trackEnded: () => {},
   connectNode: () => {},
+  isPlaying: false,
+  setPlaying: () => {},
   currentTime: 0,
   currentTimeFPS: 5,
   setCurrentTime: () => {},
@@ -94,6 +104,7 @@ AudioComponent.defaultProps = {
 AudioComponent.propTypes = {
   play: PropTypes.func,
   pause: PropTypes.func,
+  isPlaying: PropTypes.bool,
   trackEnded: PropTypes.func,
   connectNode: PropTypes.func,
   port: PropTypes.string,

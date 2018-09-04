@@ -13,6 +13,7 @@ const mapState = (state) => ({
 const mapDispatch = (dispatch) => ({
   setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } }),
   openEqualizer: () => dispatch({ type: 'SET_TAB', payload: { tab: 'equalizer' } }),
+  setPlaying: (isPlaying) => dispatch({ type: 'SET_PLAYING', payload: { isPlaying } }),
   setVolume: (volume) => dispatch({ type: 'SET_VOLUME', payload: { volume } })
 })
 

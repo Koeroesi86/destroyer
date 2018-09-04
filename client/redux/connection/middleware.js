@@ -21,6 +21,7 @@ const eventNames = [
   'LIBRARY_SIZE',
   'MAXIMIZED_APP',
   'CLICKED_URL',
+  'SET_PLAYING',
   'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]

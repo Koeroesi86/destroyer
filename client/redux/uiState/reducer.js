@@ -13,6 +13,7 @@ const initialState = {
   progress: 0,
   totalCount: 0,
   maximized: false,
+  isPlaying: false,
   equalizer: [
     {
       type: 'lowshelf',
@@ -165,6 +166,12 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'SET_TAB') {
     return Object.assign({}, state, {
       tab: action.payload.tab
+    })
+  }
+
+  if (action.type === 'SET_PLAYING') {
+    return Object.assign({}, state, {
+      isPlaying: action.payload.isPlaying
     })
   }
 

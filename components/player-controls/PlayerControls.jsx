@@ -19,6 +19,7 @@ class PlayerControls extends PureComponent {
     this.toggle = this.toggle.bind(this)
     this.props.addPlayStatusListener(isPlaying => {
       this.setState({ isPlaying })
+      this.props.setPlaying(isPlaying)
     })
   }
 
@@ -153,6 +154,7 @@ PlayerControls.defaultProps = {
   setCurrentTime: () => {},
   openEqualizer: () => {},
   setVolume: () => {},
+  setPlaying: () => {},
   volume: 0.5,
   addPlayStatusListener: () => {},
   play: () => {},
@@ -169,6 +171,7 @@ PlayerControls.propTypes = {
   play: PropTypes.func,
   pause: PropTypes.func,
   setVolume: PropTypes.func,
+  setPlaying: PropTypes.func,
   volume: PropTypes.number
 }
 
