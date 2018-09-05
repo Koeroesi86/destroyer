@@ -2,8 +2,19 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { basename, extname } from 'path'
-import { FiBarChart2 as EQIcon, FiVolumeX as VolumeOffIcon, FiVolume2 as VolumeFullIcon } from 'react-icons/fi'
-import { MdPlayCircleOutline as PlayIcon, MdPauseCircleOutline as PauseIcon } from 'react-icons/md'
+import {
+  FiBarChart2 as EQIcon,
+  FiVolumeX as VolumeOffIcon,
+  FiVolume2 as VolumeFullIcon,
+  FiSkipForward as ForwardIcon,
+  FiSkipBack as BackIcon,
+  FiShuffle as ShuffleIcon,
+  FiRepeat as RepeatIcon
+} from 'react-icons/fi'
+import {
+  MdPlayCircleOutline as PlayIcon,
+  MdPauseCircleOutline as PauseIcon
+} from 'react-icons/md'
 import Slider from '../slider/Slider'
 import { trackType } from '../player-home/PlayerHome'
 import style from './PlayerControls.scss'
@@ -53,8 +64,15 @@ class PlayerControls extends PureComponent {
       setCurrentTime,
       openEqualizer,
       setVolume,
-      volume
+      volume,
+      shuffle,
+      repeat,
+      previousSong,
+      nextSong,
+      toggleRepeat,
+      toggleShuffle
     } = this.props
+    const { isPlaying } = this.state
     return (
       <div className={style.controls}>
         <div className={style.controlsPanel}>
@@ -92,14 +110,47 @@ class PlayerControls extends PureComponent {
             <div className={style.mainControlContainer}>
               <div className={style.mainControlButtons}>
                 <button
+                  className={style.controlButton}
+                  onClick={previousSong}
+                  title={'Previous'}
+                >
+                  <BackIcon size={'16px'} />
+                </button>
+                <button
                   onClick={this.toggle}
-                  className={classNames(style.mainControlButton, {
-                    [style.playing]: this.state.isPlaying
+                  className={classNames(style.playToggleButton, {
+                    [style.playing]: isPlaying
                   })}
                   disabled={!currentSong}
+                  title={isPlaying ? 'Pause' : 'Play'}
                 >
                   <PauseIcon className={style.pauseIcon} size={'40px'} />
                   <PlayIcon className={style.playIcon} size={'40px'} />
+                </button>
+                <button
+                  className={style.controlButton}
+                  onClick={nextSong}
+                  title={'Next'}
+                >
+                  <ForwardIcon size={'16px'} />
+                </button>
+                <button
+                  className={classNames(style.controlButton, {
+                    [style.active]: shuffle
+                  })}
+                  onClick={toggleShuffle}
+                  title={'Shuffle'}
+                >
+                  <ShuffleIcon size={'12px'} />
+                </button>
+                <button
+                  className={classNames(style.controlButton, {
+                    [style.active]: repeat
+                  })}
+                  onClick={toggleRepeat}
+                  title={'Repeat'}
+                >
+                  <RepeatIcon size={'12px'} />
                 </button>
                 <ScanProgress />
               </div>
@@ -158,7 +209,13 @@ PlayerControls.defaultProps = {
   volume: 0.5,
   addPlayStatusListener: () => {},
   play: () => {},
-  pause: () => {}
+  pause: () => {},
+  shuffle: false,
+  repeat: false,
+  toggleRepeat: () => {},
+  toggleShuffle: () => {},
+  nextSong: () => {},
+  previousSong: () => {}
 }
 
 PlayerControls.propTypes = {
@@ -172,7 +229,13 @@ PlayerControls.propTypes = {
   pause: PropTypes.func,
   setVolume: PropTypes.func,
   setPlaying: PropTypes.func,
-  volume: PropTypes.number
+  volume: PropTypes.number,
+  shuffle: PropTypes.bool,
+  repeat: PropTypes.bool,
+  toggleRepeat: PropTypes.func,
+  toggleShuffle: PropTypes.func,
+  nextSong: PropTypes.func,
+  previousSong: PropTypes.func
 }
 
 export default PlayerControls

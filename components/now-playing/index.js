@@ -8,7 +8,7 @@ const mapState = state => ({
 })
 
 const mapDispatch = dispatch => ({
-  playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } })
+  playTrack: (track) => dispatch({ type: 'FORCE_PLAY_TRACK', payload: { track } })
 })
 
 export default window

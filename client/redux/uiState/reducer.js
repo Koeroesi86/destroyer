@@ -4,6 +4,7 @@ const initialState = {
   onlineView: 'shoutcast',
   tab: 'local',
   nowPlaying: [],
+  played: [],
   currentSong: null,
   currentTime: 0,
   volume: 0.5,
@@ -14,6 +15,8 @@ const initialState = {
   totalCount: 0,
   maximized: false,
   isPlaying: false,
+  shuffle: false,
+  repeat: false,
   equalizer: [
     {
       type: 'lowshelf',
@@ -82,7 +85,8 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'PLAY_TRACKS') {
     const { tracks } = action.payload
     return Object.assign({}, state, {
-      nowPlaying: tracks
+      nowPlaying: tracks,
+      played: []
     })
   }
 
@@ -172,6 +176,32 @@ const reducer = (state = initialState, action) => {
   if (action.type === 'SET_PLAYING') {
     return Object.assign({}, state, {
       isPlaying: action.payload.isPlaying
+    })
+  }
+
+  if (action.type === 'TOGGLE_REPEAT') {
+    return Object.assign({}, state, {
+      repeat: !state.repeat
+    })
+  }
+
+  if (action.type === 'TOGGLE_SHUFFLE') {
+    return Object.assign({}, state, {
+      shuffle: !state.shuffle
+    })
+  }
+
+  if (action.type === 'CLEAR_PLAYED') {
+    return Object.assign({}, state, {
+      played: []
+    })
+  }
+
+  if (action.type === 'ADD_PLAYED') {
+    const played = state.played.slice()
+    played.push(action.payload.track)
+    return Object.assign({}, state, {
+      played
     })
   }
 

@@ -69,7 +69,7 @@ class NowPlaying extends PureComponent {
                 >
                   <PlayIcon className={style.playIcon} size={'12px'} />
                 </span>
-                {currentSong.track ? (
+                {track.track ? (
                   <span className={style.trackNo}>#{track.track}</span>
                 ) : ''}
                 {track.title}

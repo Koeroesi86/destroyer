@@ -98,23 +98,25 @@ const middleware = store => {
 
     if (action.type === 'PLAY_TRACK') {
       const { track } = action.payload
-      const notification = {
-        title: track.title,
-        body: `${track.artist}\n${track.album}`,
-        silent: false,
-        sound: false
-      }
-      if (track.picture) {
-        const { port } = store.getState().uiState
-        const cover = `${basename(track.picture, extname(track.picture))}-optimized.png`
-        const url = `http://localhost:${port}/albumart/${cover}`
-        notification.icon = url
-        notification.image = url
-      }
-      const myNotification = new window.Notification(notification.title, notification)
-      myNotification.onclick = () => {
-        store.dispatch({ type: 'CLICK_NOTIFICATION', payload: {} })
-        ipcRenderer.send('NOTIFICATION_CLICKED', { track: action.payload.track })
+      if (track) {
+        const notification = {
+          title: track.title,
+          body: `${track.artist}\n${track.album}`,
+          silent: false,
+          sound: false
+        }
+        if (track.picture) {
+          const { port } = store.getState().uiState
+          const cover = `${basename(track.picture, extname(track.picture))}-optimized.png`
+          const url = `http://localhost:${port}/albumart/${cover}`
+          notification.icon = url
+          notification.image = url
+        }
+        const myNotification = new window.Notification(notification.title, notification)
+        myNotification.onclick = () => {
+          store.dispatch({ type: 'CLICK_NOTIFICATION', payload: {} })
+          ipcRenderer.send('NOTIFICATION_CLICKED', { track: action.payload.track })
+        }
       }
     }
 
