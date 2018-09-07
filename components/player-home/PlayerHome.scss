@@ -194,41 +194,6 @@ html, body {
         .navigationContainer {
           flex: 1 1 auto;
         }
-
-        .navigation {
-          padding-top: 40px;
-          overflow-x: hidden;
-          overflow-y: auto;
-          max-height: 100%;
-
-          .item {
-            -webkit-app-region: no-drag;
-            padding-left: 12px;
-            margin-bottom: 12px;
-            line-height: 24px;
-            cursor: pointer;
-            color: #efefef;
-            border-left: 3px solid transparent;
-            transition: all .2s ease-in-out;
-
-            &:hover {
-              border-left-color: rgba(255, 255, 255, 0.2);
-            }
-
-            &.active {
-              color: #ff8686;
-              border-left-color: rgba(255, 134, 134, 0.6);
-
-              &:hover {
-                border-left-color: #ff8686;
-              }
-            }
-
-            .label {
-              padding-left: 6px;
-            }
-          }
-        }
       }
     }
 

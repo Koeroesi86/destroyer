@@ -1,6 +1,6 @@
-import { ipcRenderer, nativeImage } from 'electron'
+import { ipcRenderer } from 'electron'
 import _ from 'lodash'
-import { basename, extname, resolve } from 'path'
+import { basename, extname } from 'path'
 
 function addListeners (eventNames, store) {
   eventNames.forEach(eventName => {
@@ -22,6 +22,7 @@ const eventNames = [
   'MAXIMIZED_APP',
   'CLICKED_URL',
   'SET_PLAYING',
+  'RESTORE_SETTINGS',
   'SCANNING_FILE',
   'SCANNING_FOLDER'
 ]
@@ -40,7 +41,9 @@ const middleware = store => {
     ipcRenderer.send('APP_READY', 'Ready to receive')
 
     setInterval(() => {
-      rescanLibrary(false)
+      if (store.getState().uiState.scanningFolder.totalCount === 0) {
+        rescanLibrary(false)
+      }
     }, 1000 * 60 * 60)
 
     // rescanLibrary(false)
@@ -76,6 +79,7 @@ const middleware = store => {
     }
 
     if (action.type === 'CLOSE_APP') {
+      store.dispatch({ type: 'SAVE_SETTINGS', payload: {} })
       ipcRenderer.send('CLOSE_APP', {})
     }
 
@@ -118,6 +122,40 @@ const middleware = store => {
           ipcRenderer.send('NOTIFICATION_CLICKED', { track: action.payload.track })
         }
       }
+    }
+
+    if (action.type === 'SAVE_SETTINGS') {
+      const {
+        view,
+        onlineView,
+        tab,
+        nowPlaying,
+        played,
+        currentSong,
+        currentTime,
+        volume,
+        selectedAlbum,
+        maximized,
+        shuffle,
+        repeat,
+        equalizer
+      } = store.getState().uiState
+
+      ipcRenderer.send('SAVE_SETTINGS', {
+        view,
+        onlineView,
+        tab,
+        nowPlaying,
+        played,
+        currentSong,
+        currentTime,
+        volume,
+        selectedAlbum,
+        maximized,
+        shuffle,
+        repeat,
+        equalizer
+      })
     }
 
     next(action)

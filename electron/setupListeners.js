@@ -116,35 +116,50 @@ function setupListeners (database, windows) {
 
   ipcMain.on('APP_READY', (event) => {
     // main.openDevTools()
-    executeQuery(database, {
-      query: `SELECT * FROM folders ORDER BY path ASC`,
-      variables: []
-    }).then(folders => {
-      event.sender.send('STORE_FOLDERS', { folders })
-    }).catch(e => console.error(e))
-
-    executeQuery(database, {
-      query: `SELECT * FROM library ORDER BY path ASC`,
-      variables: []
-    }).then(library => {
-      event.sender.send('LIBRARY_SIZE', { size: memorySizeOf({ library }), length: library.length })
-      const chunkLimit = 200
-      if (library.length <= chunkLimit) {
-        event.sender.send('STORE_LIBRARY', { library, finished: true })
-      } else {
-        const chunks = []
-        let from = 0
-        library.forEach((track, index) => {
-          if (chunks.length === chunkLimit) {
-            event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from, finished: false })
-            chunks.splice(0)
-            from = index + 1
-          }
-          chunks.push(track)
-        })
-        event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from, finished: true })
-      }
-    }).catch(e => console.error(e))
+    Promise.resolve()
+      .then(() => executeQuery(database, {
+        query: `SELECT * FROM folders ORDER BY path ASC`,
+        variables: []
+      }))
+      .then(folders => {
+        event.sender.send('STORE_FOLDERS', { folders })
+        return Promise.resolve()
+      })
+      .then(() => executeQuery(database, {
+        query: `SELECT settings FROM settings WHERE id = ?`,
+        variables: [1]
+      }))
+      .then(s => {
+        if (s[0]) {
+          const { settings } = s[0]
+          event.sender.send('RESTORE_SETTINGS', { settings: JSON.parse(settings) })
+        }
+        return Promise.resolve()
+      })
+      .then(() => executeQuery(database, {
+        query: `SELECT * FROM library ORDER BY path ASC`,
+        variables: []
+      }))
+      .then(library => {
+        event.sender.send('LIBRARY_SIZE', { size: memorySizeOf({ library }), length: library.length })
+        const chunkLimit = 200
+        if (library.length <= chunkLimit) {
+          event.sender.send('STORE_LIBRARY', { library, finished: true })
+        } else {
+          const chunks = []
+          let from = 0
+          library.forEach((track, index) => {
+            if (chunks.length === chunkLimit) {
+              event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from, finished: false })
+              chunks.splice(0)
+              from = index + 1
+            }
+            chunks.push(track)
+          })
+          event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from, finished: true })
+        }
+      })
+      .catch(e => console.error(e))
   })
 
   /** @param {Array} files */
@@ -175,11 +190,10 @@ function setupListeners (database, windows) {
       .then(() => {
         event.sender.send('FOLDERS_ADDED_TO_LIBRARY', { folders })
 
-        let tracks = []
-        scanFolders(database, folders, event.sender, appDataPath)
-          .then(() => {
-            event.sender.send('TRACKS_ADDED_TO_LIBRARY', { tracks })
-          })
+        return scanFolders(folders, event.sender)
+      })
+      .then(() => {
+        event.sender.send('TRACKS_ADDED_TO_LIBRARY', {})
       })
       .catch(e => console.error(e))
   })
@@ -205,6 +219,18 @@ function setupListeners (database, windows) {
     windows.main.show()
     windows.main.focus()
     windows.main.setAlwaysOnTop(false)
+  })
+
+  ipcMain.on('SAVE_SETTINGS', (event, settings) => {
+    Promise.resolve()
+      .then(() => executeQuery(database, {
+        query: `INSERT OR REPLACE INTO settings (id, settings) VALUES (?, ?)`,
+        variables: [1, JSON.stringify(settings)]
+      }))
+      .then(() => {
+        event.sender.send('SETTINGS_SAVED', { settings })
+      })
+      .catch(e => console.error(e))
   })
 }
 

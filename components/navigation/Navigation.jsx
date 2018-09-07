@@ -1,5 +1,4 @@
 import React from 'react'
-import style from '../player-home/PlayerHome.scss'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import {
@@ -9,6 +8,7 @@ import {
   MdMusicNote as NowPlayingIcon,
   MdQueueMusic as LocalLibraryIcon
 } from 'react-icons/md'
+import style from './Navigation.scss'
 
 function Navigation ({ setTab, tab }) {
   return (

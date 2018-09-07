@@ -20,7 +20,7 @@ class Equalizer extends PureComponent {
 
   setup () {
     let connectedBands = this.props.bands
-      .map(band => {
+      .map((band, i) => {
         const currentBand = this.props.createBiquadFilter()
 
         if (band.type) {
@@ -29,7 +29,7 @@ class Equalizer extends PureComponent {
           // currentBand.type = 'bandpass'
         }
         if (band.frequency) currentBand.frequency.value = band.frequency
-        currentBand.gain.value = this.props.gainDb
+        currentBand.gain.value = this.props.gains[i]
 
         return currentBand
       })
@@ -125,6 +125,20 @@ Equalizer.defaultProps = {
   connectToSource: () => {},
   onAudioMounted: () => {},
   close: () => {},
+  gains: [
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40
+  ],
   bands: [
     {
       type: 'lowpass',
@@ -184,6 +198,7 @@ Equalizer.defaultProps = {
 Equalizer.propTypes = {
   gainDb: PropTypes.number,
   setGain: PropTypes.func,
+  gains: PropTypes.arrayOf(PropTypes.number),
   createBiquadFilter: PropTypes.func,
   createGain: PropTypes.func,
   connectDestination: PropTypes.func,

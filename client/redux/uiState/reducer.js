@@ -18,58 +18,18 @@ const initialState = {
   shuffle: false,
   repeat: false,
   equalizer: [
-    {
-      type: 'lowshelf',
-      label: '70',
-      value: -40,
-      frequency: 70
-    },
-    {
-      label: '180',
-      value: -40,
-      frequency: 180
-    },
-    {
-      label: '320',
-      value: -40,
-      frequency: 320
-    },
-    {
-      label: '600',
-      value: -40,
-      frequency: 600
-    },
-    {
-      label: '1k',
-      value: -40,
-      frequency: 1000
-    },
-    {
-      label: '3k',
-      value: -40,
-      frequency: 3000
-    },
-    {
-      label: '6k',
-      value: -40,
-      frequency: 6000
-    },
-    {
-      label: '12k',
-      value: -40,
-      frequency: 12000
-    },
-    {
-      label: '14k',
-      value: -40,
-      frequency: 14000
-    },
-    {
-      type: 'highpass',
-      label: '16k',
-      value: -40,
-      frequency: 16000
-    }
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40,
+    -40
   ]
 }
 
@@ -203,6 +163,10 @@ const reducer = (state = initialState, action) => {
     return Object.assign({}, state, {
       played
     })
+  }
+
+  if (action.type === 'RESTORE_SETTINGS') {
+    return Object.assign({}, state, action.payload.settings)
   }
 
   return state

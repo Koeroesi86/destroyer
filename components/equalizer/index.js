@@ -4,11 +4,11 @@ import { Audio } from '../../client/audio/context'
 import Equalizer from './Equalizer'
 
 const mapState = state => ({
-  // show: state.uiState.showEqualizer
+  // gains: state.uiState.equalizer
 })
 
 const mapDispatch = dispatch => ({
-  // changeGain: (value, index) => dispatch({ type: 'SET_GAIN', payload: { value, index } })
+  changeGain: (value, index) => dispatch({ type: 'SET_GAIN', payload: { value, index } })
 })
 
 const ContextualEqualizer = props => (
