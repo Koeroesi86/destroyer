@@ -3,16 +3,13 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import style from './PlayerHome.scss'
 import AlbumDetails from '../album-details'
-import Equalizer from '../equalizer'
 import Confirm from '../confirm'
-import NowPlaying from '../now-playing'
 import PlayerControls from '../player-controls'
 import AudioComponent from '../audio-component'
-import LocalCollection from '../local-collection'
 import TitleBar from '../title-bar'
-import OnlineSources from '../online-sources'
 import Navigation from '../navigation'
 import AudioSpectrum from '../audio-spectrum'
+import PlayerTabs from '../player-tabs'
 
 export default class PlayerHome extends PureComponent {
   constructor (props) {
@@ -86,7 +83,7 @@ export default class PlayerHome extends PureComponent {
   }
 
   render () {
-    const { maximized, enableTransparency, loaded, tab } = this.props
+    const { maximized, enableTransparency, loaded } = this.props
     const { confirmMessage } = this.state
     return (
       <div
@@ -117,28 +114,7 @@ export default class PlayerHome extends PureComponent {
                   </div>
                 </div>
               </div>
-              <div className={style.collection}>
-                <div className={classNames(style.tab, {
-                  [style.active]: tab === 'local'
-                })}>
-                  <LocalCollection addFiles={this.addFiles} />
-                </div>
-                <div className={classNames(style.tab, {
-                  [style.active]: tab === 'now-playing'
-                })}>
-                  <NowPlaying />
-                </div>
-                <div className={classNames(style.tab, {
-                  [style.active]: tab === 'online-sources'
-                })}>
-                  <OnlineSources />
-                </div>
-                <div className={classNames(style.tab, {
-                  [style.active]: tab === 'equalizer'
-                })}>
-                  <Equalizer />
-                </div>
-              </div>
+              <PlayerTabs addFiles={this.addFiles} />
             </div>
           </div>
           <PlayerControls />
@@ -157,8 +133,6 @@ export default class PlayerHome extends PureComponent {
 
 PlayerHome.defaultProps = {
   addFiles: () => {},
-  tab: 'local',
-  currentSong: null,
   maximized: false,
   enableTransparency: true,
   loaded: false
@@ -182,7 +156,6 @@ PlayerHome.propTypes = {
   loaded: PropTypes.bool,
   maximized: PropTypes.bool,
   addFiles: PropTypes.func,
-  tab: PropTypes.string,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,

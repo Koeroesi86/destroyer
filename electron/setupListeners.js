@@ -52,7 +52,6 @@ const isWin = process.platform === 'win32'
 const enableTransparency = true
 
 function setupListeners (database, windows) {
-  const appDataPath = global._appDataPath
   // loading.openDevTools()
 
   ipcMain.once('APP_LOADED', () => {
@@ -135,29 +134,6 @@ function setupListeners (database, windows) {
           event.sender.send('RESTORE_SETTINGS', { settings: JSON.parse(settings) })
         }
         return Promise.resolve()
-      })
-      .then(() => executeQuery(database, {
-        query: `SELECT * FROM library ORDER BY path ASC`,
-        variables: []
-      }))
-      .then(library => {
-        event.sender.send('LIBRARY_SIZE', { size: memorySizeOf({ library }), length: library.length })
-        const chunkLimit = 200
-        if (library.length <= chunkLimit) {
-          event.sender.send('STORE_LIBRARY', { library, finished: true })
-        } else {
-          const chunks = []
-          let from = 0
-          library.forEach((track, index) => {
-            if (chunks.length === chunkLimit) {
-              event.sender.send('STORE_LIBRARY', { library: chunks, to: index, from, finished: false })
-              chunks.splice(0)
-              from = index + 1
-            }
-            chunks.push(track)
-          })
-          event.sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from, finished: true })
-        }
       })
       .catch(e => console.error(e))
   })

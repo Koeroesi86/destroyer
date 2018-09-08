@@ -8,7 +8,7 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   if (action.type === 'STORE_LIBRARY') {
-    const { library: tracks, from, to, finished } = action.payload
+    const { library: tracks, finished } = action.payload
     const albumsObject = {}
     state.albums.forEach(album => {
       albumsObject[album.id] = album
@@ -44,10 +44,8 @@ const reducer = (state = initialState, action) => {
     const receivedAlbums = Object.getOwnPropertyNames(albumsObject).map(id =>
       Object.assign({}, albumsObject[id], { id })
     )
-    const receivedTracks = state.tracks.slice()
-    if (to) receivedTracks.splice(from, to, ...tracks)
     return Object.assign({}, state, {
-      tracks: to ? receivedTracks : tracks,
+      tracks: tracks,
       albums: receivedAlbums,
       loaded: !!finished
     })

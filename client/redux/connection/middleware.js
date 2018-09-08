@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
 import _ from 'lodash'
+import axios from 'axios'
 import { basename, extname } from 'path'
 
 function addListeners (eventNames, store) {
@@ -15,7 +16,7 @@ function addListeners (eventNames, store) {
 
 const eventNames = [
   'STORE_FOLDERS',
-  'STORE_LIBRARY',
+  'RESCAN_COMPLETE',
   'FOLDERS_ADDED_TO_LIBRARY',
   'TRACKS_ADDED_TO_LIBRARY',
   'LIBRARY_SIZE',
@@ -33,7 +34,54 @@ function rescanLibrary (forced = false) {
 
 const appLoaded = _.debounce(() => {
   ipcRenderer.send('APP_LOADED', {})
-}, 1000)
+}, 500)
+
+const getLibrary = (store) => {
+  const { port } = store.getState().uiState
+  return Promise.resolve()
+    .then(() => axios.request({
+      url: `http://localhost:${port}/library`,
+      method: 'get'
+    }))
+    .then(response => {
+      const library = response.data
+      return Promise.resolve(library)
+    })
+}
+
+const saveSettings = (uiState) => {
+  const {
+    view,
+    onlineView,
+    tab,
+    nowPlaying,
+    played,
+    currentSong,
+    currentTime,
+    volume,
+    selectedAlbum,
+    maximized,
+    shuffle,
+    repeat,
+    equalizer
+  } = uiState
+
+  ipcRenderer.send('SAVE_SETTINGS', {
+    view,
+    onlineView,
+    tab,
+    nowPlaying,
+    played,
+    currentSong,
+    currentTime,
+    volume,
+    selectedAlbum,
+    maximized,
+    shuffle,
+    repeat,
+    equalizer
+  })
+}
 
 const middleware = store => {
   if (window) {
@@ -47,6 +95,11 @@ const middleware = store => {
     }, 1000 * 60 * 60)
 
     // rescanLibrary(false)
+
+    getLibrary(store).then(library => {
+      appLoaded()
+      store.dispatch({ type: 'STORE_LIBRARY', payload: { library, finished: true } })
+    })
   }
 
   return next => action => {
@@ -74,9 +127,15 @@ const middleware = store => {
       rescanLibrary(true)
     }
 
-    if (action.type === 'STORE_LIBRARY') {
-      appLoaded()
+    if (action.type === 'RESCAN_COMPLETE') {
+      getLibrary(store).then(library => {
+        store.dispatch({ type: 'STORE_LIBRARY', payload: { library, finished: true } })
+      })
     }
+
+    // if (action.type === 'STORE_LIBRARY') {
+    //   appLoaded()
+    // }
 
     if (action.type === 'CLOSE_APP') {
       store.dispatch({ type: 'SAVE_SETTINGS', payload: {} })
@@ -125,37 +184,7 @@ const middleware = store => {
     }
 
     if (action.type === 'SAVE_SETTINGS') {
-      const {
-        view,
-        onlineView,
-        tab,
-        nowPlaying,
-        played,
-        currentSong,
-        currentTime,
-        volume,
-        selectedAlbum,
-        maximized,
-        shuffle,
-        repeat,
-        equalizer
-      } = store.getState().uiState
-
-      ipcRenderer.send('SAVE_SETTINGS', {
-        view,
-        onlineView,
-        tab,
-        nowPlaying,
-        played,
-        currentSong,
-        currentTime,
-        volume,
-        selectedAlbum,
-        maximized,
-        shuffle,
-        repeat,
-        equalizer
-      })
+      saveSettings(store.getState().uiState)
     }
 
     next(action)

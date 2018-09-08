@@ -52,7 +52,8 @@ const reducer = (state = initialState, action) => {
 
   if (action.type === 'PLAY_TRACK') {
     return Object.assign({}, state, {
-      currentSong: action.payload.track || null
+      currentSong: action.payload.track || null,
+      isPlaying: true
     })
   }
 

@@ -43,27 +43,8 @@ function rescanLibrary (sender, forced = false) {
 
       return Promise.all(queries)
     })
-    .then(() => executeQuery(database, {
-      query: `SELECT * FROM library ORDER BY path ASC`,
-      variables: []
-    }))
-    .then(library => {
-      console.log(`Sending library of ${library.length} songs`)
-      if (library.length <= 200) {
-        sender.send('STORE_LIBRARY', { library, finished: true })
-      } else {
-        let chunks = []
-        let from = 0
-        library.forEach((track, index) => {
-          if (chunks.length === 200) {
-            sender.send('STORE_LIBRARY', { library: chunks, to: index, from, finished: false })
-            chunks.splice(0)
-            from = index
-          }
-          chunks.push(track)
-        })
-        sender.send('STORE_LIBRARY', { library: chunks, to: library.length - 1, from, finished: true })
-      }
+    .then(() => {
+      sender.send('RESCAN_COMPLETE', {})
     })
     .catch(e => console.error(e))
 }

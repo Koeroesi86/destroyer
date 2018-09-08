@@ -5,6 +5,7 @@ const fs = require('fs')
 const url = require('url')
 const mmmagic = require('mmmagic')
 const sharp = require('sharp')
+const executeQuery = require('./executeQuery')
 
 const server = express()
 const mimeType = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
@@ -66,26 +67,24 @@ function setupServer () {
     const query = urlParts.query
 
     if (query.path) {
-      if (query.optimized) {
-        const basename = path.basename(query.path, path.extname(query.path))
-        const notificationImage = path.resolve(global._appDataPath, `./albumart/${basename}-optimized.png`)
-        if (fs.existsSync(notificationImage)) {
-          sendFile(notificationImage, response)
-        } else {
-          sharp(path.resolve(query.path))
-            .resize(250, 250)
-            .max()
-            .png({ compressionLevel: 9, force: true })
-            .toFile(notificationImage)
-            .then(info => {
-              sendFile(notificationImage, response)
-            })
-        }
-      } else {
-        sendFile(query.path, response)
-      }
+      sendFile(query.path, response)
     } else {
       response.status(404)
+    }
+  })
+
+  server.get('/library', (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*')
+    response.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    if (global._database) {
+      executeQuery(global._database, {
+        query: `SELECT * FROM library ORDER BY path ASC`,
+        variables: []
+      }).then(library => {
+        response.json(library)
+      })
+    } else {
+      response.status(403)
     }
   })
 

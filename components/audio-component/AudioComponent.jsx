@@ -11,8 +11,10 @@ class AudioComponent extends PureComponent {
       this.props.connectNode(this.audio)
     }
 
+    const round = (number) => Math.floor(number * 100)
     this.timer = setInterval(() => {
-      if (Math.floor(this.audio.currentTime * 100) !== Math.floor(this.props.currentTime * 100)) {
+      const changed = round(this.audio.currentTime) !== round(this.props.currentTime)
+      if (this.props.isPlaying && changed) {
         this.props.setCurrentTime(this.audio.currentTime)
       }
     }, 1000 / this.props.currentTimeFPS)
@@ -56,7 +58,7 @@ class AudioComponent extends PureComponent {
       this.audio.src = `http://localhost:${this.props.port}/local?path=${encodeURIComponent(track.path)}`
     }
 
-    this.props.play()
+    if (this.props.isPlaying) this.props.play()
   }
 
   seekTo (currentTime) {
