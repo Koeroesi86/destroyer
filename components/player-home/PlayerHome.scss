@@ -113,6 +113,10 @@ html, body {
 
   &.maximized {
     border-radius: 0;
+
+    &.opaque {
+      background: rgba(0, 0, 0, 0.6);
+    }
   }
 
   &.opaque {

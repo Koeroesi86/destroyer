@@ -24,6 +24,9 @@ export default class PlayerHome extends PureComponent {
     this.handleConfirm = this.handleConfirm.bind(this)
     this.addFiles = this.addFiles.bind(this)
     this.confirmCallback = () => {}
+    window.addEventListener('beforeunload', () => {
+      this.props.onUnload()
+    })
   }
 
   confirm (message, callback) {
@@ -133,6 +136,7 @@ export default class PlayerHome extends PureComponent {
 
 PlayerHome.defaultProps = {
   addFiles: () => {},
+  onUnload: () => {},
   maximized: false,
   enableTransparency: true,
   loaded: false
@@ -156,6 +160,7 @@ PlayerHome.propTypes = {
   loaded: PropTypes.bool,
   maximized: PropTypes.bool,
   addFiles: PropTypes.func,
+  onUnload: PropTypes.func,
   folders: PropTypes.arrayOf(
     PropTypes.shape({
       lastModified: PropTypes.number,

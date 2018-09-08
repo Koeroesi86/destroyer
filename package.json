@@ -8,8 +8,8 @@
     "clean": "rm -r bundle || true",
     "prebuild": "yarn run clean",
     "postinstall": "node scripts/postinstall.js",
-    "dev": "node --max_old_space_size=2048 scripts/start.js",
-    "build": "webpack --progress --config config/webpack.config.base.js",
+    "dev": "node scripts/prebuild.js && node --max_old_space_size=2048 scripts/start.js",
+    "build": "node scripts/prebuild.js && webpack --progress --config config/webpack.config.base.js",
     "start": "electron index.js",
     "pack:osx": "rm -rf Destroyer-darwin-x64 && NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --platform=darwin --arch=x64 --icon=icons.icns --prune",
     "pack:win": "cross-env NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --out=dist/windows --platform=win32 --arch=x64 --overwrite --icon=icons.ico --prune"

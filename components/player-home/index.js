@@ -14,7 +14,8 @@ const mapDispatch = dispatch => ({
   openEqualizer: () => dispatch({ type: 'OPEN_EQUALIZER', payload: {} }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
   trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),
-  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} })
+  rescanLibrary: () => dispatch({ type: 'RESCAN_LIBRARY', payload: {} }),
+  onUnload: () => dispatch({ type: 'SAVE_SETTINGS', payload: {} })
 })
 
 export default window

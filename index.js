@@ -10,7 +10,6 @@ const getLoadingWindow = require('./electron/getLoadingWindow')
 const createDatabase = require('./electron/createDatabase')
 const setupListeners = require('./electron/setupListeners')
 const setupServer = require('./electron/setupServer')
-const generateIcons = require('./electron/generateIcons')
 
 process.env.ELECTRON_ENABLE_LOGGING = '1'
 
@@ -40,8 +39,6 @@ if (argv.webpackPort) {
 function setAppId() {
   const exeName = basename(process.execPath).replace(/\.exe$/i, '')
 
-  generateIcons()
-
   if (isDev) {
     global._appId = `com.squirrel.${exeName}-${process.env.NODE_ENV}`;
   } else {
@@ -56,20 +53,22 @@ function setAppId() {
       isDev ? '-' + process.env.NODE_ENV : ''
     }.lnk`
 
-    if (!fs.existsSync(shortcutPath)) {
-      ws.create(shortcutPath, {
-        target: process.execPath,
-        desc: package.description,
-        workingDir: resolve(__dirname),
-        icon: resolve(__dirname, './icons/win/icon.ico')
-      }, err => {
-        if(err) throw err
-
-        ws.addAppId(shortcutPath, _appId, err => {
-          if(err) throw err
-        })
-      })
+    if (fs.existsSync(shortcutPath)) {
+      fs.unlinkSync(shortcutPath)
     }
+
+    ws.create(shortcutPath, {
+      target: process.execPath,
+      desc: package.description,
+      workingDir: resolve(__dirname),
+      icon: resolve(__dirname, './icons/win/icon.ico')
+    }, err => {
+      if(err) throw err
+
+      ws.addAppId(shortcutPath, _appId, err => {
+        if(err) throw err
+      })
+    })
   }
 }
 
