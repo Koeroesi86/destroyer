@@ -10,7 +10,7 @@ const executeQuery = require('./executeQuery')
 const server = express()
 const mimeType = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
 
-const sendFile = (path, response) => {
+const sendFile = (path, response, range = '') => {
   mimeType.detectFile(path, (err, mime) => {
     if (err) {
       response.status(500).send(err)
@@ -21,8 +21,24 @@ const sendFile = (path, response) => {
     response.setHeader('Content-Type', mime)
     if (/^image\//.test(mime)) {
       response.setHeader('Cache-Control', 'Public')
+      fs.createReadStream(path).pipe(response)
+    } else if (range !== '') {
+      const stat = fs.statSync(path)
+      const fileSize = stat.size
+      const parts = range.match(/bytes=([0-9]+)-([0-9]*)/)
+      const start = parseInt(parts[1], 10)
+      const end = parts[2] !== ''
+        ? parseInt(parts[2], 10)
+        : fileSize - 1
+      const file = fs.createReadStream(path, { start, end })
+      response.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`)
+      response.setHeader('Accept-Ranges', 'bytes')
+      response.setHeader('Content-Length', (end - start) + 1)
+      response.status(206)
+      file.pipe(response)
+    } else {
+      fs.createReadStream(path).pipe(response)
     }
-    fs.createReadStream(path).pipe(response)
   })
 }
 
@@ -67,7 +83,7 @@ function setupServer () {
     const query = urlParts.query
 
     if (query.path) {
-      sendFile(query.path, response)
+      sendFile(query.path, response, request.headers.range)
     } else {
       response.status(404)
     }

@@ -10,6 +10,10 @@ let isPlaying = false
 const listeners = []
 const connectedItems = []
 const audioMountListeners = []
+const timeChangeListeners = []
+let timeChangeTimer
+const currentTimeFPS = 5
+let currentTime = 0
 
 const onAudioMounted = (listener) => {
   audioMountListeners.push(listener)
@@ -47,6 +51,25 @@ const connectNode = (node) => {
     })
 
     audioMountListeners.forEach(cb => { cb() })
+
+    seek(currentTime)
+
+    clearInterval(timeChangeTimer)
+    timeChangeTimer = setInterval(() => {
+      if (audioNode) {
+        currentTime = audioNode.currentTime
+        timeChangeListeners.forEach(listener => {
+          listener(audioNode.currentTime)
+        })
+      }
+    }, 1000 / currentTimeFPS)
+  }
+}
+
+const seek = (to) => {
+  currentTime = to
+  if (audioNode && audioNode.duration && audioNode.currentTime !== to) {
+    audioNode.currentTime = to
   }
 }
 
@@ -97,6 +120,10 @@ const removePlayStatusListener = (listener) => {
   }
 }
 
+const addTimeChangeListener = (listener) => {
+  if (!timeChangeListeners.includes(listener)) timeChangeListeners.push(listener)
+}
+
 /** @returns {AnalyserNode|boolean} */
 const createAnalyser = () => {
   if (audioSource) {
@@ -120,6 +147,7 @@ const connectDestination = (node) => node.connect(audioContext.destination)
 export const Audio = createContext({
   addPlayStatusListener,
   removePlayStatusListener,
+  addTimeChangeListener,
   connectNode,
   connectToSource,
   connectDestination,
@@ -128,5 +156,6 @@ export const Audio = createContext({
   onAudioMounted,
   play,
   pause,
+  seek,
   createAnalyser
 })

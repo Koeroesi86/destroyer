@@ -24,18 +24,31 @@ import Time from '../time'
 class PlayerControls extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      isPlaying: false
-    }
+
     this.toggle = this.toggle.bind(this)
+
     this.props.addPlayStatusListener(isPlaying => {
-      this.setState({ isPlaying })
-      this.props.setPlaying(isPlaying)
+      if (this.props.isPlaying !== isPlaying) {
+        this.props.setPlaying(isPlaying)
+      }
+    })
+
+    const round = (number) => Math.floor(number * 100)
+    this.props.addTimeChangeListener(currentTime => {
+      if (round(currentTime) !== round(this.props.currentTime)) {
+        this.props.setCurrentTime(currentTime)
+      }
     })
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.currentTime !== prevProps.currentTime) {
+      this.props.seek(this.props.currentTime)
+    }
+  }
+
   toggle () {
-    if (this.state.isPlaying) {
+    if (this.props.isPlaying) {
       this.props.pause()
     } else {
       this.props.play()
@@ -61,7 +74,6 @@ class PlayerControls extends PureComponent {
     const {
       currentSong,
       currentTime,
-      setCurrentTime,
       openEqualizer,
       setVolume,
       volume,
@@ -70,9 +82,10 @@ class PlayerControls extends PureComponent {
       previousSong,
       nextSong,
       toggleRepeat,
-      toggleShuffle
+      toggleShuffle,
+      seek,
+      isPlaying
     } = this.props
-    const { isPlaying } = this.state
     return (
       <div className={style.controls}>
         <div className={style.controlsPanel}>
@@ -100,8 +113,8 @@ class PlayerControls extends PureComponent {
                 step={0.0001}
                 value={currentTime}
                 onInput={e => {
-                  const value = e.target.value
-                  if (currentTime !== value) setCurrentTime(value)
+                  const value = parseFloat(e.target.value)
+                  if (currentTime !== value) seek(value)
                 }}
                 onChange={() => {
                 }}
@@ -208,10 +221,13 @@ PlayerControls.defaultProps = {
   setPlaying: () => {},
   volume: 0.5,
   addPlayStatusListener: () => {},
+  addTimeChangeListener: () => {},
+  seek: () => {},
   play: () => {},
   pause: () => {},
   shuffle: false,
   repeat: false,
+  isPlaying: false,
   toggleRepeat: () => {},
   toggleShuffle: () => {},
   nextSong: () => {},
@@ -222,6 +238,8 @@ PlayerControls.propTypes = {
   currentSong: PropTypes.shape(trackType),
   currentTime: PropTypes.number,
   addPlayStatusListener: PropTypes.func,
+  addTimeChangeListener: PropTypes.func,
+  seek: PropTypes.func,
   port: PropTypes.string,
   setCurrentTime: PropTypes.func,
   openEqualizer: PropTypes.func,
@@ -232,6 +250,7 @@ PlayerControls.propTypes = {
   volume: PropTypes.number,
   shuffle: PropTypes.bool,
   repeat: PropTypes.bool,
+  isPlaying: PropTypes.bool,
   toggleRepeat: PropTypes.func,
   toggleShuffle: PropTypes.func,
   nextSong: PropTypes.func,

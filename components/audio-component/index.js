@@ -18,12 +18,13 @@ const mapDispatch = dispatch => ({
 
 const ContextualAudioComponent = props => (
   <Audio.Consumer>
-    {({ connectNode, play, pause }) =>
+    {({ connectNode, play, pause, seek }) =>
       <AudioComponent
         {...props}
         play={play}
         pause={pause}
         connectNode={connectNode}
+        seek={seek}
     />}
   </Audio.Consumer>
 )

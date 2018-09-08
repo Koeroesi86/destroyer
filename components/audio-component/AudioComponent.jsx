@@ -6,22 +6,9 @@ class AudioComponent extends PureComponent {
   componentDidMount () {
     if (this.audio) {
       this.setVolume()
-      this.seekTo(this.props.currentTime)
 
       this.props.connectNode(this.audio)
     }
-
-    const round = (number) => Math.floor(number * 100)
-    this.timer = setInterval(() => {
-      const changed = round(this.audio.currentTime) !== round(this.props.currentTime)
-      if (this.props.isPlaying && changed) {
-        this.props.setCurrentTime(this.audio.currentTime)
-      }
-    }, 1000 / this.props.currentTimeFPS)
-  }
-
-  componentWillUnmount () {
-    clearInterval(this.timer)
   }
 
   componentDidUpdate (prevProps) {
@@ -82,6 +69,7 @@ class AudioComponent extends PureComponent {
           this.audio = a
         }}
         crossOrigin='anonymous'
+        preload
         onEnded={trackEnded}
       />
     )
@@ -91,6 +79,7 @@ class AudioComponent extends PureComponent {
 AudioComponent.defaultProps = {
   play: () => {},
   pause: () => {},
+  seek: () => {},
   trackEnded: () => {},
   connectNode: () => {},
   isPlaying: false,
@@ -106,6 +95,7 @@ AudioComponent.defaultProps = {
 AudioComponent.propTypes = {
   play: PropTypes.func,
   pause: PropTypes.func,
+  seek: PropTypes.func,
   isPlaying: PropTypes.bool,
   trackEnded: PropTypes.func,
   connectNode: PropTypes.func,
