@@ -24,7 +24,7 @@ const config = {
   output: {
     pathinfo: true,
     libraryTarget: 'umd',
-    path: path.resolve(__dirname, '../bundle'),
+    path: path.resolve(__dirname, '../build'),
     publicPath: './',
     globalObject: 'this',
     filename: '[name].js'
@@ -135,14 +135,6 @@ const config = {
       locals: appConfig.locals
     })
   ]
-}
-
-if (process.env.NODE_ENV === 'production') {
-  config.plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      comments: false
-    })
-  )
 }
 
 module.exports = config

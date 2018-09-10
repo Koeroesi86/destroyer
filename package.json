@@ -5,18 +5,25 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "clean": "rm -r bundle || true",
-    "prebuild": "yarn run clean",
+    "prebuild": "node scripts/prebuild.js",
     "postinstall": "node scripts/postinstall.js",
     "dev": "node scripts/prebuild.js && node --max_old_space_size=2048 scripts/start.js",
-    "build": "node scripts/prebuild.js && webpack --progress --config config/webpack.config.base.js",
+    "build": "node scripts/build.js",
     "start": "electron index.js",
-    "pack:osx": "rm -rf Destroyer-darwin-x64 && NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --platform=darwin --arch=x64 --icon=icons.icns --prune",
-    "pack:win": "cross-env NODE_ENV=production webpack --progress -p && electron-packager ./ Destroyer --out=dist/windows --platform=win32 --arch=x64 --overwrite --icon=icons.ico --prune"
+    "dist": "node scripts/dist.js"
   },
   "author": "Krisztian Korosi",
   "build": {
-    "appId": "com.squirrel.emusic"
+    "appId": "com.squirrel.emusic",
+    "compression": "normal",
+    "win": {
+      "icon": "icons/win/icon.ico"
+    },
+    "mac": {
+      "category": "public.app-category.music",
+      "target": "dmg",
+      "icon": "icons/mac/icon.icns"
+    }
   },
   "license": "ISC",
   "dependencies": {
@@ -27,8 +34,6 @@
     "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
     "date-fns": "^1.28.2",
-    "electron": "^2.0.8",
-    "electron-builder": "^20.28.2",
     "electron-vibrancy": "^0.1.3",
     "electron-window-state": "^4.1.0",
     "express": "^4.16.3",
@@ -68,6 +73,8 @@
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-0": "^6.22.0",
     "css-loader": "^1.0.0",
+    "electron": "^2.0.8",
+    "electron-builder": "^20.28.2",
     "electron-icon-maker": "^0.0.4",
     "electron-packager": "^12.1.1",
     "eslint": "^3.19.0",
@@ -82,6 +89,7 @@
     "mini-css-extract-plugin": "^0.4.2",
     "node-sass": "^4.9.3",
     "react-dev-utils": "^5.0.1",
+    "rimraf": "^2.6.2",
     "sass-loader": "^7.1.0",
     "static-site-generator-webpack-plugin": "^3.4.1",
     "style-loader": "^0.22.1",
