@@ -9,6 +9,7 @@ console.log('Packaging started...')
 
 const isWin = process.platform === 'win32'
 const isMac = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
 
 process.env.DEBUG = 'electron-builder' // TODO: find another way to log
 process.env.NODE_OPTIONS = '--max-old-space-size=2048'
@@ -33,7 +34,18 @@ if (isWin) {
 if (isMac) {
   electronBuilder
     .build({
-      platform: 'macos'
+      platform: 'darwin'
+    })
+    .then(() => {
+      console.log('Mac OS package created.')
+      process.exit(0)
+    })
+}
+
+if (isLinux) {
+  electronBuilder
+    .build({
+      platform: 'linux'
     })
     .then(() => {
       console.log('Mac OS package created.')
