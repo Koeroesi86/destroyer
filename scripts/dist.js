@@ -48,7 +48,7 @@ if (isLinux) {
       platform: 'linux'
     })
     .then(() => {
-      console.log('Mac OS package created.')
+      console.log('Linux package created.')
       process.exit(0)
     })
 }
