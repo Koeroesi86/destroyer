@@ -1,17 +1,27 @@
 language: node_js
 node_js:
-  - '9'
+  - '10'
 sudo: required
 matrix:
   include:
     - os: linux
       dist: xenial
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
     - os: osx
-      osx_image: "xcode9.4"
+      osx_image: "xcode10"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+#before_cache:
+#  - rm -rf $HOME/.cache/electron-builder/wine
 cache:
   yarn: true
   directories:
     - node_modules
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
 notifications:
   email: false
 script:
