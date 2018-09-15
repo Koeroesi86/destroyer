@@ -33,7 +33,7 @@ class PlayerControls extends PureComponent {
       }
     })
 
-    const round = (number) => Math.floor(number * 100)
+    const round = (number) => Math.floor(number)
     this.props.addTimeChangeListener(currentTime => {
       if (round(currentTime) !== round(this.props.currentTime)) {
         this.props.setCurrentTime(currentTime)
