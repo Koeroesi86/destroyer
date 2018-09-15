@@ -16,24 +16,12 @@ class AudioComponent extends PureComponent {
       if (this.props.currentSong) {
         this.playTrack(this.props.currentSong)
       } else {
-        this.props.pause()
+        this.audio.src = ''
       }
     }
 
     if (prevProps.volume !== this.props.volume) {
       this.setVolume()
-    }
-
-    if (prevProps.currentTime !== this.props.currentTime) {
-      this.seekTo(this.props.currentTime)
-    }
-
-    if (this.props.isPlaying !== prevProps.isPlaying) {
-      if (this.props.isPlaying) {
-        this.props.play()
-      } else {
-        this.props.pause()
-      }
     }
   }
 
@@ -43,14 +31,6 @@ class AudioComponent extends PureComponent {
       this.audio.src = src
     } else {
       this.audio.src = `http://localhost:${this.props.port}/local?path=${encodeURIComponent(track.path)}`
-    }
-
-    if (this.props.isPlaying) this.props.play()
-  }
-
-  seekTo (currentTime) {
-    if (this.audio.currentTime !== currentTime) {
-      this.audio.currentTime = currentTime
     }
   }
 
@@ -69,7 +49,7 @@ class AudioComponent extends PureComponent {
           this.audio = a
         }}
         crossOrigin='anonymous'
-        preload
+        preload='true'
         onEnded={trackEnded}
       />
     )
@@ -77,32 +57,18 @@ class AudioComponent extends PureComponent {
 }
 
 AudioComponent.defaultProps = {
-  play: () => {},
-  pause: () => {},
-  seek: () => {},
   trackEnded: () => {},
   connectNode: () => {},
-  isPlaying: false,
   setPlaying: () => {},
-  currentTime: 0,
-  currentTimeFPS: 5,
-  setCurrentTime: () => {},
   currentSong: null,
   port: '3000',
   volume: 0.5
 }
 
 AudioComponent.propTypes = {
-  play: PropTypes.func,
-  pause: PropTypes.func,
-  seek: PropTypes.func,
-  isPlaying: PropTypes.bool,
   trackEnded: PropTypes.func,
   connectNode: PropTypes.func,
   port: PropTypes.string,
-  currentTime: PropTypes.number,
-  currentTimeFPS: PropTypes.number,
-  setCurrentTime: PropTypes.func,
   currentSong: PropTypes.shape(trackType),
   volume: PropTypes.number
 }

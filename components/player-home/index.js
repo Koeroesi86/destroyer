@@ -10,7 +10,6 @@ const mapDispatch = dispatch => ({
   /** @param {FileList} fileList */
   addFiles: (fileList) => dispatch({ type: 'FILES_ADDED', payload: { fileList } }),
   setVolume: (volume) => dispatch({ type: 'SET_VOLUME', payload: { volume } }),
-  setCurrentTime: (currentTime) => dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime } }),
   openEqualizer: () => dispatch({ type: 'OPEN_EQUALIZER', payload: {} }),
   playTrack: (track) => dispatch({ type: 'PLAY_TRACK', payload: { track } }),
   trackEnded: () => dispatch({ type: 'TRACK_ENDED', payload: {} }),

@@ -1941,13 +1941,6 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-cross-env@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-5.2.0.tgz#6ecd4c015d5773e614039ee529076669b9d126f2"
-  dependencies:
-    cross-spawn "^6.0.5"
-    is-windows "^1.0.0"
-
 cross-spawn@5.1.0, cross-spawn@^5.0.1:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
@@ -2060,10 +2053,6 @@ dashdash@^1.12.0:
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
   dependencies:
     assert-plus "^1.0.0"
-
-date-fns@^1.28.2:
-  version "1.29.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.29.0.tgz#12e609cdcb935127311d04d33334e2960a2a54e6"
 
 date-now@^0.1.4:
   version "0.1.4"
@@ -3149,10 +3138,6 @@ for-own@^1.0.0:
   dependencies:
     for-in "^1.0.1"
 
-foreachasync@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/foreachasync/-/foreachasync-3.0.0.tgz#5502987dc8714be3392097f32e0071c9dee07cf6"
-
 forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
@@ -3341,14 +3326,6 @@ get-package-info@^1.0.0:
     debug "^2.2.0"
     lodash.get "^4.0.0"
     read-pkg-up "^2.0.0"
-
-get-scrollmax-x@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/get-scrollmax-x/-/get-scrollmax-x-0.2.0.tgz#968b1b2102d8ddc9976bca5d3bf33bc09b56f541"
-
-get-scrollmax-y@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/get-scrollmax-y/-/get-scrollmax-y-1.0.0.tgz#1e3bfd74ae375abc3b905cd4dd7456ed00abe8f4"
 
 get-stdin@^4.0.1:
   version "4.0.1"
@@ -4157,7 +4134,7 @@ is-utf8@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
 
-is-windows@^1.0.0, is-windows@^1.0.1, is-windows@^1.0.2:
+is-windows@^1.0.1, is-windows@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-windows/-/is-windows-1.0.2.tgz#d1850eb9791ecd18e6182ce12a30f396634bb19d"
 
@@ -4336,10 +4313,6 @@ jsx-ast-utils@^1.3.4:
 kew@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/kew/-/kew-0.7.0.tgz#79d93d2d33363d6fdd2970b335d9141ad591d79b"
-
-key@^0.1.11:
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/key/-/key-0.1.11.tgz#66024f2e2daaa4fabe049b26d74c47220551cfd9"
 
 killable@^1.0.0:
   version "1.0.0"
@@ -5294,10 +5267,6 @@ pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
 
-paper@^0.11.5:
-  version "0.11.5"
-  resolved "https://registry.yarnpkg.com/paper/-/paper-0.11.5.tgz#d662de67bce8218c287bfe17586d099d2cc48040"
-
 parallel-transform@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/parallel-transform/-/parallel-transform-1.1.0.tgz#d410f065b05da23081fcd10f28854c29bda33b06"
@@ -6080,7 +6049,7 @@ request@2.87.0:
     tunnel-agent "^0.6.0"
     uuid "^3.1.0"
 
-request@^2.45.0, request@^2.65.0, request@^2.79.0, request@^2.81.0, request@^2.87.0, request@^2.88.0:
+request@^2.45.0, request@^2.65.0, request@^2.79.0, request@^2.81.0, request@^2.87.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   dependencies:
@@ -6290,13 +6259,6 @@ schema-utils@^1.0.0:
     ajv "^6.1.0"
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
-
-scroll-animator@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/scroll-animator/-/scroll-animator-1.1.0.tgz#10df1e0420534ff147c409495e4e46825c23aa0b"
-  dependencies:
-    get-scrollmax-x "^0.2.0"
-    get-scrollmax-y "^1.0.0"
 
 scss-tokenizer@^0.2.3:
   version "0.2.3"
@@ -7346,12 +7308,6 @@ vm-browserify@0.0.4:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-0.0.4.tgz#5d7ea45bbef9e4a6ff65f95438e0a87c357d5a73"
   dependencies:
     indexof "0.0.1"
-
-walk@^2.3.9:
-  version "2.3.14"
-  resolved "https://registry.yarnpkg.com/walk/-/walk-2.3.14.tgz#60ec8631cfd23276ae1e7363ce11d626452e1ef3"
-  dependencies:
-    foreachasync "^3.0.0"
 
 watchpack@^1.5.0:
   version "1.6.0"

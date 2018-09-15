@@ -4,9 +4,7 @@ import AudioComponent from './AudioComponent'
 import { Audio } from '../../client/audio/context'
 
 const mapState = state => ({
-  isPlaying: state.uiState.isPlaying,
   currentSong: state.uiState.currentSong,
-  currentTime: state.uiState.currentTime,
   volume: state.uiState.volume,
   port: state.uiState.port
 })
@@ -18,13 +16,10 @@ const mapDispatch = dispatch => ({
 
 const ContextualAudioComponent = props => (
   <Audio.Consumer>
-    {({ connectNode, play, pause, seek }) =>
+    {({ connectNode }) =>
       <AudioComponent
         {...props}
-        play={play}
-        pause={pause}
         connectNode={connectNode}
-        seek={seek}
     />}
   </Audio.Consumer>
 )
