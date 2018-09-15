@@ -10,6 +10,7 @@ platform:
 init:
   - git config --global core.autocrlf true
 install:
+  - ps: Install-Product node $env:nodejs_version $env:platform
   - yarn
 build: off
 test_script:
