@@ -35,6 +35,9 @@
       "category": "public.app-category.music",
       "target": "dmg",
       "icon": "icons/mac/icon.icns"
+    },
+    "linux": {
+      "icon": "icons/png/"
     }
   },
   "license": "ISC",
