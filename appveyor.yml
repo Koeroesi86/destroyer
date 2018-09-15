@@ -1,0 +1,18 @@
+# http://www.appveyor.com/docs/appveyor-yml
+
+version: "{build}"
+skip_tags: true
+environment:
+  matrix:
+    - nodejs_version: 9
+init:
+  - git config --global core.autocrlf true
+install:
+  - yarn
+build: off
+test_script:
+  - yarn build
+  - yarn dist
+cache:
+  - "%LOCALAPPDATA%\\Yarn"
+  - node_modules -> package.json

@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - '9'
+sudo: required
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+    - os: osx
+cache:
+  yarn: true
+  directories:
+    - node_modules
+notifications:
+  email: false
+script:
+  - yarn install
+  - yarn build
+  - yarn dist
+#deploy:
+#  provider: releases
+#  api_key: $ENCRYPTED_GITHUB_TOKEN
+#  skip_cleanup: true
+#  on:
+#    tags: true
