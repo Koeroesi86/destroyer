@@ -12,10 +12,10 @@ init:
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - yarn
-build: off
-test_script:
+build_script:
   - yarn build
   - yarn dist
+test: off
 cache:
   - "%LOCALAPPDATA%\\Yarn"
   - node_modules -> package.json
