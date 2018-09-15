@@ -1,10 +1,9 @@
-const { execSync } = require('child_process')
 const { resolve } = require('path')
+const rimraf = require('rimraf')
+const fs = require('fs')
 const electronBuilder = require('electron-builder')
 
 const cwd = resolve(__dirname, '../')
-
-execSync('rm -r dist || true', { cwd, stdio: 'inherit' })
 
 console.log('Packaging started...')
 
@@ -12,6 +11,13 @@ const isWin = process.platform === 'win32'
 const isMac = process.platform === 'darwin'
 
 process.env.DEBUG = 'electron-builder' // TODO: find another way to log
+process.env.NODE_OPTIONS = '--max-old-space-size=2048'
+
+const distPath = resolve(cwd, './dist')
+if (fs.existsSync(distPath)) {
+  rimraf.sync(distPath)
+  console.log('Removed previous build.')
+}
 
 if (isWin) {
   electronBuilder

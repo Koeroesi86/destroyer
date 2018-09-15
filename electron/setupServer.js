@@ -3,43 +3,41 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const url = require('url')
-const mmmagic = require('mmmagic')
+const mimeType = require('mime-types')
 const sharp = require('sharp')
 const executeQuery = require('./executeQuery')
 
 const server = express()
-const mimeType = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
 
-const sendFile = (path, response, range = '') => {
-  mimeType.detectFile(path, (err, mime) => {
-    if (err) {
-      response.status(500).send(err)
-      return
-    }
+const sendFile = (filePath, response, range = '') => {
+  const mime = mimeType.contentType(path.resolve(filePath))
+  if (!mime) {
+    response.status(500).send(`contentType failed`)
+    return
+  }
     response.setHeader('Access-Control-Allow-Origin', '*')
     response.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
     response.setHeader('Content-Type', mime)
     if (/^image\//.test(mime)) {
       response.setHeader('Cache-Control', 'Public')
-      fs.createReadStream(path).pipe(response)
+      fs.createReadStream(filePath).pipe(response)
     } else if (range !== '') {
-      const stat = fs.statSync(path)
+      const stat = fs.statSync(filePath)
       const fileSize = stat.size
       const parts = range.match(/bytes=([0-9]+)-([0-9]*)/)
       const start = parseInt(parts[1], 10)
       const end = parts[2] !== ''
         ? parseInt(parts[2], 10)
         : fileSize - 1
-      const file = fs.createReadStream(path, { start, end })
+      const file = fs.createReadStream(filePath, { start, end })
       response.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`)
       response.setHeader('Accept-Ranges', 'bytes')
       response.setHeader('Content-Length', (end - start) + 1)
       response.status(206)
       file.pipe(response)
     } else {
-      fs.createReadStream(path).pipe(response)
+      fs.createReadStream(filePath).pipe(response)
     }
-  })
 }
 
 function setupServer () {

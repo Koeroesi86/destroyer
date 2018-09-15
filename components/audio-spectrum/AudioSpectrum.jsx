@@ -21,8 +21,10 @@ class AudioSpectrum extends PureComponent {
 
       if (isPlaying) {
         if (!this.analyser) this.setupAudioNode()
+        clearTimeout(this.timer)
         this.drawSpectrum()
       } else {
+        clearTimeout(this.timer)
         window.cancelAnimationFrame(this.animationId)
       }
     })
@@ -103,7 +105,7 @@ class AudioSpectrum extends PureComponent {
       }
 
       // this.animationId = window.requestAnimationFrame(drawMeter)
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.animationId = window.requestAnimationFrame(drawMeter)
       }, 1000 / fps)
     }

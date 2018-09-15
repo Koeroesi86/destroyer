@@ -15,7 +15,7 @@ process.env.ELECTRON_ENABLE_LOGGING = '1'
 
 const isWin = process.platform === 'win32'
 const isMac = process.platform === 'darwin'
-const isDev = process.env.NODE_ENV !== 'production'
+const isDev = process.env.NODE_ENV === 'development'
 
 const argv = require('minimist')(process.argv.slice(2))
 
@@ -45,7 +45,7 @@ function setAppId() {
     global._appId = `com.squirrel.${exeName}`;
   }
 
-  if (isWin) {
+  if (isWin && isDev) {
     app.setAppUserModelId(_appId)
     console.log('Registered app ID', _appId)
 
@@ -108,17 +108,20 @@ const getPort = () => {
 }
 
 getPort()
-  .then(() => createDatabase(libraryLocation))
-  .then((d) => {
-    console.log(`Connected to library ${libraryLocation}`)
-    global._database = d
-
+  .then(() => {
     windows.loading = getLoadingWindow()
     windows.loading.loadURL(loadingLocation)
     windows.loading.once('ready-to-show', () => {
       windows.loading.show()
       if (isWin) electronVibrancy.SetVibrancy(windows.loading, 0)
     })
+
+    return Promise.resolve()
+  })
+  .then(() => createDatabase(libraryLocation))
+  .then((d) => {
+    console.log(`Connected to library ${libraryLocation}`)
+    global._database = d
 
     initWindow()
     setupListeners(_database, windows, appDataPath)

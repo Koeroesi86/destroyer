@@ -1,4 +1,4 @@
-const { ipcMain, session } = require('electron')
+const { app, ipcMain, session } = require('electron')
 const fs = require('fs')
 const { resolve } = require('path')
 const electronVibrancy = require('electron-vibrancy')
@@ -64,24 +64,28 @@ function setupListeners (database, windows) {
       windows.loading.close()
       windows.loading = null
 
-      windows.main.setThumbarButtons([
-        {
-          tooltip: 'Play',
-          icon: resolve(__dirname, '../assets/icons_play.png'),
-          click () {
-            console.log('play clicked')
-            windows.main.webContents.send('SET_PLAYING', { isPlaying: true })
+      // windows.main.webContents.openDevTools()
+
+      if (isWin) {
+        windows.main.setThumbarButtons([
+          {
+            tooltip: 'Play',
+            icon: resolve(__dirname, '../assets/icons_play.png'),
+            click () {
+              console.log('play clicked')
+              windows.main.webContents.send('SET_PLAYING', { isPlaying: true })
+            }
+          },
+          {
+            tooltip: 'Pause',
+            icon: resolve(__dirname, '../assets/icons_pause.png'),
+            click () {
+              console.log('pause clicked.')
+              windows.main.webContents.send('SET_PLAYING', { isPlaying: false })
+            }
           }
-        },
-        {
-          tooltip: 'Pause',
-          icon: resolve(__dirname, '../assets/icons_pause.png'),
-          click () {
-            console.log('pause clicked.')
-            windows.main.webContents.send('SET_PLAYING', { isPlaying: false })
-          }
-        }
-      ])
+        ])
+      }
     }, 200)
   })
 

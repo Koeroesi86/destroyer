@@ -1,6 +1,6 @@
 {
   "name": "electron-music-player",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "description": "Lossless Audio Player",
   "main": "index.js",
   "private": true,
@@ -15,7 +15,19 @@
   "author": "Krisztian Korosi",
   "build": {
     "appId": "com.squirrel.emusic",
+    "productName": "eMusic",
     "compression": "normal",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "electron/**/*",
+      "icons/**/*",
+      "assets/**/*",
+      "config/**/*",
+      "migrations/**/*",
+      "index.js",
+      "package.json"
+    ],
     "win": {
       "icon": "icons/win/icon.ico"
     },
@@ -41,8 +53,8 @@
     "in-view": "^0.6.1",
     "key": "^0.1.11",
     "lodash": "^4.17.10",
+    "mime-types": "^2.1.20",
     "minimist": "^1.2.0",
-    "mmmagic": "^0.5.1",
     "moment": "^2.22.2",
     "music-metadata": "^2.6.1",
     "paper": "^0.11.5",

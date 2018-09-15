@@ -18,18 +18,15 @@ class AlbumDetails extends PureComponent {
 
   componentDidUpdate (prevProps) {
     if (this.props.album !== prevProps.album) {
-      if (!this.props.album) {
-        setTimeout(() => {
-          this.updateDisplayed()
-        }, 2)
-      } else {
-        this.updateDisplayed()
-      }
+      this.updateDisplayed()
     }
   }
 
   updateDisplayed () {
-    this.setState({ album: this.props.album })
+    clearTimeout(this.debounced)
+    this.debounced = setTimeout(() => {
+      this.setState({ album: this.props.album })
+    }, 2)
   }
 
   render () {
