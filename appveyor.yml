@@ -7,7 +7,6 @@ environment:
     - nodejs_version: 9
 platform:
   - x64
-  - Any CPU
 init:
   - git config --global core.autocrlf true
 install:
