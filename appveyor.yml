@@ -15,13 +15,15 @@ install:
 build_script:
   - yarn build
   - yarn dist
+  - for /f %a in ('dir /b /s dist\eMusic*.exe') do xcopy "%a" .\ /i
+  - copy dist/latest.yml latest.yml
 test: off
 cache:
   - "%LOCALAPPDATA%\\Yarn"
   - node_modules -> package.json
   - '%USERPROFILE%\.electron'
 artifacts:
-  - path: dist/*.exe
+  - path: ./eMusic*.exe
     name: Installer
-  - path: dist/**/latest.yml
+  - path: latest.yml
     name: Latest
