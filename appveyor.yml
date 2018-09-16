@@ -23,5 +23,5 @@ cache:
 artifacts:
   - path: dist/*.exe
     name: Installer
-  - path: dist\latest.yml
-    name: Latest
+  - path: dist/*.yml
+    name: Yamls
