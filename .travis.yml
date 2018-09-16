@@ -29,7 +29,8 @@ script:
   - yarn build
   - yarn dist
 deploy:
+  skip_cleanup: true
   provider: script
-  script: ./travis-deploy.sh
+  script: "/bin/sh ./travis-deploy.sh"
 #  on:
 #    tags: true
