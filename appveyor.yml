@@ -15,7 +15,6 @@ install:
 build_script:
   - yarn build
   - yarn dist
-  - Start-Sleep -s 5
 test: off
 cache:
   - "%LOCALAPPDATA%\\Yarn"
