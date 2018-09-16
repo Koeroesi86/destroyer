@@ -18,7 +18,8 @@ build_script:
   - ps: Start-Sleep -s 5
 test: off
 cache:
-  - "%LOCALAPPDATA%\\Yarn"
+  - '%LOCALAPPDATA%\Yarn'
+  - '%APPDATA%\npm-cache'
   - node_modules -> package.json
   - '%USERPROFILE%\.electron'
 artifacts:
