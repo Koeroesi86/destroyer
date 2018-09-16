@@ -39,7 +39,7 @@
     "linux": {
       "executableName": "eMusic",
       "target": [
-        "AppImage", "snap", "deb", "rpm", "freebsd", "pacman", "p5p", "apk", "7z", "zip", "tar.xz", "tar.lz", "tar.gz"
+        "AppImage", "snap", "deb", "rpm", "freebsd", "pacman", "p5p", "apk", "7z", "zip", "tar.gz"
       ],
       "icon": "icons/png/"
     }
