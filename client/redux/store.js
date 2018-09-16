@@ -1,7 +1,7 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import connectionMiddleware from './redux/connection/middleware'
-import uiStateMiddleware from './redux/uiState/middleware'
-import reducers from './redux/reducers'
+import connectionMiddleware from './connection/middleware'
+import uiStateMiddleware from './uiState/middleware'
+import reducers from './reducers'
 
 const initialState = {}
 

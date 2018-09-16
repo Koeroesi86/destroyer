@@ -33,7 +33,7 @@ class PlayerControls extends PureComponent {
       }
     })
 
-    const round = (number) => Math.floor(number)
+    const round = (number) => Math.floor(number * 100)
     this.props.addTimeChangeListener(currentTime => {
       if (round(currentTime) !== round(this.props.currentTime)) {
         this.props.setCurrentTime(currentTime)
@@ -44,6 +44,15 @@ class PlayerControls extends PureComponent {
   componentDidUpdate (prevProps) {
     if (this.props.currentTime !== prevProps.currentTime) {
       this.props.seek(this.props.currentTime)
+    }
+
+    if (this.props.isPlaying !== prevProps.isPlaying) {
+      if (this.props.isPlaying) this.props.play()
+      else this.props.pause()
+    }
+
+    if (this.props.currentSong !== prevProps.currentSong) {
+      if (this.props.isPlaying) this.props.play()
     }
   }
 

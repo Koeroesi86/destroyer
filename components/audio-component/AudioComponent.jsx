@@ -49,7 +49,6 @@ class AudioComponent extends PureComponent {
           this.audio = a
         }}
         crossOrigin='anonymous'
-        preload='true'
         onEnded={trackEnded}
       />
     )
