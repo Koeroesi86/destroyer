@@ -28,9 +28,10 @@ script:
   - yarn install
   - yarn build
   - yarn dist
-#deploy:
-#  provider: releases
-#  api_key: $ENCRYPTED_GITHUB_TOKEN
-#  skip_cleanup: true
+deploy:
+  provider: script
+  script:
+    - cd dist
+    - curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} -T latest.yml --key /tmp/sftp_rsa sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}
 #  on:
 #    tags: true
