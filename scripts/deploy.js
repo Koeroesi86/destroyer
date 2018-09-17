@@ -35,5 +35,5 @@ sftp.connect({
     const f = foundFiles.map(localFilePath => sftp.put(localFilePath, `${SFTP_PATH}/${TRAVIS_OS_NAME}`))
     return Promise.all(f)
   })
-  .then(() => sftp.list('/pathname'))
+  .then(() => sftp.list(`${SFTP_PATH}/${TRAVIS_OS_NAME}`))
   .then((data) => console.log(data))
