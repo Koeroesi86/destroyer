@@ -23,7 +23,7 @@ cache:
   - node_modules -> package.json
   - '%USERPROFILE%\.electron'
 artifacts:
-  - path: dist/*.exe
+  - path: dist/eMusic*
     name: Installer
   - path: dist/latest.yml
     name: Latest
