@@ -11,8 +11,8 @@ const isWin = process.platform === 'win32'
 const isMac = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 
-process.env.DEBUG = 'electron-builder' // TODO: find another way to log
-process.env.NODE_OPTIONS = '--max-old-space-size=2048'
+// process.env.DEBUG = 'electron-builder' // TODO: find another way to log
+// process.env.NODE_OPTIONS = '--max-old-space-size=2048'
 
 const distPath = resolve(cwd, './dist')
 if (fs.existsSync(distPath)) {

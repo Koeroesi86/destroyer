@@ -34,11 +34,12 @@
       "package.json"
     ],
     "win": {
-      "icon": "icons/win/icon.ico"
+      "icon": "icons/win/icon.ico",
+      "target": [ "nsis", "msi", "zip" ]
     },
     "mac": {
       "category": "public.app-category.music",
-      "target": "dmg",
+      "target": [ "dmg", "zip" ],
       "icon": "icons/mac/icon.icns"
     },
     "linux": {
