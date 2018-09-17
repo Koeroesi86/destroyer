@@ -43,11 +43,18 @@
       "icon": "icons/mac/icon.icns"
     },
     "linux": {
+      "artifactName": "eMusic-${version}",
       "executableName": "eMusic",
       "target": [
         "AppImage", "snap", "deb", "rpm", "freebsd", "pacman", "p5p", "apk", "7z", "zip", "tar.gz"
       ],
       "icon": "icons/png/"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "http://localhost",
+      "channel": "latest",
+      "publishAutoUpdate": true
     }
   },
   "license": "ISC",
