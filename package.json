@@ -17,6 +17,7 @@
     "email": "koeroesi86@gmail.com",
     "url": "http://chris.koro.si"
   },
+  "homepage": "https://github.com/Koeroesi86/electron-music-player",
   "build": {
     "appId": "com.squirrel.emusic",
     "productName": "eMusic",
