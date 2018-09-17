@@ -12,7 +12,12 @@
     "start": "electron index.js",
     "dist": "node scripts/dist.js"
   },
-  "author": "Krisztian Korosi",
+  "author": {
+    "name": "Krisztian Korosi",
+    "email": "koeroesi86@gmail.com",
+    "url": "http://chris.koro.si"
+  },
+  "homepage": "https://github.com/Koeroesi86/electron-music-player",
   "build": {
     "appId": "com.squirrel.emusic",
     "productName": "eMusic",
