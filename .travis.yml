@@ -31,7 +31,7 @@ script:
 deploy:
   skip_cleanup: true
   provider: script
-  script: "node scripts/deploy.js"
-#  script: "/bin/sh ./travis-deploy.sh"
+#  script: "node scripts/deploy.js"
+  script: "/bin/sh ./travis-deploy.sh"
 #  on:
 #    tags: true
