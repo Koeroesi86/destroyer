@@ -30,7 +30,10 @@ sftp.connect({
   port: '22',
   username: SFTP_USER,
   password: SFTP_PASSWORD
-}).then(() => {
-  const f = foundFiles.map(localFilePath => sftp.put(localFilePath, `${SFTP_PATH}/${TRAVIS_OS_NAME}`))
-  return Promise.all(f)
-}).then(() => sftp.list('/pathname'))
+})
+  .then(() => {
+    const f = foundFiles.map(localFilePath => sftp.put(localFilePath, `${SFTP_PATH}/${TRAVIS_OS_NAME}`))
+    return Promise.all(f)
+  })
+  .then(() => sftp.list('/pathname'))
+  .then((data) => console.log(data))
