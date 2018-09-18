@@ -1,23 +1,11 @@
 #!/usr/bin/env bash
 
-if [ "$TRAVIS_OS_NAME" = "osx" ]
-then
-    brew update;
-    brew install curl;
-    export PATH="/usr/local/opt/curl/bin:$PATH";
-fi
-
-if [ "$TRAVIS_OS_NAME" = "linux" ]
-then
-    apt-get update;
-    apt-get install -y curl;
-fi
-
 cd dist
 ls -la
-echo uploading to sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}
-find ./ -name 'eMusic-*' -type f -exec curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} --verbose --fail -T {} sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}/{} \; -exec echo {} \;
+#echo uploading to sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}
+#find ./ -name 'eMusic-*' -type f -exec curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} --verbose --fail -T {} sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}/{} \; -exec echo {} \;
+rsync -ue "ssh" ./eMusic-* ${SFTP_USER}:${SFTP_PASSWORD}@${SFTP_HOST}:${SFTP_PATH}/${TRAVIS_OS_NAME}/
 echo "Uploaded package"
-find ./ -name 'latest*.yml' -type f -exec curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} --verbose --fail -T {} sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}/{} \; -exec echo {} \;
+#find ./ -name 'latest*.yml' -type f -exec curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} --verbose --fail -T {} sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}/{} \; -exec echo {} \;
 #curl -k -u ${SFTP_USER}:${SFTP_PASSWORD} --verbose --fail -T ./latest-mac.yml sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}/latest-mac.yml
 #echo "Uploaded latest-mac.yml"
