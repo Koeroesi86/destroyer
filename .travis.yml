@@ -16,6 +16,9 @@ matrix:
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 #before_cache:
 #  - rm -rf $HOME/.cache/electron-builder/wine
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install curl && brew link curl --force; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget https://curl.haxx.se/download/curl-7.61.1.tar.gz && tar -xvf curl-7.61.1.tar.gz && cd curl-7* && ./configure && make &&make install; fi
 cache:
   yarn: true
   directories:
