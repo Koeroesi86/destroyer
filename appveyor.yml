@@ -5,6 +5,7 @@ skip_tags: true
 environment:
   matrix:
     - nodejs_version: 9
+      APPVEYOR_CACHE_ENTRY_ZIP_ARGS: '-t7z -m0=lzma -mx=9'
 platform:
   - x64
 init:

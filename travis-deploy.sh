@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+if [ "$TRAVIS_OS_NAME" = "osx" ]
+then
     brew update;
     brew install curl;
-    brew link curl --force;
+    export PATH="/usr/local/opt/curl/bin:$PATH";
 fi
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+
+if [ "$TRAVIS_OS_NAME" = "linux" ]
+then
     apt-get update;
     apt-get install -y curl;
 fi
