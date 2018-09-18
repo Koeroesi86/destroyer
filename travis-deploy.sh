@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    brew update;
+    brew install curl;
+    brew link curl --force;
+fi
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    apt-get update;
+    apt-get install -y curl;
+fi
+
 cd dist
 ls -la
 echo uploading to sftp://${SFTP_HOST}${SFTP_PATH}/${TRAVIS_OS_NAME}
