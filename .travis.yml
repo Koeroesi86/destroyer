@@ -34,9 +34,7 @@ deploy:
   api_key: $PUBLISH_TOKEN
   file_glob: true
   draft: true
+  overwrite: true
   file: dist/*
-#  provider: script
-#  script: "node scripts/deploy.js"
-#  script: "/bin/sh ./travis-deploy.sh"
-#  on:
-#    tags: true
+  on:
+    tags: true
