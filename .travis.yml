@@ -30,8 +30,13 @@ script:
   - yarn dist
 deploy:
   skip_cleanup: true
-  provider: script
+  provider: releases
+  api_key: $PUBLISH_TOKEN
+  file_glob: true
+  draft: true
+  file: dist/*
+#  provider: script
 #  script: "node scripts/deploy.js"
-  script: "/bin/sh ./travis-deploy.sh"
+#  script: "/bin/sh ./travis-deploy.sh"
 #  on:
 #    tags: true
